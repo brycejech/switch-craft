@@ -2,7 +2,8 @@
 
 docker build -t switchcraft .
 
-# Run with .env
+# Migrate database up, use local .env file
 docker run --rm -p 8080:8080 --net switchcraft_network --env-file .env switchcraft migrate up
 
-# docker run --rm -p 8080:8080 --net switchcraft_network --env-file .env switchcraft serve
+# List accounts
+# docker run --rm -p 8080:8080 --net switchcraft_network --env-file .env switchcraft account getMany
