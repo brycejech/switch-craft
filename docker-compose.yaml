@@ -13,6 +13,7 @@ services:
       - '5432:5432'
 
   switchcraft_pgadmin:
+    container_name: switchcraft_pg_admin
     image: elestio/pgadmin:latest
     restart: always
     env_file: .env

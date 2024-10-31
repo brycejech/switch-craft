@@ -27,10 +27,13 @@ var globalCtx = context.Background()
 
 func main() {
 	db := mustInitDb(globalCtx)
-	repo := repository.NewRepository(db)
-	core := core.NewCore(repo)
 
-	cli.Start(core)
+	repo := repository.NewRepository(db)
+	accountRepo := repository.NewAccountRepository(db)
+
+	switchcraft := core.NewCore(repo, accountRepo)
+
+	cli.Start(switchcraft)
 }
 
 func mustInitDb(ctx context.Context) *pgxpool.Pool {

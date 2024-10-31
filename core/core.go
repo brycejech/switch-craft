@@ -1,13 +1,20 @@
 package core
 
-func NewCore(repository Repository) *Core {
+import (
+	"context"
+	"switchcraft/types"
+)
+
+func NewCore(repo Repo, accountRepo AccountRepo) *Core {
 	return &Core{
-		repository: repository,
+		repository:  repo,
+		accountRepo: accountRepo,
 	}
 }
 
 type Core struct {
-	repository Repository
+	repository  Repo
+	accountRepo AccountRepo
 }
 
 func (c *Core) MigrateUp() error {
@@ -20,7 +27,32 @@ func (c *Core) MigrateDown() error {
 
 /* === PORTS === */
 
-type Repository interface {
+type Repo interface {
 	MigrateUp() error
 	MigrateDown() error
+}
+
+type AccountRepo interface {
+	Create(ctx context.Context,
+		firstName string,
+		lastName string,
+		email string,
+		username string,
+		createdBy int64,
+	) (*types.Account, error)
+	GetMany(ctx context.Context) ([]types.Account, error)
+	GetOne(ctx context.Context,
+		id *int64,
+		uuid *string,
+		username *string,
+	) (*types.Account, error)
+	Update(ctx context.Context,
+		id int64,
+		firstName string,
+		lastName string,
+		email string,
+		username string,
+		modifiedBy int64,
+	) (*types.Account, error)
+	Delete(ctx context.Context, id int64) error
 }
