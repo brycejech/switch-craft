@@ -6,7 +6,7 @@ import (
 	"switchcraft/types"
 )
 
-type createAccountArgs struct {
+type accountCreateArgs struct {
 	firstName string
 	lastName  string
 	email     string
@@ -14,7 +14,7 @@ type createAccountArgs struct {
 	createdBy int64
 }
 
-func (a *createAccountArgs) Validate() error {
+func (a *accountCreateArgs) Validate() error {
 	if a.firstName == "" {
 		return errors.New("createAccountArgs.firstName cannot be empty")
 	}
@@ -33,14 +33,14 @@ func (a *createAccountArgs) Validate() error {
 	return nil
 }
 
-func NewCreateAccountArgs(
+func NewAccountCreateArgs(
 	firstName string,
 	lastName string,
 	email string,
 	username string,
 	createdBy int64,
-) createAccountArgs {
-	return createAccountArgs{
+) accountCreateArgs {
+	return accountCreateArgs{
 		firstName: firstName,
 		lastName:  lastName,
 		email:     email,
@@ -49,7 +49,7 @@ func NewCreateAccountArgs(
 	}
 }
 
-func (c *Core) CreateAccount(ctx context.Context, args createAccountArgs) (*types.Account, error) {
+func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*types.Account, error) {
 	if err := args.Validate(); err != nil {
 		return nil, err
 	}
@@ -63,32 +63,32 @@ func (c *Core) CreateAccount(ctx context.Context, args createAccountArgs) (*type
 	)
 }
 
-func (c *Core) GetAccounts(ctx context.Context) ([]types.Account, error) {
+func (c *Core) AccountGetMany(ctx context.Context) ([]types.Account, error) {
 	return c.accountRepo.GetMany(ctx)
 }
 
-type getAccountArgs struct {
+type accountGetOneArgs struct {
 	id       *int64
 	uuid     *string
 	username *string
 }
 
-func (a *getAccountArgs) Validate() error {
+func (a *accountGetOneArgs) Validate() error {
 	if a.id == nil && a.uuid == nil && a.username == nil {
 		return errors.New("error: must provide id, uuid, or username")
 	}
 	return nil
 }
 
-func NewGetAccountArgs(id *int64, uuid *string, username *string) getAccountArgs {
-	return getAccountArgs{
+func NewAccountGetOneArgs(id *int64, uuid *string, username *string) accountGetOneArgs {
+	return accountGetOneArgs{
 		id:       id,
 		uuid:     uuid,
 		username: username,
 	}
 }
 
-func (c *Core) GetAccount(ctx context.Context, args getAccountArgs) (*types.Account, error) {
+func (c *Core) AccountGetOne(ctx context.Context, args accountGetOneArgs) (*types.Account, error) {
 	if err := args.Validate(); err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (c *Core) GetAccount(ctx context.Context, args getAccountArgs) (*types.Acco
 	return c.accountRepo.GetOne(ctx, args.id, args.uuid, args.username)
 }
 
-type updateAccountArgs struct {
+type accountUpdateArgs struct {
 	id         int64
 	firstName  string
 	lastName   string
@@ -105,19 +105,19 @@ type updateAccountArgs struct {
 	modifiedBy int64
 }
 
-func (a *updateAccountArgs) Validate() error {
+func (a *accountUpdateArgs) Validate() error {
 	return nil
 }
 
-func NewUpdateAccountArgs(
+func NewAccountUpdateArgs(
 	id int64,
 	firstName string,
 	lastName string,
 	email string,
 	username string,
 	modifiedBy int64,
-) updateAccountArgs {
-	return updateAccountArgs{
+) accountUpdateArgs {
+	return accountUpdateArgs{
 		id:         id,
 		firstName:  firstName,
 		lastName:   lastName,
@@ -127,7 +127,7 @@ func NewUpdateAccountArgs(
 	}
 }
 
-func (c *Core) UpdateAccount(ctx context.Context, args updateAccountArgs) (*types.Account, error) {
+func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*types.Account, error) {
 	if err := args.Validate(); err != nil {
 		return nil, err
 	}
@@ -142,6 +142,6 @@ func (c *Core) UpdateAccount(ctx context.Context, args updateAccountArgs) (*type
 	)
 }
 
-func (c *Core) DeleteAccount(ctx context.Context, id int64) error {
+func (c *Core) AccountDelete(ctx context.Context, id int64) error {
 	return c.accountRepo.Delete(ctx, id)
 }

@@ -24,7 +24,7 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "getMany",
 		Short: "Get multiple accounts",
 		Run: func(cmd *cobra.Command, args []string) {
-			accounts, err := switchcraft.GetAccounts(ctx)
+			accounts, err := switchcraft.AccountGetMany(ctx)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -47,7 +47,7 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "create",
 		Short: "Create new account",
 		Run: func(cmd *cobra.Command, _ []string) {
-			args := core.NewCreateAccountArgs(
+			args := core.NewAccountCreateArgs(
 				createAccountCmdArgs.FirstName,
 				createAccountCmdArgs.LastName,
 				createAccountCmdArgs.Email,
@@ -55,7 +55,7 @@ func registerAccountModule(switchcraft *core.Core) {
 				createAccountCmdArgs.CreatedBy,
 			)
 
-			account, err := switchcraft.CreateAccount(ctx, args)
+			account, err := switchcraft.AccountCreate(ctx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -100,13 +100,13 @@ func registerAccountModule(switchcraft *core.Core) {
 				username = &getAccountUsername
 			}
 
-			args := core.NewGetAccountArgs(
+			args := core.NewAccountGetOneArgs(
 				id,
 				uuid,
 				username,
 			)
 
-			account, err := switchcraft.GetAccount(ctx, args)
+			account, err := switchcraft.AccountGetOne(ctx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -133,7 +133,7 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "update",
 		Short: "Update an existing account",
 		Run: func(cmd *cobra.Command, _ []string) {
-			args := core.NewUpdateAccountArgs(
+			args := core.NewAccountUpdateArgs(
 				updateAccountCmdArgs.ID,
 				updateAccountCmdArgs.FirstName,
 				updateAccountCmdArgs.LastName,
@@ -142,7 +142,7 @@ func registerAccountModule(switchcraft *core.Core) {
 				updateAccountCmdArgs.ModifiedBy,
 			)
 
-			account, err := switchcraft.UpdateAccount(ctx, args)
+			account, err := switchcraft.AccountUpdate(ctx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -172,7 +172,7 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "delete",
 		Short: "Delete an account",
 		Run: func(cmd *cobra.Command, _ []string) {
-			if err := switchcraft.DeleteAccount(ctx, deleteAccountID); err != nil {
+			if err := switchcraft.AccountDelete(ctx, deleteAccountID); err != nil {
 				log.Fatal(err)
 			}
 			fmt.Printf("Account '%v' deleted successfully\n", deleteAccountID)
