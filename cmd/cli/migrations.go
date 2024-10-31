@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initMigrationsModule(core *core.Core) {
+func registerMigrationsModule(core *core.Core) {
 	var migrateCmd = &cobra.Command{
 		Use:   "migrate",
 		Short: "SwitchCraft CLI migrations module",

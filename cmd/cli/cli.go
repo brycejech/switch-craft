@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"encoding/json"
+	"fmt"
 	"switchcraft/core"
 
 	"github.com/spf13/cobra"
@@ -11,10 +13,16 @@ var rootCmd = &cobra.Command{
 	Short: "SwitchCraft CLI",
 }
 
-func Start(core *core.Core) {
+func Start(switchcraft *core.Core) {
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 
-	initMigrationsModule(core)
+	registerMigrationsModule(switchcraft)
+	registerAccountModule(switchcraft)
 
 	rootCmd.Execute()
+}
+
+func printJSON(v interface{}) {
+	bytes, _ := json.MarshalIndent(v, "", "  ")
+	fmt.Println(string(bytes))
 }
