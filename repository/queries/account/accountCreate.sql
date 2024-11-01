@@ -1,6 +1,7 @@
 
 INSERT INTO account.account(
-	  first_name
+	  tenant_id
+	, first_name
 	, last_name
 	, email
 	, username
@@ -13,10 +14,12 @@ VALUES (
 	, $3
 	, $4
 	, $5
+	, $6
 )
 
 RETURNING
-	  id
+	  tenant_id
+	, id
 	, uuid
 	, first_name
 	, last_name

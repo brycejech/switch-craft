@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"switchcraft/repository/queries"
 	"switchcraft/types"
@@ -21,6 +22,7 @@ type accountRepository struct {
 }
 
 func (r *accountRepository) Create(ctx context.Context,
+	tenantID int64,
 	firstName string,
 	lastName string,
 	email string,
@@ -37,6 +39,7 @@ func (r *accountRepository) Create(ctx context.Context,
 	if rows, err = r.db.Query(
 		ctx,
 		queries.AccountCreate,
+		tenantID,
 		firstName,
 		lastName,
 		email,
@@ -53,7 +56,7 @@ func (r *accountRepository) Create(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepository) GetMany(ctx context.Context) ([]types.Account, error) {
+func (r *accountRepository) GetMany(ctx context.Context, tenantID int64) ([]types.Account, error) {
 
 	var (
 		accounts []types.Account
@@ -61,7 +64,7 @@ func (r *accountRepository) GetMany(ctx context.Context) ([]types.Account, error
 		err      error
 	)
 
-	if rows, err = r.db.Query(ctx, queries.AccountGetMany); err != nil {
+	if rows, err = r.db.Query(ctx, queries.AccountGetMany, tenantID); err != nil {
 		return nil, handleError(err)
 	}
 
@@ -73,6 +76,7 @@ func (r *accountRepository) GetMany(ctx context.Context) ([]types.Account, error
 }
 
 func (r *accountRepository) GetOne(ctx context.Context,
+	tenantID int64,
 	id *int64,
 	uuid *string,
 	username *string,
@@ -92,6 +96,7 @@ func (r *accountRepository) GetOne(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.AccountGetOne,
+		tenantID,
 		id,
 		uuid,
 		username,
@@ -107,6 +112,7 @@ func (r *accountRepository) GetOne(ctx context.Context,
 }
 
 func (r *accountRepository) Update(ctx context.Context,
+	tenantID int64,
 	id int64,
 	firstName string,
 	lastName string,
@@ -123,6 +129,7 @@ func (r *accountRepository) Update(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.AccountUpdate,
+		tenantID,
 		id,
 		firstName,
 		lastName,
@@ -140,9 +147,21 @@ func (r *accountRepository) Update(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepository) Delete(ctx context.Context, id int64) error {
-	if _, err := r.db.Query(ctx, queries.AccountDelete, id); err != nil {
+func (r *accountRepository) Delete(ctx context.Context, tenantID int64, id int64) error {
+	row := r.db.QueryRow(ctx, queries.AccountDelete, tenantID, id)
+
+	var numDeleted int64
+	if err := row.Scan(&numDeleted); err != nil {
 		return handleError(err)
 	}
+
+	if numDeleted < 1 {
+		return errors.New("no rows deleted")
+	}
+
+	if numDeleted > 1 {
+		return errors.New(fmt.Sprintf("expected to delete 1 row, deleted %v", numDeleted))
+	}
+
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 )
 
 type accountCreateArgs struct {
+	tenantID  int64
 	firstName string
 	lastName  string
 	email     string
@@ -34,6 +35,7 @@ func (a *accountCreateArgs) Validate() error {
 }
 
 func NewAccountCreateArgs(
+	tenantID int64,
 	firstName string,
 	lastName string,
 	email string,
@@ -41,6 +43,7 @@ func NewAccountCreateArgs(
 	createdBy int64,
 ) accountCreateArgs {
 	return accountCreateArgs{
+		tenantID:  tenantID,
 		firstName: firstName,
 		lastName:  lastName,
 		email:     email,
@@ -55,6 +58,7 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 	}
 
 	return c.accountRepo.Create(ctx,
+		args.tenantID,
 		args.firstName,
 		args.lastName,
 		args.email,
@@ -63,11 +67,12 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 	)
 }
 
-func (c *Core) AccountGetMany(ctx context.Context) ([]types.Account, error) {
-	return c.accountRepo.GetMany(ctx)
+func (c *Core) AccountGetMany(ctx context.Context, tenantID int64) ([]types.Account, error) {
+	return c.accountRepo.GetMany(ctx, tenantID)
 }
 
 type accountGetOneArgs struct {
+	tenantID int64
 	id       *int64
 	uuid     *string
 	username *string
@@ -80,8 +85,9 @@ func (a *accountGetOneArgs) Validate() error {
 	return nil
 }
 
-func NewAccountGetOneArgs(id *int64, uuid *string, username *string) accountGetOneArgs {
+func NewAccountGetOneArgs(tenantID int64, id *int64, uuid *string, username *string) accountGetOneArgs {
 	return accountGetOneArgs{
+		tenantID: tenantID,
 		id:       id,
 		uuid:     uuid,
 		username: username,
@@ -93,10 +99,11 @@ func (c *Core) AccountGetOne(ctx context.Context, args accountGetOneArgs) (*type
 		return nil, err
 	}
 
-	return c.accountRepo.GetOne(ctx, args.id, args.uuid, args.username)
+	return c.accountRepo.GetOne(ctx, args.tenantID, args.id, args.uuid, args.username)
 }
 
 type accountUpdateArgs struct {
+	tenantID   int64
 	id         int64
 	firstName  string
 	lastName   string
@@ -110,6 +117,7 @@ func (a *accountUpdateArgs) Validate() error {
 }
 
 func NewAccountUpdateArgs(
+	tenantID int64,
 	id int64,
 	firstName string,
 	lastName string,
@@ -118,6 +126,7 @@ func NewAccountUpdateArgs(
 	modifiedBy int64,
 ) accountUpdateArgs {
 	return accountUpdateArgs{
+		tenantID:   tenantID,
 		id:         id,
 		firstName:  firstName,
 		lastName:   lastName,
@@ -133,6 +142,7 @@ func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*type
 	}
 
 	return c.accountRepo.Update(ctx,
+		args.tenantID,
 		args.id,
 		args.firstName,
 		args.lastName,
@@ -142,6 +152,6 @@ func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*type
 	)
 }
 
-func (c *Core) AccountDelete(ctx context.Context, id int64) error {
-	return c.accountRepo.Delete(ctx, id)
+func (c *Core) AccountDelete(ctx context.Context, tenantID int64, id int64) error {
+	return c.accountRepo.Delete(ctx, tenantID, id)
 }

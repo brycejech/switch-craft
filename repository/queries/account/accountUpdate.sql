@@ -2,18 +2,20 @@
 UPDATE account.account
 
 SET
-	  first_name = $2
-	, last_name = $3
-	, email = $4
-	, username = $5
+	  first_name = $3
+	, last_name = $4
+	, email = $5
+	, username = $6
 	, modified = (now() at time zone 'utc')
-	, modified_by = $6
+	, modified_by = $7
 
 WHERE
-	id = $1
+	    tenant_id = $1
+	AND id = $2
 
 RETURNING
-	  id
+	  tenant_id
+	, id
 	, uuid
 	, first_name
 	, last_name

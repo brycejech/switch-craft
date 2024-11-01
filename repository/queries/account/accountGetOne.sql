@@ -1,6 +1,7 @@
 
 SELECT
-	  id
+	  tenant_id
+	, id
 	, uuid
 	, first_name
 	, last_name
@@ -15,8 +16,10 @@ FROM
 	account.account
 
 WHERE
-      ($1::bigint IS NULL    OR id=$1::bigint)
-  AND (COALESCE($2, '') = '' OR uuid=$2::uuid)
-  AND (COALESCE($3, '') = '' OR username=$3::text)
+      ($2::bigint IS NULL    OR id=$2::bigint)
+  AND (COALESCE($3, '') = '' OR uuid=$3::uuid)
+  AND (COALESCE($4, '') = '' OR username=$4::text)
+
+	AND tenant_id=$1
 
 LIMIT 1;

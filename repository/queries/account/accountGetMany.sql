@@ -1,6 +1,7 @@
 
 SELECT
-	  id
+	  tenant_id
+	, id
 	, uuid
 	, first_name
 	, last_name
@@ -12,4 +13,6 @@ SELECT
 	, modified_by
 
 FROM
-	account.account;
+	account.account
+
+WHERE tenant_id=$1;
