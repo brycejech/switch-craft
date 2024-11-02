@@ -66,7 +66,7 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 	)
 	if args.password != nil {
 		tPass := *args.password
-		if password, err = c.HashPassword(tPass); err != nil {
+		if password, err = c.AuthPasswordHash(tPass); err != nil {
 			return nil, err
 		}
 	}

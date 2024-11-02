@@ -18,6 +18,7 @@ func Start(switchcraft *core.Core) {
 
 	registerMigrationsModule(switchcraft)
 	registerAccountModule(switchcraft)
+	registerAuthModule(switchcraft)
 
 	rootCmd.Execute()
 }

@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"strings"
@@ -32,7 +33,23 @@ var defaultHashParams = &hashParams{
 	keyLength:   32,
 }
 
-func (core *Core) HashPassword(password string) (encodedHash string, err error) {
+func (core *Core) AuthCreateKey(bitLength uint32) (string, error) {
+	if bitLength < 256 {
+		return "", errors.New("error: bitLength must be >= 256")
+	}
+	if bitLength%8 != 0 {
+		return "", errors.New("error: bitLength must be divisible by 8")
+	}
+
+	bytes, err := randomBytes(bitLength / 4)
+	if err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(bytes), nil
+}
+
+func (core *Core) AuthPasswordHash(password string) (encodedHash string, err error) {
 	salt, err := randomBytes(defaultHashParams.saltLength)
 	if err != nil {
 		return "", err
@@ -63,7 +80,7 @@ func (core *Core) HashPassword(password string) (encodedHash string, err error) 
 	return encodedHash, nil
 }
 
-func (core *Core) CheckPassword(password, encodedHash string) (match bool, err error) {
+func (core *Core) AuthPasswordCheck(password, encodedHash string) (match bool, err error) {
 	p, salt, hash, err := decodeHash(encodedHash)
 	if err != nil {
 		return false, err
