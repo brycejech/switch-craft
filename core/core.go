@@ -34,22 +34,23 @@ type Repo interface {
 
 type AccountRepo interface {
 	Create(ctx context.Context,
-		tenantID int64,
+		tenantID *int64,
 		firstName string,
 		lastName string,
 		email string,
 		username string,
+		password *string,
 		createdBy int64,
 	) (*types.Account, error)
-	GetMany(ctx context.Context, tenantID int64) ([]types.Account, error)
+	GetMany(ctx context.Context, tenantID *int64) ([]types.Account, error)
 	GetOne(ctx context.Context,
-		tenantID int64,
+		tenantID *int64,
 		id *int64,
 		uuid *string,
 		username *string,
 	) (*types.Account, error)
 	Update(ctx context.Context,
-		tenantID int64,
+		tenantID *int64,
 		id int64,
 		firstName string,
 		lastName string,
@@ -57,5 +58,5 @@ type AccountRepo interface {
 		username string,
 		modifiedBy int64,
 	) (*types.Account, error)
-	Delete(ctx context.Context, tenantID int64, id int64) error
+	Delete(ctx context.Context, tenantID *int64, id int64) error
 }

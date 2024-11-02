@@ -7,6 +7,7 @@ SELECT
 	, last_name
 	, email
 	, username
+	, password
 	, created
 	, created_by
 	, modified

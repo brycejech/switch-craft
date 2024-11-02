@@ -25,7 +25,12 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "getMany",
 		Short: "Get multiple accounts",
 		Run: func(cmd *cobra.Command, args []string) {
-			accounts, err := switchcraft.AccountGetMany(ctx, getAccountsTenantID)
+			var tenantID *int64
+			if cmd.Flags().Changed("tenantId") {
+				tenantID = &getAccountsTenantID
+			}
+
+			accounts, err := switchcraft.AccountGetMany(ctx, tenantID)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -51,12 +56,18 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "create",
 		Short: "Create new account",
 		Run: func(cmd *cobra.Command, _ []string) {
+
+			var tenantID *int64
+			if cmd.Flags().Changed("tenantId") {
+				tenantID = &createAccountCmdArgs.TenantID
+			}
 			args := core.NewAccountCreateArgs(
-				createAccountCmdArgs.TenantID,
+				tenantID,
 				createAccountCmdArgs.FirstName,
 				createAccountCmdArgs.LastName,
 				createAccountCmdArgs.Email,
 				createAccountCmdArgs.Username,
+				nil,
 				createAccountCmdArgs.CreatedBy,
 			)
 
@@ -70,7 +81,6 @@ func registerAccountModule(switchcraft *core.Core) {
 	}
 
 	createAccountCmd.Flags().Int64Var(&createAccountCmdArgs.TenantID, "tenantId", 0, "account.tenantId")
-	createAccountCmd.MarkFlagRequired("tenantId")
 	createAccountCmd.Flags().StringVar(&createAccountCmdArgs.FirstName, "firstName", "", "account.firstName")
 	createAccountCmd.MarkFlagRequired("firstName")
 	createAccountCmd.Flags().StringVar(&createAccountCmdArgs.LastName, "lastName", "", "account.lastName")
@@ -94,10 +104,14 @@ func registerAccountModule(switchcraft *core.Core) {
 		Short: "Get an account by id, uuid, or username",
 		Run: func(cmd *cobra.Command, _ []string) {
 			var (
+				tenantID *int64
 				id       *int64
 				uuid     *string
 				username *string
 			)
+			if cmd.Flags().Changed("tenantId") {
+				tenantID = &getAccountTenantID
+			}
 			if cmd.Flags().Changed("id") {
 				id = &getAccountID
 			}
@@ -109,7 +123,7 @@ func registerAccountModule(switchcraft *core.Core) {
 			}
 
 			args := core.NewAccountGetOneArgs(
-				getAccountTenantID,
+				tenantID,
 				id,
 				uuid,
 				username,
@@ -124,13 +138,12 @@ func registerAccountModule(switchcraft *core.Core) {
 		},
 	}
 	getAccountCmd.Flags().Int64Var(&getAccountTenantID, "tenantId", 0, "account.tenantId")
-	getAccountCmd.MarkFlagRequired("tenantId")
 	getAccountCmd.Flags().Int64Var(&getAccountID, "id", 0, "account.id")
 	getAccountCmd.Flags().StringVar(&getAccountUUID, "uuid", "", "account.uuid")
 	getAccountCmd.Flags().StringVar(&getAccountUsername, "username", "", "account.username")
 	accountCmd.AddCommand(getAccountCmd)
 
-	/* === GET ACCOUNT CMD === */
+	/* === UPDATE ACCOUNT CMD === */
 	/* ----------------------- */
 	updateAccountCmdArgs := struct {
 		TenantID   int64
@@ -145,8 +158,12 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "update",
 		Short: "Update an existing account",
 		Run: func(cmd *cobra.Command, _ []string) {
+			var tenantID *int64
+			if cmd.Flags().Changed("tenantId") {
+				tenantID = &updateAccountCmdArgs.TenantID
+			}
 			args := core.NewAccountUpdateArgs(
-				updateAccountCmdArgs.TenantID,
+				tenantID,
 				updateAccountCmdArgs.ID,
 				updateAccountCmdArgs.FirstName,
 				updateAccountCmdArgs.LastName,
@@ -165,7 +182,6 @@ func registerAccountModule(switchcraft *core.Core) {
 	}
 
 	updateAccountCmd.Flags().Int64Var(&updateAccountCmdArgs.TenantID, "tenantId", 0, "account.tenantId")
-	updateAccountCmd.MarkFlagRequired("tenantId")
 	updateAccountCmd.Flags().Int64Var(&updateAccountCmdArgs.ID, "id", 0, "account.id")
 	updateAccountCmd.MarkFlagRequired("id")
 	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.FirstName, "firstName", "", "account.firstName")
@@ -188,15 +204,17 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "delete",
 		Short: "Delete an account",
 		Run: func(cmd *cobra.Command, _ []string) {
-			if err := switchcraft.AccountDelete(ctx, deleteAccountTenantID, deleteAccountID); err != nil {
+			var tenantID *int64
+			if cmd.Flags().Changed("tenantId") {
+				tenantID = &deleteAccountTenantID
+			}
+			if err := switchcraft.AccountDelete(ctx, tenantID, deleteAccountID); err != nil {
 				log.Fatal(err)
 			}
 			fmt.Printf("Account '%v' deleted successfully\n", deleteAccountID)
 		},
 	}
 
-	deleteAccountCmd.Flags().Int64Var(&deleteAccountTenantID, "tenantId", 0, "account.tenantId")
-	deleteAccountCmd.MarkFlagRequired("tenantId")
 	deleteAccountCmd.Flags().Int64Var(&deleteAccountID, "id", 0, "account.id")
 	deleteAccountCmd.MarkFlagRequired("id")
 	accountCmd.AddCommand(deleteAccountCmd)

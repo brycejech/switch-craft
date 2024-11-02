@@ -22,11 +22,12 @@ type accountRepository struct {
 }
 
 func (r *accountRepository) Create(ctx context.Context,
-	tenantID int64,
+	tenantID *int64,
 	firstName string,
 	lastName string,
 	email string,
 	username string,
+	password *string,
 	createdBy int64,
 ) (*types.Account, error) {
 
@@ -44,6 +45,7 @@ func (r *accountRepository) Create(ctx context.Context,
 		lastName,
 		email,
 		username,
+		password,
 		createdBy,
 	); err != nil {
 		return nil, handleError(err)
@@ -56,7 +58,7 @@ func (r *accountRepository) Create(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepository) GetMany(ctx context.Context, tenantID int64) ([]types.Account, error) {
+func (r *accountRepository) GetMany(ctx context.Context, tenantID *int64) ([]types.Account, error) {
 
 	var (
 		accounts []types.Account
@@ -76,7 +78,7 @@ func (r *accountRepository) GetMany(ctx context.Context, tenantID int64) ([]type
 }
 
 func (r *accountRepository) GetOne(ctx context.Context,
-	tenantID int64,
+	tenantID *int64,
 	id *int64,
 	uuid *string,
 	username *string,
@@ -87,12 +89,6 @@ func (r *accountRepository) GetOne(ctx context.Context,
 		rows    pgx.Rows
 		err     error
 	)
-
-	if id == nil {
-		fmt.Println("id is null")
-	} else {
-		fmt.Println("id is", *id)
-	}
 
 	if rows, err = r.db.Query(ctx,
 		queries.AccountGetOne,
@@ -112,7 +108,7 @@ func (r *accountRepository) GetOne(ctx context.Context,
 }
 
 func (r *accountRepository) Update(ctx context.Context,
-	tenantID int64,
+	tenantID *int64,
 	id int64,
 	firstName string,
 	lastName string,
@@ -147,7 +143,7 @@ func (r *accountRepository) Update(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepository) Delete(ctx context.Context, tenantID int64, id int64) error {
+func (r *accountRepository) Delete(ctx context.Context, tenantID *int64, id int64) error {
 	row := r.db.QueryRow(ctx, queries.AccountDelete, tenantID, id)
 
 	var numDeleted int64

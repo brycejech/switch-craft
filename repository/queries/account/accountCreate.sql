@@ -5,6 +5,7 @@ INSERT INTO account.account(
 	, last_name
 	, email
 	, username
+	, password
 	, created_by
 )
 
@@ -15,6 +16,7 @@ VALUES (
 	, $4
 	, $5
 	, $6
+	, $7
 )
 
 RETURNING
@@ -25,6 +27,7 @@ RETURNING
 	, last_name
 	, email
 	, username
+	, password
 	, created
 	, created_by
 	, modified
