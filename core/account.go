@@ -61,7 +61,7 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 	}
 
 	var (
-		password string
+		password *string
 		err      error
 	)
 	if args.password != nil {
@@ -77,7 +77,7 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 		args.lastName,
 		args.email,
 		args.username,
-		&password,
+		password,
 		args.createdBy,
 	)
 }

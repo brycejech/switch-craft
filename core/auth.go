@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/subtle"
 	"encoding/base64"
@@ -8,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"switchcraft/types"
 
 	"golang.org/x/crypto/argon2"
 )
@@ -33,7 +35,37 @@ var defaultHashParams = &hashParams{
 	keyLength:   32,
 }
 
-func (core *Core) AuthCreateKey(bitLength uint32) (string, error) {
+func (c *Core) Authn(ctx context.Context, username string, password string) (account *types.Account, ok bool) {
+	var (
+		passwordsMatch bool
+		err            error
+	)
+
+	if account, err = c.AccountGetOne(ctx,
+		NewAccountGetOneArgs(nil, nil, nil, &username),
+	); err != nil {
+		return nil, false
+	}
+
+	if account.Password == nil {
+		return nil, false
+	}
+
+	if passwordsMatch, err = c.AuthPasswordCheck(
+		password,
+		*account.Password,
+	); err != nil {
+		return nil, false
+	}
+
+	if !passwordsMatch {
+		return nil, false
+	}
+
+	return account, true
+}
+
+func (c *Core) AuthCreateSigningKey(bitLength uint32) (string, error) {
 	if bitLength < 256 {
 		return "", errors.New("error: bitLength must be >= 256")
 	}
@@ -49,10 +81,10 @@ func (core *Core) AuthCreateKey(bitLength uint32) (string, error) {
 	return hex.EncodeToString(bytes), nil
 }
 
-func (core *Core) AuthPasswordHash(password string) (encodedHash string, err error) {
+func (c *Core) AuthPasswordHash(password string) (encodedHash *string, err error) {
 	salt, err := randomBytes(defaultHashParams.saltLength)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	hash := argon2.IDKey(
@@ -67,7 +99,7 @@ func (core *Core) AuthPasswordHash(password string) (encodedHash string, err err
 	b64Salt := base64.RawStdEncoding.EncodeToString(salt)
 	b64Hash := base64.RawStdEncoding.EncodeToString(hash)
 
-	encodedHash = fmt.Sprintf(
+	tmpHash := fmt.Sprintf(
 		"$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s",
 		argon2.Version,
 		defaultHashParams.memory,
@@ -77,10 +109,10 @@ func (core *Core) AuthPasswordHash(password string) (encodedHash string, err err
 		b64Hash,
 	)
 
-	return encodedHash, nil
+	return &tmpHash, nil
 }
 
-func (core *Core) AuthPasswordCheck(password, encodedHash string) (match bool, err error) {
+func (c *Core) AuthPasswordCheck(password, encodedHash string) (match bool, err error) {
 	p, salt, hash, err := decodeHash(encodedHash)
 	if err != nil {
 		return false, err

@@ -62,7 +62,7 @@ func registerAuthModule(switchcraft *core.Core) {
 		Use:   "createSigningKey",
 		Short: "Create a cryptographically secure signing key encoded to hexadecimal",
 		Run: func(cmd *cobra.Command, args []string) {
-			key, err := switchcraft.AuthCreateKey(createSigningKeyCmdKeyLength)
+			key, err := switchcraft.AuthCreateSigningKey(createSigningKeyCmdKeyLength)
 			if err != nil {
 				log.Fatal(err)
 			}
