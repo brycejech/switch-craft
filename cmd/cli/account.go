@@ -1,17 +1,16 @@
 package cli
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"switchcraft/core"
+	"switchcraft/types"
+	"time"
 
 	"github.com/spf13/cobra"
 )
 
 func registerAccountModule(switchcraft *core.Core) {
-	ctx := context.Background()
-
 	var accountCmd = &cobra.Command{
 		Use:   "account",
 		Short: "SwitchCraft CLI account module",
@@ -25,12 +24,15 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "getMany",
 		Short: "Get multiple accounts",
 		Run: func(cmd *cobra.Command, args []string) {
+			authAccount := mustAuthn(switchcraft)
+			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
+
 			var tenantID *int64
 			if cmd.Flags().Changed("tenantId") {
 				tenantID = &getAccountsTenantID
 			}
 
-			accounts, err := switchcraft.AccountGetMany(ctx, tenantID)
+			accounts, err := switchcraft.AccountGetMany(opCtx, tenantID)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -56,22 +58,19 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "create",
 		Short: "Create new account",
 		Run: func(cmd *cobra.Command, _ []string) {
+			authAccount := mustAuthn(switchcraft)
+			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			var tenantID *int64
-			if cmd.Flags().Changed("tenantId") {
-				tenantID = &createAccountCmdArgs.TenantID
-			}
 			args := core.NewAccountCreateArgs(
-				tenantID,
+				createAccountCmdArgs.TenantID,
 				createAccountCmdArgs.FirstName,
 				createAccountCmdArgs.LastName,
 				createAccountCmdArgs.Email,
 				createAccountCmdArgs.Username,
 				nil,
-				createAccountCmdArgs.CreatedBy,
 			)
 
-			account, err := switchcraft.AccountCreate(ctx, args)
+			account, err := switchcraft.AccountCreate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -103,6 +102,9 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "getOne",
 		Short: "Get an account by id, uuid, or username",
 		Run: func(cmd *cobra.Command, _ []string) {
+			authAccount := mustAuthn(switchcraft)
+			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
+
 			var (
 				tenantID *int64
 				id       *int64
@@ -129,7 +131,7 @@ func registerAccountModule(switchcraft *core.Core) {
 				username,
 			)
 
-			account, err := switchcraft.AccountGetOne(ctx, args)
+			account, err := switchcraft.AccountGetOne(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -158,6 +160,9 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "update",
 		Short: "Update an existing account",
 		Run: func(cmd *cobra.Command, _ []string) {
+			authAccount := mustAuthn(switchcraft)
+			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
+
 			var tenantID *int64
 			if cmd.Flags().Changed("tenantId") {
 				tenantID = &updateAccountCmdArgs.TenantID
@@ -172,7 +177,7 @@ func registerAccountModule(switchcraft *core.Core) {
 				updateAccountCmdArgs.ModifiedBy,
 			)
 
-			account, err := switchcraft.AccountUpdate(ctx, args)
+			account, err := switchcraft.AccountUpdate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -204,11 +209,14 @@ func registerAccountModule(switchcraft *core.Core) {
 		Use:   "delete",
 		Short: "Delete an account",
 		Run: func(cmd *cobra.Command, _ []string) {
+			authAccount := mustAuthn(switchcraft)
+			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
+
 			var tenantID *int64
 			if cmd.Flags().Changed("tenantId") {
 				tenantID = &deleteAccountTenantID
 			}
-			if err := switchcraft.AccountDelete(ctx, tenantID, deleteAccountID); err != nil {
+			if err := switchcraft.AccountDelete(opCtx, tenantID, deleteAccountID); err != nil {
 				log.Fatal(err)
 			}
 			fmt.Printf("Account '%v' deleted successfully\n", deleteAccountID)

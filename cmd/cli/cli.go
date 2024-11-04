@@ -37,7 +37,7 @@ func Start(switchcraft *core.Core) {
 	rootCmd.Execute()
 }
 
-func authn(switchcraft *core.Core) (account *types.Account, ok bool) {
+func mustAuthn(switchcraft *core.Core) (account *types.Account) {
 	var (
 		username = os.Getenv("SWITCHCRAFT_USER")
 		password = os.Getenv("SWITCHCRAFT_PASS")
@@ -46,7 +46,11 @@ func authn(switchcraft *core.Core) (account *types.Account, ok bool) {
 		log.Fatal("Must provide SWITCHCRAFT_USER and SWITCHCRAFT_PASS env vars to use CLI")
 	}
 
-	return switchcraft.Authn(baseCtx, username, password)
+	account, ok := switchcraft.Authn(baseCtx, username, password)
+	if !ok {
+		log.Fatal("Unable to authenticate local account")
+	}
+	return account
 }
 
 func printJSON(v interface{}) {

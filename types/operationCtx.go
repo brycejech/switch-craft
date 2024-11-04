@@ -15,9 +15,9 @@ const (
 )
 
 type OperationTracker struct {
-	traceID     string
-	startTime   time.Time
-	authAccount Account
+	TraceID     string
+	StartTime   time.Time
+	AuthAccount Account
 }
 
 func NewOperationCtx(
@@ -35,9 +35,9 @@ func NewOperationCtx(
 		traceID = safeishUUIDV4()
 	}
 	operationTracker := OperationTracker{
-		traceID:     traceID,
-		startTime:   startTime,
-		authAccount: authAccount,
+		TraceID:     traceID,
+		StartTime:   startTime,
+		AuthAccount: authAccount,
 	}
 
 	return context.WithValue(baseContext, CtxOperationTracker, operationTracker)

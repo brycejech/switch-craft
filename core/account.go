@@ -7,16 +7,18 @@ import (
 )
 
 type accountCreateArgs struct {
-	tenantID  *int64
+	tenantID  int64
 	firstName string
 	lastName  string
 	email     string
 	username  string
 	password  *string
-	createdBy int64
 }
 
 func (a *accountCreateArgs) Validate() error {
+	if a.tenantID < 1 {
+		return errors.New("createAccountArgs.tenantID must be positive integer")
+	}
 	if a.firstName == "" {
 		return errors.New("createAccountArgs.firstName cannot be empty")
 	}
@@ -29,20 +31,16 @@ func (a *accountCreateArgs) Validate() error {
 	if a.username == "" {
 		return errors.New("createAccountArgs.username cannot be empty")
 	}
-	if a.createdBy == 0 {
-		return errors.New("createAccountArgs.createdBy cannot be empty")
-	}
 	return nil
 }
 
 func NewAccountCreateArgs(
-	tenantID *int64,
+	tenantID int64,
 	firstName string,
 	lastName string,
 	email string,
 	username string,
 	password *string,
-	createdBy int64,
 ) accountCreateArgs {
 	return accountCreateArgs{
 		tenantID:  tenantID,
@@ -51,34 +49,97 @@ func NewAccountCreateArgs(
 		email:     email,
 		username:  username,
 		password:  password,
-		createdBy: createdBy,
 	}
 }
 
 func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*types.Account, error) {
+	opCtx, ok := ctx.Value(types.CtxOperationTracker).(types.OperationTracker)
+	if !ok {
+		return nil, errors.New("error: invalid operation context")
+	}
+
 	if err := args.Validate(); err != nil {
 		return nil, err
 	}
 
-	var (
-		password *string
-		err      error
-	)
+	var password *string
 	if args.password != nil {
-		tPass := *args.password
-		if password, err = c.AuthPasswordHash(tPass); err != nil {
+		tmpPass, err := c.AuthPasswordHash(*args.password)
+		if err != nil {
 			return nil, err
+		}
+		if tmpPass == "" {
+			password = nil
+		} else {
+			password = &tmpPass
 		}
 	}
 
 	return c.accountRepo.Create(ctx,
-		args.tenantID,
+		&args.tenantID,
 		args.firstName,
 		args.lastName,
 		args.email,
 		args.username,
 		password,
-		args.createdBy,
+		opCtx.AuthAccount.ID,
+	)
+}
+
+type accountCreateGlobalArgs struct {
+	firstName string
+	lastName  string
+	email     string
+	username  string
+	password  string
+}
+
+func (a *accountCreateGlobalArgs) Validate() error {
+	if len(a.password) < 12 {
+		return errors.New("accountCreateGlobalArgs.password must be at least 12 characters")
+	}
+	return nil
+}
+
+func NewAccountCreateGlobalArgs(
+	firstName string,
+	lastName string,
+	email string,
+	username string,
+	password string,
+) accountCreateGlobalArgs {
+	return accountCreateGlobalArgs{
+		firstName: firstName,
+		lastName:  lastName,
+		email:     email,
+		username:  username,
+		password:  password,
+	}
+}
+
+func (c *Core) AccountCreateGlobal(ctx context.Context, args accountCreateGlobalArgs) (*types.Account, error) {
+	opCtx, ok := ctx.Value(types.CtxOperationTracker).(types.OperationTracker)
+	if !ok {
+		return nil, errors.New("error casting operation context")
+	}
+
+	if err := args.Validate(); err != nil {
+		return nil, err
+	}
+
+	hashedPassword, err := c.AuthPasswordHash(args.password)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.accountRepo.Create(ctx,
+		nil,
+		args.firstName,
+		args.lastName,
+		args.email,
+		args.username,
+		&hashedPassword,
+		opCtx.AuthAccount.ID,
 	)
 }
 

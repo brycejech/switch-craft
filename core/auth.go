@@ -81,10 +81,10 @@ func (c *Core) AuthCreateSigningKey(bitLength uint32) (string, error) {
 	return hex.EncodeToString(bytes), nil
 }
 
-func (c *Core) AuthPasswordHash(password string) (encodedHash *string, err error) {
+func (c *Core) AuthPasswordHash(password string) (encodedHash string, err error) {
 	salt, err := randomBytes(defaultHashParams.saltLength)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	hash := argon2.IDKey(
@@ -109,7 +109,7 @@ func (c *Core) AuthPasswordHash(password string) (encodedHash *string, err error
 		b64Hash,
 	)
 
-	return &tmpHash, nil
+	return tmpHash, nil
 }
 
 func (c *Core) AuthPasswordCheck(password, encodedHash string) (match bool, err error) {
