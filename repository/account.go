@@ -11,17 +11,17 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewAccountRepository(pool *pgxpool.Pool) *accountRepository {
-	return &accountRepository{
-		db: pool,
+func NewAccountRepository(db *pgxpool.Pool) *accountRepo {
+	return &accountRepo{
+		db: db,
 	}
 }
 
-type accountRepository struct {
+type accountRepo struct {
 	db *pgxpool.Pool
 }
 
-func (r *accountRepository) Create(ctx context.Context,
+func (r *accountRepo) Create(ctx context.Context,
 	tenantID *int64,
 	firstName string,
 	lastName string,
@@ -58,7 +58,7 @@ func (r *accountRepository) Create(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepository) GetMany(ctx context.Context, tenantID *int64) ([]types.Account, error) {
+func (r *accountRepo) GetMany(ctx context.Context, tenantID *int64) ([]types.Account, error) {
 
 	var (
 		accounts []types.Account
@@ -77,7 +77,7 @@ func (r *accountRepository) GetMany(ctx context.Context, tenantID *int64) ([]typ
 	return accounts, nil
 }
 
-func (r *accountRepository) GetOne(ctx context.Context,
+func (r *accountRepo) GetOne(ctx context.Context,
 	tenantID *int64,
 	id *int64,
 	uuid *string,
@@ -107,7 +107,7 @@ func (r *accountRepository) GetOne(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepository) Update(ctx context.Context,
+func (r *accountRepo) Update(ctx context.Context,
 	tenantID *int64,
 	id int64,
 	firstName string,
@@ -143,7 +143,7 @@ func (r *accountRepository) Update(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepository) Delete(ctx context.Context, tenantID *int64, id int64) error {
+func (r *accountRepo) Delete(ctx context.Context, tenantID *int64, id int64) error {
 	row := r.db.QueryRow(ctx, queries.AccountDelete, tenantID, id)
 
 	var numDeleted int64

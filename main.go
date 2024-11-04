@@ -30,8 +30,9 @@ func main() {
 
 	repo := repository.NewRepository(db)
 	accountRepo := repository.NewAccountRepository(db)
+	tenantRepo := repository.NewTenantRepository(db)
 
-	switchcraft := core.NewCore(repo, accountRepo)
+	switchcraft := core.NewCore(repo, accountRepo, tenantRepo)
 
 	cli.Start(switchcraft)
 }

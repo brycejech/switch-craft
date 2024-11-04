@@ -5,16 +5,18 @@ import (
 	"switchcraft/types"
 )
 
-func NewCore(repo Repo, accountRepo AccountRepo) *Core {
+func NewCore(repo Repo, accountRepo AccountRepo, tenantRepo TenantRepo) *Core {
 	return &Core{
 		repository:  repo,
 		accountRepo: accountRepo,
+		tenantRepo:  tenantRepo,
 	}
 }
 
 type Core struct {
 	repository  Repo
 	accountRepo AccountRepo
+	tenantRepo  TenantRepo
 }
 
 func (c *Core) MigrateUp() error {
@@ -59,4 +61,23 @@ type AccountRepo interface {
 		modifiedBy int64,
 	) (*types.Account, error)
 	Delete(ctx context.Context, tenantID *int64, id int64) error
+}
+
+type TenantRepo interface {
+	Create(ctx context.Context,
+		name string,
+		slug string,
+		owner int64,
+		createdBy int64,
+	) (*types.Tenant, error)
+	GetMany(ctx context.Context) ([]types.Tenant, error)
+	GetOne(ctx context.Context, ID int64) (*types.Tenant, error)
+	Update(ctx context.Context,
+		id int64,
+		name string,
+		slug string,
+		owner int64,
+		modifiedBy int64,
+	) (*types.Tenant, error)
+	Delete(ctx context.Context, id int64) error
 }

@@ -1,32 +1,139 @@
 package repository
 
-type tenant struct {
-	ID   int64
-	Name string
+import (
+	"context"
+	"errors"
+	"fmt"
+	"switchcraft/repository/queries"
+	"switchcraft/types"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+func NewTenantRepository(db *pgxpool.Pool) *tenantRepo {
+	return &tenantRepo{
+		db: db,
+	}
 }
 
-func NewTenantRepository() *tenantRepo {
-	return &tenantRepo{}
+type tenantRepo struct {
+	db *pgxpool.Pool
 }
 
-type tenantRepo struct{}
+func (r *tenantRepo) Create(ctx context.Context,
+	name string,
+	slug string,
+	owner int64,
+	createdBy int64,
+) (*types.Tenant, error) {
+	var (
+		tenant types.Tenant
+		rows   pgx.Rows
+		err    error
+	)
 
-func (r *tenantRepo) GetTenants() ([]tenant, error) {
-	return []tenant{}, nil
+	if rows, err = r.db.Query(ctx,
+		queries.TenantCreate,
+		name,
+		slug,
+		owner,
+		createdBy,
+	); err != nil {
+		return nil, handleError(err)
+	}
+
+	if tenant, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Tenant]); err != nil {
+		return nil, handleError(err)
+	}
+
+	return &tenant, nil
 }
 
-func (r *tenantRepo) GetTenant(ID int64) (*tenant, error) {
-	return &tenant{}, nil
+func (r *tenantRepo) GetMany(ctx context.Context) ([]types.Tenant, error) {
+	var (
+		tenants []types.Tenant
+		rows    pgx.Rows
+		err     error
+	)
+
+	if rows, err = r.db.Query(ctx, queries.TenantGetMany); err != nil {
+		return nil, handleError(err)
+	}
+
+	if tenants, err = pgx.CollectRows(rows, pgx.RowToStructByName[types.Tenant]); err != nil {
+		return nil, handleError(err)
+	}
+
+	return tenants, nil
 }
 
-func (r *tenantRepo) CreateTenant(name string) (*tenant, error) {
-	return &tenant{}, nil
+func (r *tenantRepo) GetOne(ctx context.Context, ID int64) (*types.Tenant, error) {
+	var (
+		tenant types.Tenant
+		rows   pgx.Rows
+		err    error
+	)
+
+	if rows, err = r.db.Query(ctx, queries.TenantGetOne, ID); err != nil {
+		return nil, handleError(err)
+	}
+
+	if tenant, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Tenant]); err != nil {
+		return nil, handleError(err)
+	}
+
+	return &tenant, nil
 }
 
-func (r *tenantRepo) UpdateTenant(t *tenant) error {
-	return nil
+func (r *tenantRepo) Update(ctx context.Context,
+	id int64,
+	name string,
+	slug string,
+	owner int64,
+	modifiedBy int64,
+) (*types.Tenant, error) {
+	var (
+		tenant types.Tenant
+		rows   pgx.Rows
+		err    error
+	)
+
+	if rows, err = r.db.Query(ctx,
+		queries.TenantUpdate,
+		id,
+		name,
+		slug,
+		owner,
+		modifiedBy,
+	); err != nil {
+		return nil, handleError(err)
+	}
+
+	if tenant, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Tenant]); err != nil {
+		return nil, handleError(err)
+	}
+
+	return &tenant, nil
 }
 
-func (r *tenantRepo) DeleteTenant(ID int64) error {
+func (r *tenantRepo) Delete(ctx context.Context, id int64) error {
+	row := r.db.QueryRow(ctx, queries.TenantDelete, id)
+
+	var numDeleted int64
+	if err := row.Scan(&numDeleted); err != nil {
+		return handleError(err)
+	}
+
+	if numDeleted < 1 {
+		return errors.New("no rows deleted")
+	}
+
+	if numDeleted > 1 {
+		return errors.New(
+			fmt.Sprintf("expected to delete 1 row, deleted %v", numDeleted),
+		)
+	}
+
 	return nil
 }

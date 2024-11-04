@@ -40,13 +40,16 @@ CREATE TABLE application.application (
 	
 	, id         bigint       NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY
 	, uuid       uuid         NOT NULL UNIQUE DEFAULT gen_random_uuid()
-	, name       varchar(64)  NOT NULL UNIQUE
-	, slug       varchar(64)  NOT NULL UNIQUE
+	, name       varchar(64)  NOT NULL
+	, slug       varchar(64)  NOT NULL
 
 	, created      timestamp with time zone  NOT NULL DEFAULT (now() at time zone 'utc')
 	, created_by   bigint                    REFERENCES account.account(id)
 	, modified     timestamp with time zone
 	, modified_by  bigint                    REFERENCES account.account(id)
+
+	, UNIQUE (tenant_id, name)
+	, UNIQUE (tenant_id, slug)
 );
 
 CREATE TABLE application.feature_flag (
@@ -55,14 +58,17 @@ CREATE TABLE application.feature_flag (
 	
 	, id              int          NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY
 	, uuid            uuid         NOT NULL UNIQUE DEFAULT gen_random_uuid()
-	, name            varchar(64)  NOT NULL UNIQUE
-	, slug            varchar(64)  NOT NULL UNIQUE
+	, name            varchar(64)  NOT NULL
+	, slug            varchar(64)  NOT NULL
 	, is_enabled      boolean      NOT NULL DEFAULT FALSE
 
 	, created      timestamp with time zone  NOT NULL DEFAULT (now() at time zone 'utc')
 	, created_by   bigint                    REFERENCES account.account(id)
 	, modified     timestamp with time zone
 	, modified_by  bigint                    REFERENCES account.account(id)
+
+	, UNIQUE (application_id, name)
+	, UNIQUE (application_id, slug)
 );
 
 END TRANSACTION;
