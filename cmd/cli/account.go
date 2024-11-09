@@ -52,7 +52,6 @@ func registerAccountModule(switchcraft *core.Core) {
 		LastName  string
 		Email     string
 		Username  string
-		CreatedBy int64
 	}{}
 	var createAccountCmd = &cobra.Command{
 		Use:   "create",
@@ -88,8 +87,6 @@ func registerAccountModule(switchcraft *core.Core) {
 	createAccountCmd.MarkFlagRequired("email")
 	createAccountCmd.Flags().StringVar(&createAccountCmdArgs.Username, "username", "", "account.username")
 	createAccountCmd.MarkFlagRequired("username")
-	createAccountCmd.Flags().Int64Var(&createAccountCmdArgs.CreatedBy, "createdBy", 0, "account.createdBy")
-	createAccountCmd.MarkFlagRequired("createdBy")
 	accountCmd.AddCommand(createAccountCmd)
 
 	/* === GET ACCOUNT CMD === */
@@ -148,13 +145,12 @@ func registerAccountModule(switchcraft *core.Core) {
 	/* === UPDATE ACCOUNT CMD === */
 	/* ----------------------- */
 	updateAccountCmdArgs := struct {
-		TenantID   int64
-		ID         int64
-		FirstName  string
-		LastName   string
-		Email      string
-		Username   string
-		ModifiedBy int64
+		TenantID  int64
+		ID        int64
+		FirstName string
+		LastName  string
+		Email     string
+		Username  string
 	}{}
 	var updateAccountCmd = &cobra.Command{
 		Use:   "update",
@@ -174,7 +170,6 @@ func registerAccountModule(switchcraft *core.Core) {
 				updateAccountCmdArgs.LastName,
 				updateAccountCmdArgs.Email,
 				updateAccountCmdArgs.Username,
-				updateAccountCmdArgs.ModifiedBy,
 			)
 
 			account, err := switchcraft.AccountUpdate(opCtx, args)
@@ -197,8 +192,6 @@ func registerAccountModule(switchcraft *core.Core) {
 	updateAccountCmd.MarkFlagRequired("email")
 	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.Username, "username", "", "account.username")
 	updateAccountCmd.MarkFlagRequired("username")
-	updateAccountCmd.Flags().Int64Var(&updateAccountCmdArgs.ModifiedBy, "modifiedBy", 0, "account.modifiedBy")
-	updateAccountCmd.MarkFlagRequired("modifiedBy")
 	accountCmd.AddCommand(updateAccountCmd)
 
 	/* === DELETE ACCOUNT CMD === */

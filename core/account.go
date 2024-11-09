@@ -17,19 +17,19 @@ type accountCreateArgs struct {
 
 func (a *accountCreateArgs) Validate() error {
 	if a.tenantID < 1 {
-		return errors.New("createAccountArgs.tenantID must be positive integer")
+		return errors.New("accountCreateArgs.tenantID must be positive integer")
 	}
 	if a.firstName == "" {
-		return errors.New("createAccountArgs.firstName cannot be empty")
+		return errors.New("accountCreateArgs.firstName cannot be empty")
 	}
 	if a.lastName == "" {
-		return errors.New("createAccountArgs.lastName cannot be empty")
+		return errors.New("accountCreateArgs.lastName cannot be empty")
 	}
 	if a.email == "" {
-		return errors.New("createAccountArgs.email cannot be empty")
+		return errors.New("accountCreateArgs.email cannot be empty")
 	}
 	if a.username == "" {
-		return errors.New("createAccountArgs.username cannot be empty")
+		return errors.New("accountCreateArgs.username cannot be empty")
 	}
 	return nil
 }
@@ -179,13 +179,12 @@ func (c *Core) AccountGetOne(ctx context.Context, args accountGetOneArgs) (*type
 }
 
 type accountUpdateArgs struct {
-	tenantID   *int64
-	id         int64
-	firstName  string
-	lastName   string
-	email      string
-	username   string
-	modifiedBy int64
+	tenantID  *int64
+	id        int64
+	firstName string
+	lastName  string
+	email     string
+	username  string
 }
 
 func (a *accountUpdateArgs) Validate() error {
@@ -199,20 +198,23 @@ func NewAccountUpdateArgs(
 	lastName string,
 	email string,
 	username string,
-	modifiedBy int64,
 ) accountUpdateArgs {
 	return accountUpdateArgs{
-		tenantID:   tenantID,
-		id:         id,
-		firstName:  firstName,
-		lastName:   lastName,
-		email:      email,
-		username:   username,
-		modifiedBy: modifiedBy,
+		tenantID:  tenantID,
+		id:        id,
+		firstName: firstName,
+		lastName:  lastName,
+		email:     email,
+		username:  username,
 	}
 }
 
 func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*types.Account, error) {
+	opCtx, ok := ctx.Value(types.CtxOperationTracker).(types.OperationTracker)
+	if !ok {
+		return nil, errors.New("error casting operation context")
+	}
+
 	if err := args.Validate(); err != nil {
 		return nil, err
 	}
@@ -224,7 +226,7 @@ func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*type
 		args.lastName,
 		args.email,
 		args.username,
-		args.modifiedBy,
+		opCtx.AuthAccount.ID,
 	)
 }
 
