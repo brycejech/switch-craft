@@ -34,6 +34,7 @@ func Start(switchcraft *core.Core) {
 	registerAccountModule(switchcraft)
 	registerTenantModule(switchcraft)
 	registerAuthModule(switchcraft)
+	registerAppModule(switchcraft)
 
 	rootCmd.Execute()
 }
