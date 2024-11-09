@@ -38,6 +38,23 @@ var TenantUpdate string
 //go:embed tenant/tenantDelete.sql
 var TenantDelete string
 
+/* === APPLICATION QUERIES === */
+
+//go:embed application/applicationCreate.sql
+var AppCreate string
+
+//go:embed application/applicationGetMany.sql
+var AppGetMany string
+
+//go:embed application/applicationGetOne.sql
+var AppGetOne string
+
+//go:embed application/applicationUpdate.sql
+var AppUpdate string
+
+//go:embed application/applicationDelete.sql
+var AppDelete string
+
 /* === MIGRATION QUERIES === */
 
 //go:embed migrations

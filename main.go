@@ -28,11 +28,14 @@ var globalCtx = context.Background()
 func main() {
 	db := mustInitDb(globalCtx)
 
-	repo := repository.NewRepository(db)
-	accountRepo := repository.NewAccountRepository(db)
-	tenantRepo := repository.NewTenantRepository(db)
+	var (
+		repo            = repository.NewRepository(db)
+		accountRepo     = repository.NewAccountRepository(db)
+		tenantRepo      = repository.NewTenantRepository(db)
+		applicationRepo = repository.NewAppRepository(db)
+	)
 
-	switchcraft := core.NewCore(repo, accountRepo, tenantRepo)
+	switchcraft := core.NewCore(repo, accountRepo, tenantRepo, applicationRepo)
 
 	cli.Start(switchcraft)
 }

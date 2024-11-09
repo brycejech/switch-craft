@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	"errors"
-	"regexp"
 	"switchcraft/types"
 )
 
@@ -112,12 +111,4 @@ func (c *Core) TenantUpdate(ctx context.Context, args tenantUpdateArgs) (*types.
 
 func (c *Core) TenantDelete(ctx context.Context, id int64) error {
 	return c.tenantRepo.Delete(ctx, id)
-}
-
-func validateSlug(slug string) error {
-	exp := regexp.MustCompile(`^[a-zA-Z0-9\-_]+$`)
-	if !exp.MatchString(slug) {
-		return errors.New("slug must be alphanumeric with '-' or '_' only")
-	}
-	return nil
 }
