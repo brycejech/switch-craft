@@ -27,14 +27,14 @@ var rootCmd = &cobra.Command{
 
 var baseCtx = context.Background()
 
-func Start(switchcraft *core.Core) {
+func Start(core *core.Core) {
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 
-	registerMigrationsModule(switchcraft)
-	registerAccountModule(switchcraft)
-	registerTenantModule(switchcraft)
-	registerAuthModule(switchcraft)
-	registerAppModule(switchcraft)
+	registerMigrationsModule(core)
+	registerAccountModule(core)
+	registerTenantModule(core)
+	registerAuthModule(core)
+	registerAppModule(core)
 
 	rootCmd.Execute()
 }

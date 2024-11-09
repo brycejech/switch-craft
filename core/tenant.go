@@ -19,7 +19,7 @@ func (a *tenantCreateArgs) Validate() error {
 	return nil
 }
 
-func NewTenantCreateArgs(
+func (c *Core) NewTenantCreateArgs(
 	name string,
 	slug string,
 	owner int64,
@@ -82,7 +82,7 @@ func (a *tenantUpdateArgs) Validate() error {
 	return nil
 }
 
-func NewTenantUpdateArgs(
+func (c *Core) NewTenantUpdateArgs(
 	id int64,
 	name string,
 	slug string,

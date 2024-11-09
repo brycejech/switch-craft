@@ -34,7 +34,7 @@ func (a *accountCreateArgs) Validate() error {
 	return nil
 }
 
-func NewAccountCreateArgs(
+func (c *Core) NewAccountCreateArgs(
 	tenantID int64,
 	firstName string,
 	lastName string,
@@ -101,7 +101,7 @@ func (a *accountCreateGlobalArgs) Validate() error {
 	return nil
 }
 
-func NewAccountCreateGlobalArgs(
+func (c *Core) NewAccountCreateGlobalArgs(
 	firstName string,
 	lastName string,
 	email string,
@@ -161,7 +161,7 @@ func (a *accountGetOneArgs) Validate() error {
 	return nil
 }
 
-func NewAccountGetOneArgs(tenantID *int64, id *int64, uuid *string, username *string) accountGetOneArgs {
+func (c *Core) NewAccountGetOneArgs(tenantID *int64, id *int64, uuid *string, username *string) accountGetOneArgs {
 	return accountGetOneArgs{
 		tenantID: tenantID,
 		id:       id,
@@ -191,7 +191,7 @@ func (a *accountUpdateArgs) Validate() error {
 	return nil
 }
 
-func NewAccountUpdateArgs(
+func (c *Core) NewAccountUpdateArgs(
 	tenantID *int64,
 	id int64,
 	firstName string,

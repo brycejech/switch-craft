@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func registerAuthModule(switchcraft *core.Core) {
+func registerAuthModule(core *core.Core) {
 	var authCmd = &cobra.Command{
 		Use:   "auth",
 		Short: "SwitchCraft CLI auth module",
@@ -23,7 +23,7 @@ func registerAuthModule(switchcraft *core.Core) {
 		Use:   "hashPassword",
 		Short: "Hash a password",
 		Run: func(_ *cobra.Command, _ []string) {
-			hash, err := switchcraft.AuthPasswordHash(hashPasswordCmdPass)
+			hash, err := core.AuthPasswordHash(hashPasswordCmdPass)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -43,7 +43,7 @@ func registerAuthModule(switchcraft *core.Core) {
 		Use:   "comparePassword",
 		Short: "Compare a password to a hash",
 		Run: func(_ *cobra.Command, _ []string) {
-			ok, err := switchcraft.AuthPasswordCheck(comparePasswordCmdPass, comparePasswordCmdHash)
+			ok, err := core.AuthPasswordCheck(comparePasswordCmdPass, comparePasswordCmdHash)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -68,7 +68,7 @@ func registerAuthModule(switchcraft *core.Core) {
 		Use:   "createSigningKey",
 		Short: "Create a cryptographically secure signing key encoded to hexadecimal",
 		Run: func(_ *cobra.Command, _ []string) {
-			key, err := switchcraft.AuthCreateSigningKey(createSigningKeyCmdKeyLength)
+			key, err := core.AuthCreateSigningKey(createSigningKeyCmdKeyLength)
 			if err != nil {
 				log.Fatal(err)
 			}

@@ -42,7 +42,7 @@ func (c *Core) Authn(ctx context.Context, username string, password string) (acc
 	)
 
 	if account, err = c.AccountGetOne(ctx,
-		NewAccountGetOneArgs(nil, nil, nil, &username),
+		c.NewAccountGetOneArgs(nil, nil, nil, &username),
 	); err != nil {
 		return nil, false
 	}

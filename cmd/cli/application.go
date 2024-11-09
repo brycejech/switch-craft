@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func registerAppModule(switchcraft *core.Core) {
+func registerAppModule(core *core.Core) {
 	var appCmd = &cobra.Command{
 		Use:   "application",
 		Short: "SwitchCraft CLI application module",
@@ -29,7 +29,7 @@ func registerAppModule(switchcraft *core.Core) {
 		Use:   "create",
 		Short: "Create a new application",
 		Run: func(_ *cobra.Command, _ []string) {
-			authAccount := mustAuthn(switchcraft)
+			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
 			args := core.NewAppCreateArgs(
@@ -38,7 +38,7 @@ func registerAppModule(switchcraft *core.Core) {
 				createAppArgs.slug,
 			)
 
-			app, err := switchcraft.AppCreate(opCtx, args)
+			app, err := core.AppCreate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -62,10 +62,10 @@ func registerAppModule(switchcraft *core.Core) {
 		Use:   "getMany",
 		Short: " Get multiple applications",
 		Run: func(_ *cobra.Command, _ []string) {
-			authAccount := mustAuthn(switchcraft)
+			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			apps, err := switchcraft.AppGetMany(opCtx, getAppsCmdTenantID)
+			apps, err := core.AppGetMany(opCtx, getAppsCmdTenantID)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -90,7 +90,7 @@ func registerAppModule(switchcraft *core.Core) {
 		Use:   "getOne",
 		Short: " Get a single application",
 		Run: func(cmd *cobra.Command, _ []string) {
-			authAccount := mustAuthn(switchcraft)
+			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
 			var (
@@ -115,7 +115,7 @@ func registerAppModule(switchcraft *core.Core) {
 				slug,
 			)
 
-			app, err := switchcraft.AppGetOne(opCtx, args)
+			app, err := core.AppGetOne(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -143,7 +143,7 @@ func registerAppModule(switchcraft *core.Core) {
 		Use:   "update",
 		Short: "Update an existing application",
 		Run: func(_ *cobra.Command, _ []string) {
-			authAccount := mustAuthn(switchcraft)
+			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
 			args := core.NewAppUpdateArgs(
@@ -153,7 +153,7 @@ func registerAppModule(switchcraft *core.Core) {
 				updateAppArgs.slug,
 			)
 
-			app, err := switchcraft.AppUpdate(opCtx, args)
+			app, err := core.AppUpdate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -180,10 +180,10 @@ func registerAppModule(switchcraft *core.Core) {
 		Use:   "delete",
 		Short: "Delete an application",
 		Run: func(_ *cobra.Command, _ []string) {
-			authAccount := mustAuthn(switchcraft)
+			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			if err := switchcraft.AppDelete(opCtx, deleteAppCmdTenantID, deleteAppCmdID); err != nil {
+			if err := core.AppDelete(opCtx, deleteAppCmdTenantID, deleteAppCmdID); err != nil {
 				log.Fatal(err)
 			}
 

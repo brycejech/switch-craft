@@ -25,7 +25,7 @@ func (a *appCreateArgs) Validate() error {
 	return nil
 }
 
-func NewAppCreateArgs(
+func (c *Core) NewAppCreateArgs(
 	tenantID int64,
 	name string,
 	slug string,
@@ -81,7 +81,7 @@ func (a *appGetOneArgs) Validate() error {
 	return nil
 }
 
-func NewAppGetOneArgs(
+func (c *Core) NewAppGetOneArgs(
 	tenantID int64,
 	id *int64,
 	uuid *string,
@@ -126,7 +126,7 @@ func (a *appUpdateArgs) Validate() error {
 	return nil
 }
 
-func NewAppUpdateArgs(
+func (c *Core) NewAppUpdateArgs(
 	tenantID int64,
 	id int64,
 	name string,

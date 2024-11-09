@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func registerTenantModule(switchcraft *core.Core) {
+func registerTenantModule(core *core.Core) {
 	var tenantCmd = &cobra.Command{
 		Use:   "tenant",
 		Short: "SwitchCraft CLI tenant module",
@@ -29,7 +29,7 @@ func registerTenantModule(switchcraft *core.Core) {
 		Use:   "create",
 		Short: "Create a new tenant",
 		Run: func(_ *cobra.Command, _ []string) {
-			authAccount := mustAuthn(switchcraft)
+			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
 			args := core.NewTenantCreateArgs(
@@ -38,7 +38,7 @@ func registerTenantModule(switchcraft *core.Core) {
 				createTenantCmdArgs.Owner,
 			)
 
-			tenant, err := switchcraft.TenantCreate(opCtx, args)
+			tenant, err := core.TenantCreate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -62,10 +62,10 @@ func registerTenantModule(switchcraft *core.Core) {
 		Use:   "getMany",
 		Short: "Get multiple tenants",
 		Run: func(_ *cobra.Command, _ []string) {
-			authAccount := mustAuthn(switchcraft)
+			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			tenants, err := switchcraft.TenantGetMany(opCtx)
+			tenants, err := core.TenantGetMany(opCtx)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -83,10 +83,10 @@ func registerTenantModule(switchcraft *core.Core) {
 		Use:   "getOne",
 		Short: "Get a single tenant",
 		Run: func(_ *cobra.Command, _ []string) {
-			authAccount := mustAuthn(switchcraft)
+			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			tenant, err := switchcraft.TenantGetOne(opCtx, getTenantID)
+			tenant, err := core.TenantGetOne(opCtx, getTenantID)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -112,7 +112,7 @@ func registerTenantModule(switchcraft *core.Core) {
 		Use:   "update",
 		Short: "Update a tenant",
 		Run: func(_ *cobra.Command, _ []string) {
-			authAccount := mustAuthn(switchcraft)
+			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
 			args := core.NewTenantUpdateArgs(
@@ -122,7 +122,7 @@ func registerTenantModule(switchcraft *core.Core) {
 				updateTenantCmdArgs.Owner,
 			)
 
-			tenant, err := switchcraft.TenantUpdate(opCtx, args)
+			tenant, err := core.TenantUpdate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -149,10 +149,10 @@ func registerTenantModule(switchcraft *core.Core) {
 		Use:   "delete",
 		Short: "Delete a tenant",
 		Run: func(_ *cobra.Command, _ []string) {
-			authAccount := mustAuthn(switchcraft)
+			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			if err := switchcraft.TenantDelete(opCtx, deleteTenantID); err != nil {
+			if err := core.TenantDelete(opCtx, deleteTenantID); err != nil {
 				log.Fatal(err)
 			}
 			fmt.Printf("Tenant '%v' deleted successfully\n", deleteTenantID)
