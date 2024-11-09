@@ -17,7 +17,7 @@ func registerMigrationsModule(core *core.Core) {
 	var upCmd = &cobra.Command{
 		Use:   "up",
 		Short: "Migrate database all the way up",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			if err := core.MigrateUp(); err != nil {
 				fmt.Println(err)
 				return
@@ -30,7 +30,7 @@ func registerMigrationsModule(core *core.Core) {
 	var downCmd = &cobra.Command{
 		Use:   "down",
 		Short: "Migrate database down by a single migration",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			if err := core.MigrateDown(); err != nil {
 				fmt.Println(err)
 				return

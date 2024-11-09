@@ -28,7 +28,7 @@ func registerAppModule(switchcraft *core.Core) {
 	var createAppCmd = &cobra.Command{
 		Use:   "create",
 		Short: "Create a new application",
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(switchcraft)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
@@ -61,7 +61,7 @@ func registerAppModule(switchcraft *core.Core) {
 	var getAppsCmd = &cobra.Command{
 		Use:   "getMany",
 		Short: " Get multiple applications",
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(switchcraft)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
@@ -142,7 +142,7 @@ func registerAppModule(switchcraft *core.Core) {
 	var updateAppCmd = &cobra.Command{
 		Use:   "update",
 		Short: "Update an existing application",
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(switchcraft)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
@@ -179,7 +179,7 @@ func registerAppModule(switchcraft *core.Core) {
 	var deleteAppCmd = &cobra.Command{
 		Use:   "delete",
 		Short: "Delete an application",
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(switchcraft)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 

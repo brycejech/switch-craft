@@ -17,6 +17,7 @@ func registerAccountModule(switchcraft *core.Core) {
 	}
 	rootCmd.AddCommand(accountCmd)
 
+	/* ------------------------ */
 	/* === GET ACCOUNTS CMD === */
 	/* ------------------------ */
 	var getAccountsTenantID int64
@@ -44,6 +45,7 @@ func registerAccountModule(switchcraft *core.Core) {
 	getAccountsCmd.MarkFlagRequired("tenantId")
 	accountCmd.AddCommand(getAccountsCmd)
 
+	/* -------------------------- */
 	/* === CREATE ACCOUNT CMD === */
 	/* -------------------------- */
 	createAccountCmdArgs := struct {
@@ -56,7 +58,7 @@ func registerAccountModule(switchcraft *core.Core) {
 	var createAccountCmd = &cobra.Command{
 		Use:   "create",
 		Short: "Create new account",
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(switchcraft)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
@@ -89,6 +91,7 @@ func registerAccountModule(switchcraft *core.Core) {
 	createAccountCmd.MarkFlagRequired("username")
 	accountCmd.AddCommand(createAccountCmd)
 
+	/* ----------------------- */
 	/* === GET ACCOUNT CMD === */
 	/* ----------------------- */
 	var getAccountTenantID int64
@@ -142,8 +145,9 @@ func registerAccountModule(switchcraft *core.Core) {
 	getAccountCmd.Flags().StringVar(&getAccountUsername, "username", "", "account.username")
 	accountCmd.AddCommand(getAccountCmd)
 
+	/* -------------------------- */
 	/* === UPDATE ACCOUNT CMD === */
-	/* ----------------------- */
+	/* -------------------------- */
 	updateAccountCmdArgs := struct {
 		TenantID  int64
 		ID        int64
@@ -194,6 +198,7 @@ func registerAccountModule(switchcraft *core.Core) {
 	updateAccountCmd.MarkFlagRequired("username")
 	accountCmd.AddCommand(updateAccountCmd)
 
+	/* -------------------------- */
 	/* === DELETE ACCOUNT CMD === */
 	/* -------------------------- */
 	var deleteAccountTenantID int64

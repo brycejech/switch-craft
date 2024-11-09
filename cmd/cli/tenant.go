@@ -17,7 +17,9 @@ func registerTenantModule(switchcraft *core.Core) {
 	}
 	rootCmd.AddCommand(tenantCmd)
 
+	/* ----------------------------- */
 	/* === CREATE TENANT COMMAND === */
+	/* ----------------------------- */
 	createTenantCmdArgs := struct {
 		Name  string
 		Slug  string
@@ -26,7 +28,7 @@ func registerTenantModule(switchcraft *core.Core) {
 	var createTenantCmd = &cobra.Command{
 		Use:   "create",
 		Short: "Create a new tenant",
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(switchcraft)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
@@ -53,11 +55,13 @@ func registerTenantModule(switchcraft *core.Core) {
 	createTenantCmd.MarkFlagRequired("owner")
 	tenantCmd.AddCommand(createTenantCmd)
 
-	/* === GET TENANTS COMMAND */
+	/* --------------------------- */
+	/* === GET TENANTS COMMAND === */
+	/* --------------------------- */
 	var getTenantsCmd = &cobra.Command{
 		Use:   "getMany",
 		Short: "Get multiple tenants",
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(switchcraft)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
@@ -71,12 +75,14 @@ func registerTenantModule(switchcraft *core.Core) {
 	}
 	tenantCmd.AddCommand(getTenantsCmd)
 
+	/* -------------------------- */
 	/* === GET TENANT COMMAND === */
+	/* -------------------------- */
 	var getTenantID int64
 	var getTenantCmd = &cobra.Command{
 		Use:   "getOne",
 		Short: "Get a single tenant",
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(switchcraft)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
@@ -93,7 +99,9 @@ func registerTenantModule(switchcraft *core.Core) {
 	getTenantCmd.MarkFlagRequired("id")
 	tenantCmd.AddCommand(getTenantCmd)
 
+	/* ----------------------------- */
 	/* === UPDATE TENANT COMMAND === */
+	/* ----------------------------- */
 	updateTenantCmdArgs := struct {
 		ID    int64
 		Name  string
@@ -103,7 +111,7 @@ func registerTenantModule(switchcraft *core.Core) {
 	var updateTenantCmd = &cobra.Command{
 		Use:   "update",
 		Short: "Update a tenant",
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(switchcraft)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
@@ -133,13 +141,14 @@ func registerTenantModule(switchcraft *core.Core) {
 	updateTenantCmd.MarkFlagRequired("owner")
 	tenantCmd.AddCommand(updateTenantCmd)
 
+	/* -------------------------- */
 	/* === DELETE ACCOUNT CMD === */
 	/* -------------------------- */
 	var deleteTenantID int64
 	var deleteTenantCmd = &cobra.Command{
 		Use:   "delete",
 		Short: "Delete a tenant",
-		Run: func(cmd *cobra.Command, _ []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(switchcraft)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 

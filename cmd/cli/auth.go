@@ -15,12 +15,14 @@ func registerAuthModule(switchcraft *core.Core) {
 	}
 	rootCmd.AddCommand(authCmd)
 
+	/* ----------------------------- */
 	/* === HASH PASSWORD COMMAND === */
+	/* ----------------------------- */
 	var hashPasswordCmdPass string
 	var hashPasswordCmd = &cobra.Command{
 		Use:   "hashPassword",
 		Short: "Hash a password",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			hash, err := switchcraft.AuthPasswordHash(hashPasswordCmdPass)
 			if err != nil {
 				log.Fatal(err)
@@ -32,13 +34,15 @@ func registerAuthModule(switchcraft *core.Core) {
 	hashPasswordCmd.MarkFlagRequired("password")
 	authCmd.AddCommand(hashPasswordCmd)
 
+	/* -------------------------------- */
 	/* === COMPARE PASSWORD COMMAND === */
+	/* -------------------------------- */
 	var comparePasswordCmdPass string
 	var comparePasswordCmdHash string
 	var comparePasswordCmd = &cobra.Command{
 		Use:   "comparePassword",
 		Short: "Compare a password to a hash",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			ok, err := switchcraft.AuthPasswordCheck(comparePasswordCmdPass, comparePasswordCmdHash)
 			if err != nil {
 				log.Fatal(err)
@@ -56,12 +60,14 @@ func registerAuthModule(switchcraft *core.Core) {
 	comparePasswordCmd.MarkFlagRequired("hash")
 	authCmd.AddCommand(comparePasswordCmd)
 
+	/* ---------------------------------- */
 	/* === CREATE SIGNING KEY COMMAND === */
+	/* ---------------------------------- */
 	var createSigningKeyCmdKeyLength uint32
 	var createSigningKeyCmd = &cobra.Command{
 		Use:   "createSigningKey",
 		Short: "Create a cryptographically secure signing key encoded to hexadecimal",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			key, err := switchcraft.AuthCreateSigningKey(createSigningKeyCmdKeyLength)
 			if err != nil {
 				log.Fatal(err)
