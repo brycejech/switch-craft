@@ -33,9 +33,16 @@ func main() {
 		accountRepo     = repository.NewAccountRepository(db)
 		tenantRepo      = repository.NewTenantRepository(db)
 		applicationRepo = repository.NewAppRepository(db)
+		featureFlagRepo = repository.NewFeatureFlagRepository(db)
 	)
 
-	switchcraft := core.NewCore(repo, accountRepo, tenantRepo, applicationRepo)
+	switchcraft := core.NewCore(
+		repo,
+		accountRepo,
+		tenantRepo,
+		applicationRepo,
+		featureFlagRepo,
+	)
 
 	cli.Start(switchcraft)
 }

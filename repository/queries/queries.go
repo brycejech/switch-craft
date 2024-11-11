@@ -4,7 +4,9 @@ import (
 	"embed"
 )
 
+/* ----------------------- */
 /* === ACCOUNT QUERIES === */
+/* ----------------------- */
 
 //go:embed account/accountCreate.sql
 var AccountCreate string
@@ -21,7 +23,9 @@ var AccountUpdate string
 //go:embed account/accountDelete.sql
 var AccountDelete string
 
+/* ---------------------- */
 /* === TENANT QUERIES === */
+/* ---------------------- */
 
 //go:embed tenant/tenantCreate.sql
 var TenantCreate string
@@ -38,7 +42,9 @@ var TenantUpdate string
 //go:embed tenant/tenantDelete.sql
 var TenantDelete string
 
+/* --------------------------- */
 /* === APPLICATION QUERIES === */
+/* --------------------------- */
 
 //go:embed application/applicationCreate.sql
 var AppCreate string
@@ -55,7 +61,28 @@ var AppUpdate string
 //go:embed application/applicationDelete.sql
 var AppDelete string
 
+/* ---------------------------- */
+/* === FEATURE FLAG QUERIES === */
+/* ---------------------------- */
+
+//go:embed featureFlag/featureFlagCreate.sql
+var FeatureFlagCreate string
+
+//go:embed featureFlag/featureFlagGetMany.sql
+var FeatureFlagGetMany string
+
+//go:embed featureFlag/featureFlagGetOne.sql
+var FeatureFlagGetOne string
+
+//go:embed featureFlag/featureFlagUpdate.sql
+var FeatureFlagUpdate string
+
+//go:embed featureFlag/featureFlagDelete.sql
+var FeatureFlagDelete string
+
+/* ------------------------- */
 /* === MIGRATION QUERIES === */
+/* ------------------------- */
 
 //go:embed migrations
 var Migrations embed.FS

@@ -12,20 +12,23 @@ func NewCore(
 	accountRepo AccountRepo,
 	tenantRepo TenantRepo,
 	appRepo AppRepo,
+	featureFlagRepo FeatureFlagRepo,
 ) *Core {
 	return &Core{
-		repository:  repo,
-		accountRepo: accountRepo,
-		tenantRepo:  tenantRepo,
-		appRepo:     appRepo,
+		repository:      repo,
+		accountRepo:     accountRepo,
+		tenantRepo:      tenantRepo,
+		appRepo:         appRepo,
+		featureFlagRepo: featureFlagRepo,
 	}
 }
 
 type Core struct {
-	repository  Repo
-	accountRepo AccountRepo
-	tenantRepo  TenantRepo
-	appRepo     AppRepo
+	repository      Repo
+	accountRepo     AccountRepo
+	tenantRepo      TenantRepo
+	appRepo         AppRepo
+	featureFlagRepo FeatureFlagRepo
 }
 
 func (c *Core) MigrateUp() error {
@@ -124,6 +127,42 @@ type AppRepo interface {
 	) (*types.Application, error)
 	Delete(ctx context.Context,
 		tenantID int64,
+		id int64,
+	) error
+}
+
+type FeatureFlagRepo interface {
+	Create(ctx context.Context,
+		tenantID int64,
+		applicationID int64,
+		name string,
+		slug string,
+		isEnabled bool,
+		createdBy int64,
+	) (*types.FeatureFlag, error)
+	GetMany(ctx context.Context,
+		tenantID int64,
+		applicationID int64,
+	) ([]types.FeatureFlag, error)
+	GetOne(ctx context.Context,
+		tenantID int64,
+		applicationID int64,
+		id *int64,
+		uuid *string,
+		slug *string,
+	) (*types.FeatureFlag, error)
+	Update(ctx context.Context,
+		tenantID int64,
+		applicationID int64,
+		id int64,
+		name string,
+		slug string,
+		isEnabled bool,
+		modifiedBy int64,
+	) (*types.FeatureFlag, error)
+	Delete(ctx context.Context,
+		tenantID int64,
+		applicationID int64,
 		id int64,
 	) error
 }
