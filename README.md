@@ -58,6 +58,12 @@ An initial genesis record for the first user must be manually created either by 
 command line tool or a database client such as the pgAdmin instance running in the Docker compose
 network.
 
+The genesis user needs a hashed password (see auth module in CLI) set in the `password` field as
+well as a value in the `created_by` field. It is easiest to create the user directly in the database
+with the hashed password in an initial query, then run a subsequent query that sets the `created_by`
+field by using the `id` of the same row. This will make it appear as though the genesis user created
+itself.
+
 ## Running from Docker container
 
 Services running on the `switchcraft_network` are available on `localhost` at the ports specified in
