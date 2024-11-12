@@ -25,7 +25,6 @@ func (r *featureFlagRepo) Create(ctx context.Context,
 	tenantID int64,
 	applicationID int64,
 	name string,
-	slug string,
 	isEnabled bool,
 	createdBy int64,
 ) (*types.FeatureFlag, error) {
@@ -40,7 +39,6 @@ func (r *featureFlagRepo) Create(ctx context.Context,
 		tenantID,
 		applicationID,
 		name,
-		slug,
 		isEnabled,
 		createdBy,
 	); err != nil {
@@ -90,7 +88,7 @@ func (r *featureFlagRepo) GetOne(ctx context.Context,
 	applicationID int64,
 	id *int64,
 	uuid *string,
-	slug *string,
+	name *string,
 ) (*types.FeatureFlag, error) {
 	var (
 		featureFlag types.FeatureFlag
@@ -104,7 +102,7 @@ func (r *featureFlagRepo) GetOne(ctx context.Context,
 		applicationID,
 		id,
 		uuid,
-		slug,
+		name,
 	); err != nil {
 		return nil, handleError(err)
 	}
@@ -124,7 +122,6 @@ func (r *featureFlagRepo) Update(ctx context.Context,
 	applicationID int64,
 	id int64,
 	name string,
-	slug string,
 	isEnabled bool,
 	modifiedBy int64,
 ) (*types.FeatureFlag, error) {
@@ -140,7 +137,6 @@ func (r *featureFlagRepo) Update(ctx context.Context,
 		applicationID,
 		id,
 		name,
-		slug,
 		isEnabled,
 		modifiedBy,
 	); err != nil {

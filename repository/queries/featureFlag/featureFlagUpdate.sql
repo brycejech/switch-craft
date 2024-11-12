@@ -3,10 +3,9 @@ UPDATE application.feature_flag
 
 SET
 	  name = $4
-	, slug = $5
-	, is_enabled = $6
+	, is_enabled = $5
 	, modified = (now() at time zone 'utc')
-	, modified_by = $7
+	, modified_by = $6
 
 WHERE
 	    tenant_id = $1
@@ -19,7 +18,6 @@ RETURNING
 	, id
 	, uuid
 	, name
-	, slug
 	, is_enabled
 	, created
 	, created_by

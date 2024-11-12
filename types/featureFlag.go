@@ -8,7 +8,6 @@ type FeatureFlag struct {
 	ID            int64      `json:"id" db:"id"`
 	UUID          string     `json:"uuid" db:"uuid"`
 	Name          string     `json:"name" db:"name"`
-	Slug          string     `json:"slug" db:"slug"`
 	IsEnabled     bool       `json:"isEnabled" db:"is_enabled"`
 	Created       time.Time  `json:"created" db:"created"`
 	CreatedBy     int64      `json:"createdBy" db:"created_by"`

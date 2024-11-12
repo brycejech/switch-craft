@@ -59,7 +59,6 @@ CREATE TABLE application.feature_flag (
 	, id              int          NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY
 	, uuid            uuid         NOT NULL UNIQUE DEFAULT gen_random_uuid()
 	, name            varchar(64)  NOT NULL
-	, slug            varchar(64)  NOT NULL
 	, is_enabled      boolean      NOT NULL DEFAULT FALSE
 
 	, created      timestamp with time zone  NOT NULL DEFAULT (now() at time zone 'utc')
@@ -68,7 +67,6 @@ CREATE TABLE application.feature_flag (
 	, modified_by  bigint                    REFERENCES account.account(id)
 
 	, UNIQUE (application_id, name)
-	, UNIQUE (application_id, slug)
 );
 
 END TRANSACTION;

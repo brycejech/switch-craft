@@ -136,7 +136,6 @@ type FeatureFlagRepo interface {
 		tenantID int64,
 		applicationID int64,
 		name string,
-		slug string,
 		isEnabled bool,
 		createdBy int64,
 	) (*types.FeatureFlag, error)
@@ -149,13 +148,12 @@ type FeatureFlagRepo interface {
 		applicationID int64,
 		id *int64,
 		uuid *string,
-		slug *string,
+		name *string,
 	) (*types.FeatureFlag, error)
 	Update(ctx context.Context,
 		tenantID int64,
 		applicationID int64,
 		id int64,
-		name string,
 		slug string,
 		isEnabled bool,
 		modifiedBy int64,

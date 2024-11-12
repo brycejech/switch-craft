@@ -24,7 +24,6 @@ func registerFeatureFlagModule(core *core.Core) {
 		tenantID  int64
 		appID     int64
 		name      string
-		slug      string
 		isEnabled bool
 	}{}
 	var createFeatureFlagCmd = &cobra.Command{
@@ -38,7 +37,6 @@ func registerFeatureFlagModule(core *core.Core) {
 				createFeatureFlagCmdArgs.tenantID,
 				createFeatureFlagCmdArgs.appID,
 				createFeatureFlagCmdArgs.name,
-				createFeatureFlagCmdArgs.slug,
 				createFeatureFlagCmdArgs.isEnabled,
 			)
 
@@ -56,8 +54,6 @@ func registerFeatureFlagModule(core *core.Core) {
 	createFeatureFlagCmd.MarkFlagRequired("applicationId")
 	createFeatureFlagCmd.Flags().StringVar(&createFeatureFlagCmdArgs.name, "name", "", "featureFlag.name")
 	createFeatureFlagCmd.MarkFlagRequired("name")
-	createFeatureFlagCmd.Flags().StringVar(&createFeatureFlagCmdArgs.slug, "slug", "", "featureFlag.slug")
-	createFeatureFlagCmd.MarkFlagRequired("slug")
 	createFeatureFlagCmd.Flags().BoolVar(&createFeatureFlagCmdArgs.isEnabled, "isEnabled", false, "featureFlag.isEnabled")
 	createFeatureFlagCmd.MarkFlagRequired("isEnabled")
 	featureFlagCmd.AddCommand(createFeatureFlagCmd)
@@ -96,7 +92,7 @@ func registerFeatureFlagModule(core *core.Core) {
 		appID    int64
 		id       int64
 		uuid     string
-		slug     string
+		name     string
 	}{}
 	var getFeatureFlagCmd = &cobra.Command{
 		Use:   "getOne",
@@ -108,7 +104,7 @@ func registerFeatureFlagModule(core *core.Core) {
 			var (
 				id   *int64
 				uuid *string
-				slug *string
+				name *string
 			)
 			if cmd.Flags().Changed("id") {
 				id = &getFeatureFlagCmdArgs.id
@@ -116,8 +112,8 @@ func registerFeatureFlagModule(core *core.Core) {
 			if cmd.Flags().Changed("uuid") {
 				uuid = &getFeatureFlagCmdArgs.uuid
 			}
-			if cmd.Flags().Changed("slug") {
-				slug = &getFeatureFlagCmdArgs.slug
+			if cmd.Flags().Changed("name") {
+				name = &getFeatureFlagCmdArgs.name
 			}
 
 			args := core.NewFeatureFlagGetOneArgs(
@@ -125,7 +121,7 @@ func registerFeatureFlagModule(core *core.Core) {
 				getFeatureFlagCmdArgs.appID,
 				id,
 				uuid,
-				slug,
+				name,
 			)
 
 			featureFlag, err := core.FeatureFlagGetOne(opCtx, args)
@@ -142,7 +138,7 @@ func registerFeatureFlagModule(core *core.Core) {
 	getFeatureFlagCmd.MarkFlagRequired("applicationId")
 	getFeatureFlagCmd.Flags().Int64Var(&getFeatureFlagCmdArgs.id, "id", 0, "featureFlag.id")
 	getFeatureFlagCmd.Flags().StringVar(&getFeatureFlagCmdArgs.uuid, "uuid", "", "featureFlag.uuid")
-	getFeatureFlagCmd.Flags().StringVar(&getFeatureFlagCmdArgs.slug, "slug", "", "featureFlag.slug")
+	getFeatureFlagCmd.Flags().StringVar(&getFeatureFlagCmdArgs.name, "name", "", "featureFlag.name")
 	featureFlagCmd.AddCommand(getFeatureFlagCmd)
 
 	/* ----------------------------------- */
@@ -153,7 +149,6 @@ func registerFeatureFlagModule(core *core.Core) {
 		appID     int64
 		id        int64
 		name      string
-		slug      string
 		isEnabled bool
 	}{}
 	var updateFeatureFlagCmd = &cobra.Command{
@@ -168,7 +163,6 @@ func registerFeatureFlagModule(core *core.Core) {
 				updateFeatureFlagCmdArgs.appID,
 				updateFeatureFlagCmdArgs.id,
 				updateFeatureFlagCmdArgs.name,
-				updateFeatureFlagCmdArgs.slug,
 				updateFeatureFlagCmdArgs.isEnabled,
 			)
 
@@ -187,8 +181,6 @@ func registerFeatureFlagModule(core *core.Core) {
 	updateFeatureFlagCmd.MarkFlagRequired("id")
 	updateFeatureFlagCmd.Flags().StringVar(&updateFeatureFlagCmdArgs.name, "name", "", "featureFlag.name")
 	updateFeatureFlagCmd.MarkFlagRequired("name")
-	updateFeatureFlagCmd.Flags().StringVar(&updateFeatureFlagCmdArgs.slug, "slug", "", "featureFlag.slug")
-	updateFeatureFlagCmd.MarkFlagRequired("slug")
 	updateFeatureFlagCmd.Flags().BoolVar(&updateFeatureFlagCmdArgs.isEnabled, "isEnabled", false, "featureFlag.isEnabled")
 	updateFeatureFlagCmd.MarkFlagRequired("isEnabled")
 	featureFlagCmd.AddCommand(updateFeatureFlagCmd)

@@ -10,7 +10,6 @@ type featureFlagCreateArgs struct {
 	tenantID  int64
 	appID     int64
 	name      string
-	slug      string
 	isEnabled bool
 }
 
@@ -24,9 +23,6 @@ func (a *featureFlagCreateArgs) Validate() error {
 	if a.name == "" {
 		return errors.New("featureFlagCreateArgs.name cannot be empty")
 	}
-	if err := validateSlug(a.slug); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -34,14 +30,12 @@ func (c *Core) NewFeatureFlagCreateArgs(
 	tenantID int64,
 	appID int64,
 	name string,
-	slug string,
 	isEnabled bool,
 ) featureFlagCreateArgs {
 	return featureFlagCreateArgs{
 		tenantID:  tenantID,
 		appID:     appID,
 		name:      name,
-		slug:      slug,
 		isEnabled: isEnabled,
 	}
 }
@@ -60,7 +54,6 @@ func (c *Core) FeatureFlagCreate(ctx context.Context, args featureFlagCreateArgs
 		args.tenantID,
 		args.appID,
 		args.name,
-		args.slug,
 		args.isEnabled,
 		opCtx.AuthAccount.ID,
 	)
@@ -78,7 +71,7 @@ type featureFlagGetOneArgs struct {
 	appID    int64
 	id       *int64
 	uuid     *string
-	slug     *string
+	name     *string
 }
 
 func (a *featureFlagGetOneArgs) Validate() error {
@@ -88,16 +81,11 @@ func (a *featureFlagGetOneArgs) Validate() error {
 	if a.appID < 1 {
 		return errors.New("featureFlagGetOneArgs.appID must be positive integer")
 	}
-	if a.id == nil && a.uuid == nil && a.slug == nil {
-		return errors.New("featureFlagGetOneArgs: must provide id, uuid, or slug")
+	if a.id == nil && a.uuid == nil && a.name == nil {
+		return errors.New("featureFlagGetOneArgs: must provide id, uuid, or name")
 	}
 	if a.id != nil && *a.id < 1 {
 		return errors.New("featureFlagGetOneArgs.id must be positive integer")
-	}
-	if a.slug != nil {
-		if err := validateSlug(*a.slug); err != nil {
-			return err
-		}
 	}
 	return nil
 }
@@ -107,14 +95,14 @@ func (c *Core) NewFeatureFlagGetOneArgs(
 	appID int64,
 	id *int64,
 	uuid *string,
-	slug *string,
+	name *string,
 ) featureFlagGetOneArgs {
 	return featureFlagGetOneArgs{
 		tenantID: tenantID,
 		appID:    appID,
 		id:       id,
 		uuid:     uuid,
-		slug:     slug,
+		name:     name,
 	}
 }
 
@@ -128,7 +116,7 @@ func (c *Core) FeatureFlagGetOne(ctx context.Context, args featureFlagGetOneArgs
 		args.appID,
 		args.id,
 		args.uuid,
-		args.slug,
+		args.name,
 	)
 }
 
@@ -137,7 +125,6 @@ type featureFlagUpdateArgs struct {
 	appID     int64
 	id        int64
 	name      string
-	slug      string
 	isEnabled bool
 }
 
@@ -154,9 +141,6 @@ func (a *featureFlagUpdateArgs) Validate() error {
 	if a.name == "" {
 		return errors.New("featureFlagUpdateArgs.name cannot be empty")
 	}
-	if err := validateSlug(a.slug); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -165,7 +149,6 @@ func (c *Core) NewFeatureFlagUpdateArgs(
 	appID int64,
 	id int64,
 	name string,
-	slug string,
 	isEnabled bool,
 ) featureFlagUpdateArgs {
 	return featureFlagUpdateArgs{
@@ -173,7 +156,6 @@ func (c *Core) NewFeatureFlagUpdateArgs(
 		appID:     appID,
 		id:        id,
 		name:      name,
-		slug:      slug,
 		isEnabled: isEnabled,
 	}
 }
@@ -193,7 +175,6 @@ func (c *Core) FeatureFlagUpdate(ctx context.Context, args featureFlagUpdateArgs
 		args.appID,
 		args.id,
 		args.name,
-		args.slug,
 		args.isEnabled,
 		opCtx.AuthAccount.ID,
 	)

@@ -5,7 +5,8 @@ DROP TABLE application.application;
 DROP SCHEMA application;
 
 ALTER TABLE account.tenant
-	  DROP COLUMN created_by
+	  DROP COLUMN owner
+	, DROP COLUMN created_by
 	, DROP COLUMN modified_by;
 
 DROP TABLE account.account;

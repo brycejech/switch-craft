@@ -5,7 +5,6 @@ SELECT
 	, id
 	, uuid
 	, name
-	, slug
 	, is_enabled
 	, created
 	, created_by

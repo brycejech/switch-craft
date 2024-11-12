@@ -5,7 +5,6 @@ SELECT
 	, id
 	, uuid
 	, name
-	, slug
 	, is_enabled
 	, created
 	, created_by
@@ -20,4 +19,4 @@ WHERE
 	AND application_id=$2
 	AND ($3::bigint IS NULL    OR id=$3::bigint)
 	AND (COALESCE($4, '') = '' OR uuid=$4::uuid)
-	AND (COALESCE($5, '') = '' OR slug=$5::text);
+	AND (COALESCE($5, '') = '' OR name=$5::text);
