@@ -15,6 +15,46 @@ func registerAuthModule(core *core.Core) {
 	}
 	rootCmd.AddCommand(authCmd)
 
+	/* --------------------- */
+	/* === AUTHZ COMMAND === */
+	/* --------------------- */
+	var authzCmd = &cobra.Command{
+		Use:   "authorize",
+		Short: "Create signed JWT for current user",
+		Run: func(_ *cobra.Command, _ []string) {
+			authAccount := mustAuthn(core)
+			jwt, err := core.AuthCreateJWT(authAccount)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Println(jwt)
+		},
+	}
+	authCmd.AddCommand(authzCmd)
+
+	/* ---------------------------- */
+	/* === VALIDATE JWT COMMAND === */
+	/* ---------------------------- */
+	var validateJWTCmdToken string
+	var validateJWTCmd = &cobra.Command{
+		Use:   "validateJWT",
+		Short: "Validate a signed JWT",
+		Run: func(_ *cobra.Command, _ []string) {
+			mustAuthn(core)
+
+			account, err := core.AuthValidateJWT(validateJWTCmdToken)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Printf("JWT is valid for user '%s'\n", account.Username)
+		},
+	}
+	validateJWTCmd.Flags().StringVar(&validateJWTCmdToken, "token", "", "The JWT token to check")
+	validateJWTCmd.MarkFlagRequired("token")
+	authCmd.AddCommand(validateJWTCmd)
+
 	/* ----------------------------- */
 	/* === HASH PASSWORD COMMAND === */
 	/* ----------------------------- */

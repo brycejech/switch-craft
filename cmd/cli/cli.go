@@ -36,6 +36,7 @@ func Start(core *core.Core) {
 	registerAuthModule(core)
 	registerAppModule(core)
 	registerFeatureFlagModule(core)
+	registerRestModule(core)
 
 	rootCmd.Execute()
 }

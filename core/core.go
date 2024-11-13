@@ -13,6 +13,7 @@ func NewCore(
 	tenantRepo TenantRepo,
 	appRepo AppRepo,
 	featureFlagRepo FeatureFlagRepo,
+	jwtSigningKey []byte,
 ) *Core {
 	return &Core{
 		repository:      repo,
@@ -20,6 +21,7 @@ func NewCore(
 		tenantRepo:      tenantRepo,
 		appRepo:         appRepo,
 		featureFlagRepo: featureFlagRepo,
+		jwtSigningKey:   jwtSigningKey,
 	}
 }
 
@@ -29,6 +31,7 @@ type Core struct {
 	tenantRepo      TenantRepo
 	appRepo         AppRepo
 	featureFlagRepo FeatureFlagRepo
+	jwtSigningKey   []byte
 }
 
 func (c *Core) MigrateUp() error {

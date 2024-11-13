@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"os"
@@ -14,21 +15,23 @@ import (
 )
 
 var (
-	dbHost     = os.Getenv("DB_HOST")
-	dbPort     = os.Getenv("DB_PORT")
-	dbUser     = os.Getenv("DB_USER")
-	dbPass     = os.Getenv("DB_PASS")
-	dbDatabase = os.Getenv("DB_DATABASE")
-	dbSSLMode  = os.Getenv("DB_SSL_MODE")
-	dbMaxConns = os.Getenv("DB_MAX_CONNECTIONS")
+	dbHost        = os.Getenv("DB_HOST")
+	dbPort        = os.Getenv("DB_PORT")
+	dbUser        = os.Getenv("DB_USER")
+	dbPass        = os.Getenv("DB_PASS")
+	dbDatabase    = os.Getenv("DB_DATABASE")
+	dbSSLMode     = os.Getenv("DB_SSL_MODE")
+	dbMaxConns    = os.Getenv("DB_MAX_CONNECTIONS")
+	jwtSigningKey = os.Getenv("JWT_SIGNING_KEY")
 )
 
 var globalCtx = context.Background()
 
 func main() {
-	db := mustInitDb(globalCtx)
+	jwtSigningKeyBytes := mustGetJWTSigningKey(jwtSigningKey)
 
 	var (
+		db              = mustInitDb(globalCtx)
 		repo            = repository.NewRepository(db)
 		accountRepo     = repository.NewAccountRepository(db)
 		tenantRepo      = repository.NewTenantRepository(db)
@@ -42,6 +45,7 @@ func main() {
 		tenantRepo,
 		applicationRepo,
 		featureFlagRepo,
+		jwtSigningKeyBytes,
 	)
 
 	cli.Start(switchcraft)
@@ -61,17 +65,38 @@ func mustInitDb(ctx context.Context) *pgxpool.Pool {
 
 	config, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
-		log.Fatal(fmt.Sprintf("error building database dsn: %s", err))
+		log.Fatal(fmt.Errorf("error building database dsn: %w", err))
 	}
 
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
-		log.Fatal(fmt.Sprintf("error establishing connection pool: %s", err))
+		log.Fatal(fmt.Errorf("error establishing connection pool: %w", err))
 	}
 
 	if err = pool.Ping(ctx); err != nil {
-		log.Fatal(fmt.Sprintf("error pinging database: %s", err))
+		log.Fatal(fmt.Errorf("error pinging database: %w", err))
 	}
 
 	return pool
+}
+
+func mustGetJWTSigningKey(key string) []byte {
+	bytes, err := hex.DecodeString(key)
+	if err != nil {
+		log.Fatal(fmt.Errorf("invalid JWT signing key: %w", err))
+	}
+
+	var (
+		byteLen = len(bytes)
+		bitLen  = byteLen * 8
+	)
+
+	if bitLen != 512 {
+		fmt.Println(
+			"warning: JWT signing key length invalid - expected 512 bits, got",
+			bitLen,
+		)
+	}
+
+	return bytes
 }
