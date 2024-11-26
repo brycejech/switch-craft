@@ -1,0 +1,18 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/tenant
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Test",
+    "slug": "test"
+  }
+}

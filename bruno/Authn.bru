@@ -1,0 +1,22 @@
+meta {
+  name: Authn
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/authn
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "{{username}}",
+    "password": "{{password}}"
+  }
+}
+
+script:post-response {
+  bru.setEnvVar('token', res.body.token)
+}
