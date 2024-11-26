@@ -9,6 +9,7 @@ import (
 	"switchcraft/cmd/cli"
 	"switchcraft/core"
 	"switchcraft/repository"
+	"switchcraft/types"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/joho/godotenv/autoload"
@@ -31,6 +32,7 @@ func main() {
 	jwtSigningKeyBytes := mustGetJWTSigningKey(jwtSigningKey)
 
 	var (
+		logger          = types.NewLogger(types.LogLevelInfo)
 		db              = mustInitDb(globalCtx)
 		repo            = repository.NewRepository(db)
 		accountRepo     = repository.NewAccountRepository(db)
@@ -40,6 +42,7 @@ func main() {
 	)
 
 	switchcraft := core.NewCore(
+		logger,
 		repo,
 		accountRepo,
 		tenantRepo,
@@ -48,7 +51,7 @@ func main() {
 		jwtSigningKeyBytes,
 	)
 
-	cli.Start(switchcraft)
+	cli.Start(logger, switchcraft)
 }
 
 func mustInitDb(ctx context.Context) *pgxpool.Pool {

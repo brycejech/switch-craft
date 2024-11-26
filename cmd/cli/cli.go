@@ -8,17 +8,10 @@ import (
 	"os"
 	"switchcraft/core"
 	"switchcraft/types"
+	"time"
 
 	"github.com/spf13/cobra"
 )
-
-/*
-	TODO
-	----
-	For each core method that will require a valid,
-	authenticated auth session, call the cli.authn method,
-	then types.NewOperationCtx to pass to core methods
-*/
 
 var rootCmd = &cobra.Command{
 	Use:   "",
@@ -27,7 +20,7 @@ var rootCmd = &cobra.Command{
 
 var baseCtx = context.Background()
 
-func Start(core *core.Core) {
+func Start(logger *types.Logger, core *core.Core) {
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 
 	registerMigrationsModule(core)
@@ -36,12 +29,13 @@ func Start(core *core.Core) {
 	registerAuthModule(core)
 	registerAppModule(core)
 	registerFeatureFlagModule(core)
-	registerRestModule(core)
+	registerRestModule(logger, core)
 
 	rootCmd.Execute()
 }
 
-func mustAuthn(switchcraft *core.Core) (account *types.Account) {
+// TODO: This should just return opCtx with account embedded
+func mustAuthn(core *core.Core) (account *types.Account) {
 	var (
 		username = os.Getenv("SWITCHCRAFT_USER")
 		password = os.Getenv("SWITCHCRAFT_PASS")
@@ -50,7 +44,8 @@ func mustAuthn(switchcraft *core.Core) (account *types.Account) {
 		log.Fatal("Must provide SWITCHCRAFT_USER and SWITCHCRAFT_PASS env vars to use CLI")
 	}
 
-	account, ok := switchcraft.Authn(baseCtx, username, password)
+	opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), types.Account{})
+	account, ok := core.Authn(opCtx, username, password)
 	if !ok {
 		log.Fatal("Unable to authenticate local account")
 	}
