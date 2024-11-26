@@ -11,10 +11,10 @@ type CtxType int
 
 const (
 	_ CtxType = iota
-	CtxOperationTracker
+	CtxOperationTracer
 )
 
-type OperationTracker struct {
+type OperationTracer struct {
 	TraceID     string
 	StartTime   time.Time
 	AuthAccount Account
@@ -34,13 +34,13 @@ func NewOperationCtx(
 		// Extremely unlikely, worth the risk to avoid bailing
 		traceID = safeishUUIDV4()
 	}
-	operationTracker := OperationTracker{
+	operationTracer := OperationTracer{
 		TraceID:     traceID,
 		StartTime:   startTime,
 		AuthAccount: authAccount,
 	}
 
-	return context.WithValue(baseContext, CtxOperationTracker, operationTracker)
+	return context.WithValue(baseContext, CtxOperationTracer, operationTracer)
 }
 
 func safeishUUIDV4() (uuid string) {

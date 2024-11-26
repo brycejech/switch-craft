@@ -8,6 +8,7 @@ import (
 )
 
 func NewCore(
+	logger *types.Logger,
 	repo Repo,
 	accountRepo AccountRepo,
 	tenantRepo TenantRepo,
@@ -16,6 +17,7 @@ func NewCore(
 	jwtSigningKey []byte,
 ) *Core {
 	return &Core{
+		logger:          logger,
 		repository:      repo,
 		accountRepo:     accountRepo,
 		tenantRepo:      tenantRepo,
@@ -26,12 +28,21 @@ func NewCore(
 }
 
 type Core struct {
+	logger          *types.Logger
 	repository      Repo
 	accountRepo     AccountRepo
 	tenantRepo      TenantRepo
 	appRepo         AppRepo
 	featureFlagRepo FeatureFlagRepo
 	jwtSigningKey   []byte
+}
+
+func (c *Core) getOperationTracer(ctx context.Context) (types.OperationTracer, error) {
+	tracer, ok := ctx.Value(types.CtxOperationTracer).(types.OperationTracer)
+	if !ok {
+		return tracer, errors.New("Invalid operation context")
+	}
+	return tracer, nil
 }
 
 func (c *Core) MigrateUp() error {

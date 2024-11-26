@@ -38,9 +38,9 @@ func (c *Core) NewAppCreateArgs(
 }
 
 func (c *Core) AppCreate(ctx context.Context, args appCreateArgs) (*types.Application, error) {
-	opCtx, ok := ctx.Value(types.CtxOperationTracker).(types.OperationTracker)
-	if !ok {
-		return nil, errors.New("error: invalid operation context")
+	tracer, err := c.getOperationTracer(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := args.Validate(); err != nil {
@@ -51,7 +51,7 @@ func (c *Core) AppCreate(ctx context.Context, args appCreateArgs) (*types.Applic
 		args.tenantID,
 		args.name,
 		args.slug,
-		opCtx.AuthAccount.ID,
+		tracer.AuthAccount.ID,
 	)
 }
 
@@ -141,9 +141,9 @@ func (c *Core) NewAppUpdateArgs(
 }
 
 func (c *Core) AppUpdate(ctx context.Context, args appUpdateArgs) (*types.Application, error) {
-	opCtx, ok := ctx.Value(types.CtxOperationTracker).(types.OperationTracker)
-	if !ok {
-		return nil, errors.New("error casting operation context")
+	tracer, err := c.getOperationTracer(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := args.Validate(); err != nil {
@@ -155,7 +155,7 @@ func (c *Core) AppUpdate(ctx context.Context, args appUpdateArgs) (*types.Applic
 		args.id,
 		args.name,
 		args.slug,
-		opCtx.AuthAccount.ID,
+		tracer.AuthAccount.ID,
 	)
 }
 

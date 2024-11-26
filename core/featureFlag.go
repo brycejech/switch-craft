@@ -41,9 +41,9 @@ func (c *Core) NewFeatureFlagCreateArgs(
 }
 
 func (c *Core) FeatureFlagCreate(ctx context.Context, args featureFlagCreateArgs) (*types.FeatureFlag, error) {
-	opCtx, ok := ctx.Value(types.CtxOperationTracker).(types.OperationTracker)
-	if !ok {
-		return nil, errors.New("error: invalid operation context")
+	tracer, err := c.getOperationTracer(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := args.Validate(); err != nil {
@@ -55,7 +55,7 @@ func (c *Core) FeatureFlagCreate(ctx context.Context, args featureFlagCreateArgs
 		args.appID,
 		args.name,
 		args.isEnabled,
-		opCtx.AuthAccount.ID,
+		tracer.AuthAccount.ID,
 	)
 }
 
@@ -161,9 +161,9 @@ func (c *Core) NewFeatureFlagUpdateArgs(
 }
 
 func (c *Core) FeatureFlagUpdate(ctx context.Context, args featureFlagUpdateArgs) (*types.FeatureFlag, error) {
-	opCtx, ok := ctx.Value(types.CtxOperationTracker).(types.OperationTracker)
-	if !ok {
-		return nil, errors.New("error casting operation context")
+	tracer, err := c.getOperationTracer(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := args.Validate(); err != nil {
@@ -176,7 +176,7 @@ func (c *Core) FeatureFlagUpdate(ctx context.Context, args featureFlagUpdateArgs
 		args.id,
 		args.name,
 		args.isEnabled,
-		opCtx.AuthAccount.ID,
+		tracer.AuthAccount.ID,
 	)
 }
 

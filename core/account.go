@@ -53,9 +53,9 @@ func (c *Core) NewAccountCreateArgs(
 }
 
 func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*types.Account, error) {
-	opCtx, ok := ctx.Value(types.CtxOperationTracker).(types.OperationTracker)
-	if !ok {
-		return nil, errors.New("error: invalid operation context")
+	tracer, err := c.getOperationTracer(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := args.Validate(); err != nil {
@@ -82,7 +82,7 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 		args.email,
 		args.username,
 		password,
-		opCtx.AuthAccount.ID,
+		tracer.AuthAccount.ID,
 	)
 }
 
@@ -118,9 +118,9 @@ func (c *Core) NewAccountCreateGlobalArgs(
 }
 
 func (c *Core) AccountCreateGlobal(ctx context.Context, args accountCreateGlobalArgs) (*types.Account, error) {
-	opCtx, ok := ctx.Value(types.CtxOperationTracker).(types.OperationTracker)
-	if !ok {
-		return nil, errors.New("error casting operation context")
+	tracer, err := c.getOperationTracer(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := args.Validate(); err != nil {
@@ -139,7 +139,7 @@ func (c *Core) AccountCreateGlobal(ctx context.Context, args accountCreateGlobal
 		args.email,
 		args.username,
 		&hashedPassword,
-		opCtx.AuthAccount.ID,
+		tracer.AuthAccount.ID,
 	)
 }
 
@@ -210,9 +210,9 @@ func (c *Core) NewAccountUpdateArgs(
 }
 
 func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*types.Account, error) {
-	opCtx, ok := ctx.Value(types.CtxOperationTracker).(types.OperationTracker)
-	if !ok {
-		return nil, errors.New("error casting operation context")
+	tracer, err := c.getOperationTracer(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := args.Validate(); err != nil {
@@ -226,7 +226,7 @@ func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*type
 		args.lastName,
 		args.email,
 		args.username,
-		opCtx.AuthAccount.ID,
+		tracer.AuthAccount.ID,
 	)
 }
 

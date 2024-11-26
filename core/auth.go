@@ -48,9 +48,15 @@ func (c *Core) Authn(ctx context.Context, username string, password string) (*ty
 		err            error
 	)
 
+	tracer, err := c.getOperationTracer(ctx)
+	if err != nil {
+		return nil, false
+	}
+
 	if account, err = c.AccountGetOne(ctx,
 		c.NewAccountGetOneArgs(nil, nil, nil, &username),
 	); err != nil {
+		c.logger.Error(tracer, err.Error(), nil)
 		return nil, false
 	}
 
@@ -62,10 +68,12 @@ func (c *Core) Authn(ctx context.Context, username string, password string) (*ty
 		password,
 		*account.Password,
 	); err != nil {
+		c.logger.Error(tracer, err.Error(), nil)
 		return nil, false
 	}
 
 	if !passwordsMatch {
+		c.logger.Error(tracer, "Incorrect username/password combination", nil)
 		return nil, false
 	}
 
