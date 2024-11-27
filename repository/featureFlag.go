@@ -11,14 +11,16 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewFeatureFlagRepository(db *pgxpool.Pool) *featureFlagRepo {
+func NewFeatureFlagRepository(logger *types.Logger, db *pgxpool.Pool) *featureFlagRepo {
 	return &featureFlagRepo{
-		db: db,
+		logger: logger,
+		db:     db,
 	}
 }
 
 type featureFlagRepo struct {
-	db *pgxpool.Pool
+	logger *types.Logger
+	db     *pgxpool.Pool
 }
 
 func (r *featureFlagRepo) Create(ctx context.Context,
@@ -42,14 +44,14 @@ func (r *featureFlagRepo) Create(ctx context.Context,
 		isEnabled,
 		createdBy,
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if featureFlag, err = pgx.CollectOneRow(
 		rows,
 		pgx.RowToStructByName[types.FeatureFlag],
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return &featureFlag, nil
@@ -70,14 +72,14 @@ func (r *featureFlagRepo) GetMany(ctx context.Context,
 		orgID,
 		applicationID,
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if featureFlags, err = pgx.CollectRows(
 		rows,
 		pgx.RowToStructByName[types.FeatureFlag],
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return featureFlags, nil
@@ -104,14 +106,14 @@ func (r *featureFlagRepo) GetOne(ctx context.Context,
 		uuid,
 		name,
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if featureFlag, err = pgx.CollectOneRow(
 		rows,
 		pgx.RowToStructByName[types.FeatureFlag],
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return &featureFlag, err
@@ -140,14 +142,14 @@ func (r *featureFlagRepo) Update(ctx context.Context,
 		isEnabled,
 		modifiedBy,
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if featureFlag, err = pgx.CollectOneRow(
 		rows,
 		pgx.RowToStructByName[types.FeatureFlag],
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return &featureFlag, nil
@@ -167,7 +169,7 @@ func (r *featureFlagRepo) Delete(ctx context.Context,
 
 	var numDeleted int64
 	if err := row.Scan(&numDeleted); err != nil {
-		return handleError(err)
+		return handleError(ctx, r.logger, err)
 	}
 
 	if numDeleted < 1 {

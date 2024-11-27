@@ -11,14 +11,16 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewAppRepository(db *pgxpool.Pool) *appRepo {
+func NewAppRepository(logger *types.Logger, db *pgxpool.Pool) *appRepo {
 	return &appRepo{
-		db: db,
+		logger: logger,
+		db:     db,
 	}
 }
 
 type appRepo struct {
-	db *pgxpool.Pool
+	logger *types.Logger
+	db     *pgxpool.Pool
 }
 
 func (r *appRepo) Create(ctx context.Context,
@@ -40,14 +42,14 @@ func (r *appRepo) Create(ctx context.Context,
 		slug,
 		createdBy,
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if application, err = pgx.CollectOneRow(
 		rows,
 		pgx.RowToStructByName[types.Application],
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return &application, nil
@@ -63,14 +65,14 @@ func (r *appRepo) GetMany(ctx context.Context,
 	)
 
 	if rows, err = r.db.Query(ctx, queries.AppGetMany, orgID); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if applications, err = pgx.CollectRows(
 		rows,
 		pgx.RowToStructByName[types.Application],
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return applications, nil
@@ -95,14 +97,14 @@ func (r *appRepo) GetOne(ctx context.Context,
 		uuid,
 		slug,
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if application, err = pgx.CollectOneRow(
 		rows,
 		pgx.RowToStructByName[types.Application],
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return &application, nil
@@ -129,14 +131,14 @@ func (r *appRepo) Update(ctx context.Context,
 		slug,
 		modifiedBy,
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if application, err = pgx.CollectOneRow(
 		rows,
 		pgx.RowToStructByName[types.Application],
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return &application, nil
@@ -154,7 +156,7 @@ func (r *appRepo) Delete(ctx context.Context,
 
 	var numDeleted int64
 	if err := row.Scan(&numDeleted); err != nil {
-		return handleError(err)
+		return handleError(ctx, r.logger, err)
 	}
 
 	if numDeleted < 1 {

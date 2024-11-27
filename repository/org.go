@@ -11,14 +11,16 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewOrgRepository(db *pgxpool.Pool) *orgRepo {
+func NewOrgRepository(logger *types.Logger, db *pgxpool.Pool) *orgRepo {
 	return &orgRepo{
-		db: db,
+		logger: logger,
+		db:     db,
 	}
 }
 
 type orgRepo struct {
-	db *pgxpool.Pool
+	logger *types.Logger
+	db     *pgxpool.Pool
 }
 
 func (r *orgRepo) Create(ctx context.Context,
@@ -40,11 +42,11 @@ func (r *orgRepo) Create(ctx context.Context,
 		owner,
 		createdBy,
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if org, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Org]); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return &org, nil
@@ -58,11 +60,11 @@ func (r *orgRepo) GetMany(ctx context.Context) ([]types.Org, error) {
 	)
 
 	if rows, err = r.db.Query(ctx, queries.OrgGetMany); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if orgs, err = pgx.CollectRows(rows, pgx.RowToStructByName[types.Org]); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return orgs, nil
@@ -89,11 +91,11 @@ func (r *orgRepo) GetOne(ctx context.Context,
 		uuid,
 		slug,
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if org, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Org]); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return &org, nil
@@ -120,11 +122,11 @@ func (r *orgRepo) Update(ctx context.Context,
 		owner,
 		modifiedBy,
 	); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	if org, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Org]); err != nil {
-		return nil, handleError(err)
+		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return &org, nil
@@ -135,7 +137,7 @@ func (r *orgRepo) Delete(ctx context.Context, id int64) error {
 
 	var numDeleted int64
 	if err := row.Scan(&numDeleted); err != nil {
-		return handleError(err)
+		return handleError(ctx, r.logger, err)
 	}
 
 	if numDeleted < 1 {

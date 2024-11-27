@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,12 +17,14 @@ import (
 )
 
 type Repository struct {
-	db *pgxpool.Pool
+	logger *types.Logger
+	db     *pgxpool.Pool
 }
 
-func NewRepository(db *pgxpool.Pool) *Repository {
+func NewRepository(logger *types.Logger, db *pgxpool.Pool) *Repository {
 	return &Repository{
-		db: db,
+		logger: logger,
+		db:     db,
 	}
 }
 
@@ -83,18 +86,28 @@ func (r *Repository) getMigration() (*migrate.Migrate, error) {
 	return migration, nil
 }
 
-func handleError(err error) error {
+func handleError(ctx context.Context, logger *types.Logger, err error) error {
+	tracer, _ := ctx.Value(types.CtxOperationTracer).(types.OperationTracer)
+
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) {
+		if pgErr.Code == "23505" {
+			logger.Error(tracer, types.ErrItemExists.Error(), nil)
+			return types.ErrItemExists
+		}
 		bytes, _ := json.MarshalIndent(pgErr, "", "  ")
 		fmt.Println(string(bytes))
+
+		return err
 	} else {
 		if err.Error() == "no rows in result set" {
+			logger.Error(tracer, types.ErrNotFound.Error(), nil)
 			return types.ErrNotFound
 		}
 
-		fmt.Printf("error: unknown pg error - %+v\n", err)
-	}
+		err = fmt.Errorf("unkonwn postgres error - %w", err)
+		logger.Error(tracer, err.Error(), nil)
 
-	return err
+		return err
+	}
 }

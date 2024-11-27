@@ -34,11 +34,11 @@ func main() {
 	var (
 		logger          = types.NewLogger(types.LogLevelInfo)
 		db              = mustInitDb(globalCtx)
-		repo            = repository.NewRepository(db)
-		accountRepo     = repository.NewAccountRepository(db)
-		orgRepo         = repository.NewOrgRepository(db)
-		applicationRepo = repository.NewAppRepository(db)
-		featureFlagRepo = repository.NewFeatureFlagRepository(db)
+		repo            = repository.NewRepository(logger, db)
+		accountRepo     = repository.NewAccountRepository(logger, db)
+		orgRepo         = repository.NewOrgRepository(logger, db)
+		applicationRepo = repository.NewAppRepository(logger, db)
+		featureFlagRepo = repository.NewFeatureFlagRepository(logger, db)
 	)
 
 	switchcraft := core.NewCore(
