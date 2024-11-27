@@ -60,7 +60,37 @@ func (c *Core) TenantGetMany(ctx context.Context) ([]types.Tenant, error) {
 	return c.tenantRepo.GetMany(ctx)
 }
 
-func (c *Core) TenantGetOne(ctx context.Context, id int64) (*types.Tenant, error) {
+type tenantGetOneArgs struct {
+	id   *int64
+	uuid *string
+	slug *string
+}
+
+func (a *tenantGetOneArgs) Validate() error {
+	if a.id == nil && a.uuid == nil && a.slug == nil {
+		return errors.New("tenantGetOneArgs: must provide one of id, uuid, or slug")
+	}
+
+	if a.id != nil && *a.id < 1 {
+		return errors.New("tenantGetOneArgs: id must be positive integer")
+	}
+
+	return nil
+}
+
+func (c *Core) NewTenantGetOneArgs(id *int64, uuid *string, slug *string) tenantGetOneArgs {
+	return tenantGetOneArgs{
+		id:   id,
+		uuid: uuid,
+		slug: slug,
+	}
+}
+
+func (c *Core) TenantGetOne(ctx context.Context, args tenantGetOneArgs) (*types.Tenant, error) {
+	if err := args.Validate(); err != nil {
+		return nil, err
+	}
+
 	tracer, err := c.getOperationTracer(ctx)
 	if err != nil {
 		return nil, err
@@ -70,7 +100,7 @@ func (c *Core) TenantGetOne(ctx context.Context, id int64) (*types.Tenant, error
 		return nil, errors.New("error: invalid operation context authAccount")
 	}
 
-	return c.tenantRepo.GetOne(ctx, id)
+	return c.tenantRepo.GetOne(ctx, args.id, args.uuid, args.slug)
 }
 
 type tenantUpdateArgs struct {

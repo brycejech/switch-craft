@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"switchcraft/repository/queries"
+	"switchcraft/types"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -88,6 +89,10 @@ func handleError(err error) error {
 		bytes, _ := json.MarshalIndent(pgErr, "", "  ")
 		fmt.Println(string(bytes))
 	} else {
+		if err.Error() == "no rows in result set" {
+			return types.ErrNotFound
+		}
+
 		fmt.Printf("error: unknown pg error - %+v\n", err)
 	}
 

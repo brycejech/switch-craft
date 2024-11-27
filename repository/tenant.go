@@ -68,14 +68,27 @@ func (r *tenantRepo) GetMany(ctx context.Context) ([]types.Tenant, error) {
 	return tenants, nil
 }
 
-func (r *tenantRepo) GetOne(ctx context.Context, ID int64) (*types.Tenant, error) {
+func (r *tenantRepo) GetOne(ctx context.Context,
+	id *int64,
+	uuid *string,
+	slug *string,
+) (*types.Tenant, error) {
+	if id == nil && uuid == nil && slug == nil {
+		return nil, errors.New("tenantRepository.GetOne must provide at least one of id, uuid, or slug")
+	}
+
 	var (
 		tenant types.Tenant
 		rows   pgx.Rows
 		err    error
 	)
 
-	if rows, err = r.db.Query(ctx, queries.TenantGetOne, ID); err != nil {
+	if rows, err = r.db.Query(ctx,
+		queries.TenantGetOne,
+		id,
+		uuid,
+		slug,
+	); err != nil {
 		return nil, handleError(err)
 	}
 

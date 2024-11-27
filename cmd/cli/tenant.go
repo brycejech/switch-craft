@@ -79,14 +79,33 @@ func registerTenantModule(core *core.Core) {
 	/* === GET TENANT COMMAND === */
 	/* -------------------------- */
 	var getTenantID int64
+	var getTenantUUID string
+	var getTenantSlug string
 	var getTenantCmd = &cobra.Command{
 		Use:   "getOne",
 		Short: "Get a single tenant",
-		Run: func(_ *cobra.Command, _ []string) {
+		Run: func(cmd *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			tenant, err := core.TenantGetOne(opCtx, getTenantID)
+			var (
+				id   *int64
+				uuid *string
+				slug *string
+			)
+
+			if cmd.Flags().Changed("id") {
+				id = &getTenantID
+			}
+			if cmd.Flags().Changed("uuid") {
+				uuid = &getTenantUUID
+			}
+			if cmd.Flags().Changed("slug") {
+				slug = &getTenantSlug
+			}
+
+			args := core.NewTenantGetOneArgs(id, uuid, slug)
+			tenant, err := core.TenantGetOne(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -97,6 +116,10 @@ func registerTenantModule(core *core.Core) {
 
 	getTenantCmd.Flags().Int64Var(&getTenantID, "id", 0, "tenant.id")
 	getTenantCmd.MarkFlagRequired("id")
+	getTenantCmd.Flags().StringVar(&getTenantUUID, "uuid", "", "tenant.uuid")
+	getTenantCmd.MarkFlagRequired("uuid")
+	getTenantCmd.Flags().StringVar(&getTenantSlug, "slug", "", "tenant.slug")
+	getTenantCmd.MarkFlagRequired("slug")
 	tenantCmd.AddCommand(getTenantCmd)
 
 	/* ----------------------------- */

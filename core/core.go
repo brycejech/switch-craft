@@ -105,7 +105,11 @@ type TenantRepo interface {
 		createdBy int64,
 	) (*types.Tenant, error)
 	GetMany(ctx context.Context) ([]types.Tenant, error)
-	GetOne(ctx context.Context, ID int64) (*types.Tenant, error)
+	GetOne(ctx context.Context,
+		id *int64,
+		uuid *string,
+		slug *string,
+	) (*types.Tenant, error)
 	Update(ctx context.Context,
 		id int64,
 		name string,

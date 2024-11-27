@@ -22,6 +22,6 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 
 	router.HandleFunc("POST /tenant", authMiddleware(tenantController.Create))
 	router.HandleFunc("GET /tenant", authMiddleware(tenantController.GetMany))
-	router.HandleFunc("GET /tenant/{tenantID}", authMiddleware(tenantController.GetOne))
-	router.HandleFunc("PUT /tenant/{tenantID}", authMiddleware(tenantController.Update))
+	router.HandleFunc("GET /tenant/{tenantSlug}", authMiddleware(tenantController.GetOne))
+	router.HandleFunc("PUT /tenant/{tenantSlug}", authMiddleware(tenantController.Update))
 }

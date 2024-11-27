@@ -2,9 +2,9 @@ package rest
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 	"switchcraft/core"
 	"switchcraft/types"
 )
@@ -33,14 +33,16 @@ func (c *tenantController) GetMany(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *tenantController) GetOne(w http.ResponseWriter, r *http.Request) {
-	tenantID, err := strconv.ParseInt(r.PathValue("tenantID"), 10, 64)
+	tenantSlug := r.PathValue("tenantSlug")
+	tenant, err := c.core.TenantGetOne(r.Context(),
+		c.core.NewTenantGetOneArgs(nil, nil, &tenantSlug),
+	)
 	if err != nil {
-		badRequest(w, r)
-		return
-	}
+		if errors.Is(err, types.ErrNotFound) {
+			notFound(w, r)
+			return
+		}
 
-	tenant, err := c.core.TenantGetOne(r.Context(), tenantID)
-	if err != nil {
 		internalServerError(w, r)
 		return
 	}
@@ -85,19 +87,18 @@ func (c *tenantController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tenantIDFromURL, err := strconv.ParseInt(r.PathValue("tenantID"), 10, 64)
-	if err != nil {
-		badRequest(w, r)
-		return
-	}
-	tenant, err := c.core.TenantGetOne(r.Context(), tenantIDFromURL)
+	tenantSlug := r.PathValue("tenantID")
+	tenant, err := c.core.TenantGetOne(r.Context(),
+		c.core.NewTenantGetOneArgs(nil, nil, &tenantSlug),
+	)
 	if err != nil || tenant == nil {
 		notFound(w, r)
 		return
 	}
 
-	args := c.core.NewTenantUpdateArgs(tenantIDFromURL, body.Name, body.Slug, tenant.Owner)
-	updatedTenant, err := c.core.TenantUpdate(r.Context(), args)
+	updatedTenant, err := c.core.TenantUpdate(r.Context(),
+		c.core.NewTenantUpdateArgs(tenant.ID, body.Name, body.Slug, tenant.Owner),
+	)
 	if err != nil {
 		internalServerError(w, r)
 		return
