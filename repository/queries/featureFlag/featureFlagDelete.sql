@@ -4,7 +4,7 @@ WITH deleted AS (
 		application.feature_flag
 
 	WHERE
-		    tenant_id = $1
+		    org_id = $1
 		AND application_id = $2
 		AND id = $3
 	

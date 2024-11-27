@@ -8,7 +8,7 @@ import (
 
 func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	authController := newAuthController(logger, core)
-	tenantController := newTenantController(logger, core)
+	orgController := newOrgController(logger, core)
 
 	authMiddleware := createAuthMiddleware(logger, core)
 
@@ -20,8 +20,8 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 
 	router.HandleFunc("POST /authn", authController.Login)
 
-	router.HandleFunc("POST /tenant", authMiddleware(tenantController.Create))
-	router.HandleFunc("GET /tenant", authMiddleware(tenantController.GetMany))
-	router.HandleFunc("GET /tenant/{tenantSlug}", authMiddleware(tenantController.GetOne))
-	router.HandleFunc("PUT /tenant/{tenantSlug}", authMiddleware(tenantController.Update))
+	router.HandleFunc("POST /org", authMiddleware(orgController.Create))
+	router.HandleFunc("GET /org", authMiddleware(orgController.GetMany))
+	router.HandleFunc("GET /org/{orgSlug}", authMiddleware(orgController.GetOne))
+	router.HandleFunc("PUT /org/{orgSlug}", authMiddleware(orgController.Update))
 }

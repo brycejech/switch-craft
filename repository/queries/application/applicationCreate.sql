@@ -1,6 +1,6 @@
 
 INSERT INTO application.application (
-	  tenant_id
+	  org_id
 	, name
 	, slug
 	, created_by
@@ -14,7 +14,7 @@ VALUES (
 )
 
 RETURNING
-	  tenant_id
+	  org_id
 	, id
 	, uuid
 	, name

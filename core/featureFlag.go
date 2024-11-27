@@ -7,15 +7,15 @@ import (
 )
 
 type featureFlagCreateArgs struct {
-	tenantID  int64
+	orgID     int64
 	appID     int64
 	name      string
 	isEnabled bool
 }
 
 func (a *featureFlagCreateArgs) Validate() error {
-	if a.tenantID < 1 {
-		return errors.New("featureFlagCreateArgs.tenantID must be positive integer")
+	if a.orgID < 1 {
+		return errors.New("featureFlagCreateArgs.orgID must be positive integer")
 	}
 	if a.appID < 1 {
 		return errors.New("featureFlagCreateArgs.appID must be positive integer")
@@ -27,13 +27,13 @@ func (a *featureFlagCreateArgs) Validate() error {
 }
 
 func (c *Core) NewFeatureFlagCreateArgs(
-	tenantID int64,
+	orgID int64,
 	appID int64,
 	name string,
 	isEnabled bool,
 ) featureFlagCreateArgs {
 	return featureFlagCreateArgs{
-		tenantID:  tenantID,
+		orgID:     orgID,
 		appID:     appID,
 		name:      name,
 		isEnabled: isEnabled,
@@ -51,7 +51,7 @@ func (c *Core) FeatureFlagCreate(ctx context.Context, args featureFlagCreateArgs
 	}
 
 	return c.featureFlagRepo.Create(ctx,
-		args.tenantID,
+		args.orgID,
 		args.appID,
 		args.name,
 		args.isEnabled,
@@ -60,23 +60,23 @@ func (c *Core) FeatureFlagCreate(ctx context.Context, args featureFlagCreateArgs
 }
 
 func (c *Core) FeatureFlagGetMany(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	appID int64,
 ) ([]types.FeatureFlag, error) {
-	return c.featureFlagRepo.GetMany(ctx, tenantID, appID)
+	return c.featureFlagRepo.GetMany(ctx, orgID, appID)
 }
 
 type featureFlagGetOneArgs struct {
-	tenantID int64
-	appID    int64
-	id       *int64
-	uuid     *string
-	name     *string
+	orgID int64
+	appID int64
+	id    *int64
+	uuid  *string
+	name  *string
 }
 
 func (a *featureFlagGetOneArgs) Validate() error {
-	if a.tenantID < 1 {
-		return errors.New("featureFlagGetOneArgs.tenantID must be positive integer")
+	if a.orgID < 1 {
+		return errors.New("featureFlagGetOneArgs.orgID must be positive integer")
 	}
 	if a.appID < 1 {
 		return errors.New("featureFlagGetOneArgs.appID must be positive integer")
@@ -91,18 +91,18 @@ func (a *featureFlagGetOneArgs) Validate() error {
 }
 
 func (c *Core) NewFeatureFlagGetOneArgs(
-	tenantID int64,
+	orgID int64,
 	appID int64,
 	id *int64,
 	uuid *string,
 	name *string,
 ) featureFlagGetOneArgs {
 	return featureFlagGetOneArgs{
-		tenantID: tenantID,
-		appID:    appID,
-		id:       id,
-		uuid:     uuid,
-		name:     name,
+		orgID: orgID,
+		appID: appID,
+		id:    id,
+		uuid:  uuid,
+		name:  name,
 	}
 }
 
@@ -112,7 +112,7 @@ func (c *Core) FeatureFlagGetOne(ctx context.Context, args featureFlagGetOneArgs
 	}
 
 	return c.featureFlagRepo.GetOne(ctx,
-		args.tenantID,
+		args.orgID,
 		args.appID,
 		args.id,
 		args.uuid,
@@ -121,7 +121,7 @@ func (c *Core) FeatureFlagGetOne(ctx context.Context, args featureFlagGetOneArgs
 }
 
 type featureFlagUpdateArgs struct {
-	tenantID  int64
+	orgID     int64
 	appID     int64
 	id        int64
 	name      string
@@ -129,8 +129,8 @@ type featureFlagUpdateArgs struct {
 }
 
 func (a *featureFlagUpdateArgs) Validate() error {
-	if a.tenantID < 1 {
-		return errors.New("featureFlagUpdateArgs.tenantID must be positive integer")
+	if a.orgID < 1 {
+		return errors.New("featureFlagUpdateArgs.orgID must be positive integer")
 	}
 	if a.appID < 1 {
 		return errors.New("featureFlagUpdateArgs.appID must be positive integer")
@@ -145,14 +145,14 @@ func (a *featureFlagUpdateArgs) Validate() error {
 }
 
 func (c *Core) NewFeatureFlagUpdateArgs(
-	tenantID int64,
+	orgID int64,
 	appID int64,
 	id int64,
 	name string,
 	isEnabled bool,
 ) featureFlagUpdateArgs {
 	return featureFlagUpdateArgs{
-		tenantID:  tenantID,
+		orgID:     orgID,
 		appID:     appID,
 		id:        id,
 		name:      name,
@@ -171,7 +171,7 @@ func (c *Core) FeatureFlagUpdate(ctx context.Context, args featureFlagUpdateArgs
 	}
 
 	return c.featureFlagRepo.Update(ctx,
-		args.tenantID,
+		args.orgID,
 		args.appID,
 		args.id,
 		args.name,
@@ -181,12 +181,12 @@ func (c *Core) FeatureFlagUpdate(ctx context.Context, args featureFlagUpdateArgs
 }
 
 func (c *Core) FeatureFlagDelete(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	appID int64,
 	id int64,
 ) error {
 	return c.featureFlagRepo.Delete(ctx,
-		tenantID,
+		orgID,
 		appID,
 		id,
 	)

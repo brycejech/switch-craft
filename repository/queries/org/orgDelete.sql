@@ -1,6 +1,6 @@
 
 WITH deleted AS (
-	DELETE FROM account.tenant WHERE id=$1 RETURNING id
+	DELETE FROM account.org WHERE id=$1 RETURNING id
 )
 
 SELECT

@@ -11,7 +11,7 @@ func NewCore(
 	logger *types.Logger,
 	repo Repo,
 	accountRepo AccountRepo,
-	tenantRepo TenantRepo,
+	orgRepo OrgRepo,
 	appRepo AppRepo,
 	featureFlagRepo FeatureFlagRepo,
 	jwtSigningKey []byte,
@@ -20,7 +20,7 @@ func NewCore(
 		logger:          logger,
 		repository:      repo,
 		accountRepo:     accountRepo,
-		tenantRepo:      tenantRepo,
+		orgRepo:         orgRepo,
 		appRepo:         appRepo,
 		featureFlagRepo: featureFlagRepo,
 		jwtSigningKey:   jwtSigningKey,
@@ -31,7 +31,7 @@ type Core struct {
 	logger          *types.Logger
 	repository      Repo
 	accountRepo     AccountRepo
-	tenantRepo      TenantRepo
+	orgRepo         OrgRepo
 	appRepo         AppRepo
 	featureFlagRepo FeatureFlagRepo
 	jwtSigningKey   []byte
@@ -70,7 +70,7 @@ type Repo interface {
 
 type AccountRepo interface {
 	Create(ctx context.Context,
-		tenantID *int64,
+		orgID *int64,
 		firstName string,
 		lastName string,
 		email string,
@@ -78,15 +78,15 @@ type AccountRepo interface {
 		password *string,
 		createdBy int64,
 	) (*types.Account, error)
-	GetMany(ctx context.Context, tenantID *int64) ([]types.Account, error)
+	GetMany(ctx context.Context, orgID *int64) ([]types.Account, error)
 	GetOne(ctx context.Context,
-		tenantID *int64,
+		orgID *int64,
 		id *int64,
 		uuid *string,
 		username *string,
 	) (*types.Account, error)
 	Update(ctx context.Context,
-		tenantID *int64,
+		orgID *int64,
 		id int64,
 		firstName string,
 		lastName string,
@@ -94,82 +94,82 @@ type AccountRepo interface {
 		username string,
 		modifiedBy int64,
 	) (*types.Account, error)
-	Delete(ctx context.Context, tenantID *int64, id int64) error
+	Delete(ctx context.Context, orgID *int64, id int64) error
 }
 
-type TenantRepo interface {
+type OrgRepo interface {
 	Create(ctx context.Context,
 		name string,
 		slug string,
 		owner int64,
 		createdBy int64,
-	) (*types.Tenant, error)
-	GetMany(ctx context.Context) ([]types.Tenant, error)
+	) (*types.Org, error)
+	GetMany(ctx context.Context) ([]types.Org, error)
 	GetOne(ctx context.Context,
 		id *int64,
 		uuid *string,
 		slug *string,
-	) (*types.Tenant, error)
+	) (*types.Org, error)
 	Update(ctx context.Context,
 		id int64,
 		name string,
 		slug string,
 		owner int64,
 		modifiedBy int64,
-	) (*types.Tenant, error)
+	) (*types.Org, error)
 	Delete(ctx context.Context, id int64) error
 }
 
 type AppRepo interface {
 	Create(ctx context.Context,
-		tenantID int64,
+		orgID int64,
 		name string,
 		slug string,
 		createdBy int64,
 	) (*types.Application, error)
 	GetMany(ctx context.Context,
-		tenantID int64,
+		orgID int64,
 	) ([]types.Application, error)
 	GetOne(ctx context.Context,
-		tenantID int64,
+		orgID int64,
 		id *int64,
 		uuid *string,
 		slug *string,
 	) (*types.Application, error)
 	Update(ctx context.Context,
-		tenantID int64,
+		orgID int64,
 		id int64,
 		name string,
 		slug string,
 		modifiedBy int64,
 	) (*types.Application, error)
 	Delete(ctx context.Context,
-		tenantID int64,
+		orgID int64,
 		id int64,
 	) error
 }
 
 type FeatureFlagRepo interface {
 	Create(ctx context.Context,
-		tenantID int64,
+		orgID int64,
 		applicationID int64,
 		name string,
 		isEnabled bool,
 		createdBy int64,
 	) (*types.FeatureFlag, error)
 	GetMany(ctx context.Context,
-		tenantID int64,
+		orgID int64,
 		applicationID int64,
 	) ([]types.FeatureFlag, error)
 	GetOne(ctx context.Context,
-		tenantID int64,
+		orgID int64,
 		applicationID int64,
 		id *int64,
 		uuid *string,
 		name *string,
 	) (*types.FeatureFlag, error)
 	Update(ctx context.Context,
-		tenantID int64,
+		orgID int64,
 		applicationID int64,
 		id int64,
 		slug string,
@@ -177,7 +177,7 @@ type FeatureFlagRepo interface {
 		modifiedBy int64,
 	) (*types.FeatureFlag, error)
 	Delete(ctx context.Context,
-		tenantID int64,
+		orgID int64,
 		applicationID int64,
 		id int64,
 	) error

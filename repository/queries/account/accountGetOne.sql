@@ -1,6 +1,6 @@
 
 SELECT
-	  tenant_id
+	  org_id
 	, id
 	, uuid
 	, first_name
@@ -18,7 +18,7 @@ FROM
 
 WHERE
 
-	    ($1::bigint IS NULL    OR tenant_id=$1::bigint)
+	    ($1::bigint IS NULL    OR org_id=$1::bigint)
 	AND ($2::bigint IS NULL    OR id=$2::bigint)
 	AND (COALESCE($3, '') = '' OR uuid=$3::uuid)
 	AND (COALESCE($4, '') = '' OR username=$4::text)

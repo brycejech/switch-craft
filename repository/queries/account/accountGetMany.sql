@@ -1,6 +1,6 @@
 
 SELECT
-	  tenant_id
+	  org_id
 	, id
 	, uuid
 	, first_name
@@ -16,4 +16,4 @@ SELECT
 FROM
 	account.account
 
-WHERE tenant_id=$1;
+WHERE org_id=$1;

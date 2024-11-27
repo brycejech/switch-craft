@@ -20,7 +20,7 @@ func registerAccountModule(core *core.Core) {
 	/* ------------------------ */
 	/* === GET ACCOUNTS CMD === */
 	/* ------------------------ */
-	var getAccountsTenantID int64
+	var getAccountsOrgID int64
 	var getAccountsCmd = &cobra.Command{
 		Use:   "getMany",
 		Short: "Get multiple accounts",
@@ -28,12 +28,12 @@ func registerAccountModule(core *core.Core) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			var tenantID *int64
-			if cmd.Flags().Changed("tenantId") {
-				tenantID = &getAccountsTenantID
+			var orgID *int64
+			if cmd.Flags().Changed("orgId") {
+				orgID = &getAccountsOrgID
 			}
 
-			accounts, err := core.AccountGetMany(opCtx, tenantID)
+			accounts, err := core.AccountGetMany(opCtx, orgID)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -41,15 +41,15 @@ func registerAccountModule(core *core.Core) {
 			printJSON(accounts)
 		},
 	}
-	getAccountsCmd.Flags().Int64Var(&getAccountsTenantID, "tenantId", 0, "account.createdBy")
-	getAccountsCmd.MarkFlagRequired("tenantId")
+	getAccountsCmd.Flags().Int64Var(&getAccountsOrgID, "orgId", 0, "account.createdBy")
+	getAccountsCmd.MarkFlagRequired("orgId")
 	accountCmd.AddCommand(getAccountsCmd)
 
 	/* -------------------------- */
 	/* === CREATE ACCOUNT CMD === */
 	/* -------------------------- */
 	createAccountCmdArgs := struct {
-		TenantID  int64
+		OrgID     int64
 		FirstName string
 		LastName  string
 		Email     string
@@ -63,7 +63,7 @@ func registerAccountModule(core *core.Core) {
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
 			args := core.NewAccountCreateArgs(
-				createAccountCmdArgs.TenantID,
+				createAccountCmdArgs.OrgID,
 				createAccountCmdArgs.FirstName,
 				createAccountCmdArgs.LastName,
 				createAccountCmdArgs.Email,
@@ -80,7 +80,7 @@ func registerAccountModule(core *core.Core) {
 		},
 	}
 
-	createAccountCmd.Flags().Int64Var(&createAccountCmdArgs.TenantID, "tenantId", 0, "account.tenantId")
+	createAccountCmd.Flags().Int64Var(&createAccountCmdArgs.OrgID, "orgId", 0, "account.orgId")
 	createAccountCmd.Flags().StringVar(&createAccountCmdArgs.FirstName, "firstName", "", "account.firstName")
 	createAccountCmd.MarkFlagRequired("firstName")
 	createAccountCmd.Flags().StringVar(&createAccountCmdArgs.LastName, "lastName", "", "account.lastName")
@@ -94,7 +94,7 @@ func registerAccountModule(core *core.Core) {
 	/* ----------------------- */
 	/* === GET ACCOUNT CMD === */
 	/* ----------------------- */
-	var getAccountTenantID int64
+	var getAccountOrgID int64
 	var getAccountID int64
 	var getAccountUUID string
 	var getAccountUsername string
@@ -106,13 +106,13 @@ func registerAccountModule(core *core.Core) {
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
 			var (
-				tenantID *int64
+				orgID    *int64
 				id       *int64
 				uuid     *string
 				username *string
 			)
-			if cmd.Flags().Changed("tenantId") {
-				tenantID = &getAccountTenantID
+			if cmd.Flags().Changed("orgId") {
+				orgID = &getAccountOrgID
 			}
 			if cmd.Flags().Changed("id") {
 				id = &getAccountID
@@ -125,7 +125,7 @@ func registerAccountModule(core *core.Core) {
 			}
 
 			args := core.NewAccountGetOneArgs(
-				tenantID,
+				orgID,
 				id,
 				uuid,
 				username,
@@ -139,7 +139,7 @@ func registerAccountModule(core *core.Core) {
 			printJSON(account)
 		},
 	}
-	getAccountCmd.Flags().Int64Var(&getAccountTenantID, "tenantId", 0, "account.tenantId")
+	getAccountCmd.Flags().Int64Var(&getAccountOrgID, "orgId", 0, "account.orgId")
 	getAccountCmd.Flags().Int64Var(&getAccountID, "id", 0, "account.id")
 	getAccountCmd.Flags().StringVar(&getAccountUUID, "uuid", "", "account.uuid")
 	getAccountCmd.Flags().StringVar(&getAccountUsername, "username", "", "account.username")
@@ -149,7 +149,7 @@ func registerAccountModule(core *core.Core) {
 	/* === UPDATE ACCOUNT CMD === */
 	/* -------------------------- */
 	updateAccountCmdArgs := struct {
-		TenantID  int64
+		OrgID     int64
 		ID        int64
 		FirstName string
 		LastName  string
@@ -163,12 +163,12 @@ func registerAccountModule(core *core.Core) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			var tenantID *int64
-			if cmd.Flags().Changed("tenantId") {
-				tenantID = &updateAccountCmdArgs.TenantID
+			var orgID *int64
+			if cmd.Flags().Changed("orgId") {
+				orgID = &updateAccountCmdArgs.OrgID
 			}
 			args := core.NewAccountUpdateArgs(
-				tenantID,
+				orgID,
 				updateAccountCmdArgs.ID,
 				updateAccountCmdArgs.FirstName,
 				updateAccountCmdArgs.LastName,
@@ -185,7 +185,7 @@ func registerAccountModule(core *core.Core) {
 		},
 	}
 
-	updateAccountCmd.Flags().Int64Var(&updateAccountCmdArgs.TenantID, "tenantId", 0, "account.tenantId")
+	updateAccountCmd.Flags().Int64Var(&updateAccountCmdArgs.OrgID, "orgId", 0, "account.orgId")
 	updateAccountCmd.Flags().Int64Var(&updateAccountCmdArgs.ID, "id", 0, "account.id")
 	updateAccountCmd.MarkFlagRequired("id")
 	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.FirstName, "firstName", "", "account.firstName")
@@ -201,7 +201,7 @@ func registerAccountModule(core *core.Core) {
 	/* -------------------------- */
 	/* === DELETE ACCOUNT CMD === */
 	/* -------------------------- */
-	var deleteAccountTenantID int64
+	var deleteAccountOrgID int64
 	var deleteAccountID int64
 	var deleteAccountCmd = &cobra.Command{
 		Use:   "delete",
@@ -210,11 +210,11 @@ func registerAccountModule(core *core.Core) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			var tenantID *int64
-			if cmd.Flags().Changed("tenantId") {
-				tenantID = &deleteAccountTenantID
+			var orgID *int64
+			if cmd.Flags().Changed("orgId") {
+				orgID = &deleteAccountOrgID
 			}
-			if err := core.AccountDelete(opCtx, tenantID, deleteAccountID); err != nil {
+			if err := core.AccountDelete(opCtx, orgID, deleteAccountID); err != nil {
 				log.Fatal(err)
 			}
 			fmt.Printf("Account '%v' deleted successfully\n", deleteAccountID)

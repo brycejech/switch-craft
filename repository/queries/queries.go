@@ -24,23 +24,23 @@ var AccountUpdate string
 var AccountDelete string
 
 /* ---------------------- */
-/* === TENANT QUERIES === */
+/* === ORG QUERIES === */
 /* ---------------------- */
 
-//go:embed tenant/tenantCreate.sql
-var TenantCreate string
+//go:embed org/orgCreate.sql
+var OrgCreate string
 
-//go:embed tenant/tenantGetMany.sql
-var TenantGetMany string
+//go:embed org/orgGetMany.sql
+var OrgGetMany string
 
-//go:embed tenant/tenantGetOne.sql
-var TenantGetOne string
+//go:embed org/orgGetOne.sql
+var OrgGetOne string
 
-//go:embed tenant/tenantUpdate.sql
-var TenantUpdate string
+//go:embed org/orgUpdate.sql
+var OrgUpdate string
 
-//go:embed tenant/tenantDelete.sql
-var TenantDelete string
+//go:embed org/orgDelete.sql
+var OrgDelete string
 
 /* --------------------------- */
 /* === APPLICATION QUERIES === */

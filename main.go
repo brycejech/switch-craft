@@ -36,7 +36,7 @@ func main() {
 		db              = mustInitDb(globalCtx)
 		repo            = repository.NewRepository(db)
 		accountRepo     = repository.NewAccountRepository(db)
-		tenantRepo      = repository.NewTenantRepository(db)
+		orgRepo         = repository.NewOrgRepository(db)
 		applicationRepo = repository.NewAppRepository(db)
 		featureFlagRepo = repository.NewFeatureFlagRepository(db)
 	)
@@ -45,7 +45,7 @@ func main() {
 		logger,
 		repo,
 		accountRepo,
-		tenantRepo,
+		orgRepo,
 		applicationRepo,
 		featureFlagRepo,
 		jwtSigningKeyBytes,

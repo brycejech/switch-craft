@@ -1,6 +1,6 @@
 
 INSERT INTO account.account(
-	  tenant_id
+	  org_id
 	, first_name
 	, last_name
 	, email
@@ -20,7 +20,7 @@ VALUES (
 )
 
 RETURNING
-	  tenant_id
+	  org_id
 	, id
 	, uuid
 	, first_name

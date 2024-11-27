@@ -22,7 +22,7 @@ type featureFlagRepo struct {
 }
 
 func (r *featureFlagRepo) Create(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	applicationID int64,
 	name string,
 	isEnabled bool,
@@ -36,7 +36,7 @@ func (r *featureFlagRepo) Create(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.FeatureFlagCreate,
-		tenantID,
+		orgID,
 		applicationID,
 		name,
 		isEnabled,
@@ -56,7 +56,7 @@ func (r *featureFlagRepo) Create(ctx context.Context,
 }
 
 func (r *featureFlagRepo) GetMany(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	applicationID int64,
 ) ([]types.FeatureFlag, error) {
 	var (
@@ -67,7 +67,7 @@ func (r *featureFlagRepo) GetMany(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.FeatureFlagGetMany,
-		tenantID,
+		orgID,
 		applicationID,
 	); err != nil {
 		return nil, handleError(err)
@@ -84,7 +84,7 @@ func (r *featureFlagRepo) GetMany(ctx context.Context,
 }
 
 func (r *featureFlagRepo) GetOne(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	applicationID int64,
 	id *int64,
 	uuid *string,
@@ -98,7 +98,7 @@ func (r *featureFlagRepo) GetOne(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.FeatureFlagGetOne,
-		tenantID,
+		orgID,
 		applicationID,
 		id,
 		uuid,
@@ -118,7 +118,7 @@ func (r *featureFlagRepo) GetOne(ctx context.Context,
 }
 
 func (r *featureFlagRepo) Update(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	applicationID int64,
 	id int64,
 	name string,
@@ -133,7 +133,7 @@ func (r *featureFlagRepo) Update(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.FeatureFlagUpdate,
-		tenantID,
+		orgID,
 		applicationID,
 		id,
 		name,
@@ -154,13 +154,13 @@ func (r *featureFlagRepo) Update(ctx context.Context,
 }
 
 func (r *featureFlagRepo) Delete(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	applicationID int64,
 	id int64,
 ) error {
 	row := r.db.QueryRow(ctx,
 		queries.FeatureFlagDelete,
-		tenantID,
+		orgID,
 		applicationID,
 		id,
 	)

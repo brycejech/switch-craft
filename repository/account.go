@@ -22,7 +22,7 @@ type accountRepo struct {
 }
 
 func (r *accountRepo) Create(ctx context.Context,
-	tenantID *int64,
+	orgID *int64,
 	firstName string,
 	lastName string,
 	email string,
@@ -40,7 +40,7 @@ func (r *accountRepo) Create(ctx context.Context,
 	if rows, err = r.db.Query(
 		ctx,
 		queries.AccountCreate,
-		tenantID,
+		orgID,
 		firstName,
 		lastName,
 		email,
@@ -58,7 +58,7 @@ func (r *accountRepo) Create(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepo) GetMany(ctx context.Context, tenantID *int64) ([]types.Account, error) {
+func (r *accountRepo) GetMany(ctx context.Context, orgID *int64) ([]types.Account, error) {
 
 	var (
 		accounts []types.Account
@@ -66,7 +66,7 @@ func (r *accountRepo) GetMany(ctx context.Context, tenantID *int64) ([]types.Acc
 		err      error
 	)
 
-	if rows, err = r.db.Query(ctx, queries.AccountGetMany, tenantID); err != nil {
+	if rows, err = r.db.Query(ctx, queries.AccountGetMany, orgID); err != nil {
 		return nil, handleError(err)
 	}
 
@@ -78,7 +78,7 @@ func (r *accountRepo) GetMany(ctx context.Context, tenantID *int64) ([]types.Acc
 }
 
 func (r *accountRepo) GetOne(ctx context.Context,
-	tenantID *int64,
+	orgID *int64,
 	id *int64,
 	uuid *string,
 	username *string,
@@ -92,7 +92,7 @@ func (r *accountRepo) GetOne(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.AccountGetOne,
-		tenantID,
+		orgID,
 		id,
 		uuid,
 		username,
@@ -108,7 +108,7 @@ func (r *accountRepo) GetOne(ctx context.Context,
 }
 
 func (r *accountRepo) Update(ctx context.Context,
-	tenantID *int64,
+	orgID *int64,
 	id int64,
 	firstName string,
 	lastName string,
@@ -125,7 +125,7 @@ func (r *accountRepo) Update(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.AccountUpdate,
-		tenantID,
+		orgID,
 		id,
 		firstName,
 		lastName,
@@ -143,8 +143,8 @@ func (r *accountRepo) Update(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepo) Delete(ctx context.Context, tenantID *int64, id int64) error {
-	row := r.db.QueryRow(ctx, queries.AccountDelete, tenantID, id)
+func (r *accountRepo) Delete(ctx context.Context, orgID *int64, id int64) error {
+	row := r.db.QueryRow(ctx, queries.AccountDelete, orgID, id)
 
 	var numDeleted int64
 	if err := row.Scan(&numDeleted); err != nil {

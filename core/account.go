@@ -7,7 +7,7 @@ import (
 )
 
 type accountCreateArgs struct {
-	tenantID  int64
+	orgID     int64
 	firstName string
 	lastName  string
 	email     string
@@ -16,8 +16,8 @@ type accountCreateArgs struct {
 }
 
 func (a *accountCreateArgs) Validate() error {
-	if a.tenantID < 1 {
-		return errors.New("accountCreateArgs.tenantID must be positive integer")
+	if a.orgID < 1 {
+		return errors.New("accountCreateArgs.orgID must be positive integer")
 	}
 	if a.firstName == "" {
 		return errors.New("accountCreateArgs.firstName cannot be empty")
@@ -35,7 +35,7 @@ func (a *accountCreateArgs) Validate() error {
 }
 
 func (c *Core) NewAccountCreateArgs(
-	tenantID int64,
+	orgID int64,
 	firstName string,
 	lastName string,
 	email string,
@@ -43,7 +43,7 @@ func (c *Core) NewAccountCreateArgs(
 	password *string,
 ) accountCreateArgs {
 	return accountCreateArgs{
-		tenantID:  tenantID,
+		orgID:     orgID,
 		firstName: firstName,
 		lastName:  lastName,
 		email:     email,
@@ -76,7 +76,7 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 	}
 
 	return c.accountRepo.Create(ctx,
-		&args.tenantID,
+		&args.orgID,
 		args.firstName,
 		args.lastName,
 		args.email,
@@ -143,12 +143,12 @@ func (c *Core) AccountCreateGlobal(ctx context.Context, args accountCreateGlobal
 	)
 }
 
-func (c *Core) AccountGetMany(ctx context.Context, tenantID *int64) ([]types.Account, error) {
-	return c.accountRepo.GetMany(ctx, tenantID)
+func (c *Core) AccountGetMany(ctx context.Context, orgID *int64) ([]types.Account, error) {
+	return c.accountRepo.GetMany(ctx, orgID)
 }
 
 type accountGetOneArgs struct {
-	tenantID *int64
+	orgID    *int64
 	id       *int64
 	uuid     *string
 	username *string
@@ -161,9 +161,9 @@ func (a *accountGetOneArgs) Validate() error {
 	return nil
 }
 
-func (c *Core) NewAccountGetOneArgs(tenantID *int64, id *int64, uuid *string, username *string) accountGetOneArgs {
+func (c *Core) NewAccountGetOneArgs(orgID *int64, id *int64, uuid *string, username *string) accountGetOneArgs {
 	return accountGetOneArgs{
-		tenantID: tenantID,
+		orgID:    orgID,
 		id:       id,
 		uuid:     uuid,
 		username: username,
@@ -175,11 +175,11 @@ func (c *Core) AccountGetOne(ctx context.Context, args accountGetOneArgs) (*type
 		return nil, err
 	}
 
-	return c.accountRepo.GetOne(ctx, args.tenantID, args.id, args.uuid, args.username)
+	return c.accountRepo.GetOne(ctx, args.orgID, args.id, args.uuid, args.username)
 }
 
 type accountUpdateArgs struct {
-	tenantID  *int64
+	orgID     *int64
 	id        int64
 	firstName string
 	lastName  string
@@ -192,7 +192,7 @@ func (a *accountUpdateArgs) Validate() error {
 }
 
 func (c *Core) NewAccountUpdateArgs(
-	tenantID *int64,
+	orgID *int64,
 	id int64,
 	firstName string,
 	lastName string,
@@ -200,7 +200,7 @@ func (c *Core) NewAccountUpdateArgs(
 	username string,
 ) accountUpdateArgs {
 	return accountUpdateArgs{
-		tenantID:  tenantID,
+		orgID:     orgID,
 		id:        id,
 		firstName: firstName,
 		lastName:  lastName,
@@ -220,7 +220,7 @@ func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*type
 	}
 
 	return c.accountRepo.Update(ctx,
-		args.tenantID,
+		args.orgID,
 		args.id,
 		args.firstName,
 		args.lastName,
@@ -230,6 +230,6 @@ func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*type
 	)
 }
 
-func (c *Core) AccountDelete(ctx context.Context, tenantID *int64, id int64) error {
-	return c.accountRepo.Delete(ctx, tenantID, id)
+func (c *Core) AccountDelete(ctx context.Context, orgID *int64, id int64) error {
+	return c.accountRepo.Delete(ctx, orgID, id)
 }

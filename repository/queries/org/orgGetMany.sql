@@ -11,4 +11,4 @@ SELECT
 	, modified_by
 
 FROM
-	account.tenant;
+	account.org;

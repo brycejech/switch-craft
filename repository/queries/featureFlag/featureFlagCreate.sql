@@ -1,6 +1,6 @@
 
 INSERT INTO application.feature_flag (
-	  tenant_id
+	  org_id
 	, application_id
 	, name
 	, is_enabled
@@ -16,7 +16,7 @@ VALUES (
 )
 
 RETURNING
-		tenant_id
+		org_id
 	, application_id
 	, id
 	, uuid

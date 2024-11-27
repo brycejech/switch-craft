@@ -11,7 +11,7 @@ SELECT
 	, modified_by
 
 FROM
-	account.tenant
+	account.org
 
 WHERE
 	    (COALESCE($1, '') = '' OR id=$1::bigint)

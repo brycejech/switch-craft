@@ -1,6 +1,6 @@
 
 UPDATE
-	account.tenant
+	account.org
 
 SET
 	  name = $2

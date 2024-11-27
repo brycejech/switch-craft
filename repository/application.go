@@ -22,7 +22,7 @@ type appRepo struct {
 }
 
 func (r *appRepo) Create(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	name string,
 	slug string,
 	createdBy int64,
@@ -35,7 +35,7 @@ func (r *appRepo) Create(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.AppCreate,
-		tenantID,
+		orgID,
 		name,
 		slug,
 		createdBy,
@@ -54,7 +54,7 @@ func (r *appRepo) Create(ctx context.Context,
 }
 
 func (r *appRepo) GetMany(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 ) ([]types.Application, error) {
 	var (
 		applications []types.Application
@@ -62,7 +62,7 @@ func (r *appRepo) GetMany(ctx context.Context,
 		err          error
 	)
 
-	if rows, err = r.db.Query(ctx, queries.AppGetMany, tenantID); err != nil {
+	if rows, err = r.db.Query(ctx, queries.AppGetMany, orgID); err != nil {
 		return nil, handleError(err)
 	}
 
@@ -77,7 +77,7 @@ func (r *appRepo) GetMany(ctx context.Context,
 }
 
 func (r *appRepo) GetOne(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	id *int64,
 	uuid *string,
 	slug *string,
@@ -90,7 +90,7 @@ func (r *appRepo) GetOne(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.AppGetOne,
-		tenantID,
+		orgID,
 		id,
 		uuid,
 		slug,
@@ -109,7 +109,7 @@ func (r *appRepo) GetOne(ctx context.Context,
 }
 
 func (r *appRepo) Update(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	id int64,
 	name string,
 	slug string,
@@ -123,7 +123,7 @@ func (r *appRepo) Update(ctx context.Context,
 
 	if rows, err = r.db.Query(ctx,
 		queries.AppUpdate,
-		tenantID,
+		orgID,
 		id,
 		name,
 		slug,
@@ -143,12 +143,12 @@ func (r *appRepo) Update(ctx context.Context,
 }
 
 func (r *appRepo) Delete(ctx context.Context,
-	tenantID int64,
+	orgID int64,
 	id int64,
 ) error {
 	row := r.db.QueryRow(ctx,
 		queries.AppDelete,
-		tenantID,
+		orgID,
 		id,
 	)
 

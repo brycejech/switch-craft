@@ -1,5 +1,5 @@
 
-INSERT INTO account.tenant (
+INSERT INTO account.org (
 	  name
 	, slug
 	, owner

@@ -7,14 +7,14 @@ import (
 )
 
 type appCreateArgs struct {
-	tenantID int64
-	name     string
-	slug     string
+	orgID int64
+	name  string
+	slug  string
 }
 
 func (a *appCreateArgs) Validate() error {
-	if a.tenantID < 1 {
-		return errors.New("appCreateArgs.tenantID must be positive integer")
+	if a.orgID < 1 {
+		return errors.New("appCreateArgs.orgID must be positive integer")
 	}
 	if a.name == "" {
 		return errors.New("appCreateArgs.name cannot be empty")
@@ -26,14 +26,14 @@ func (a *appCreateArgs) Validate() error {
 }
 
 func (c *Core) NewAppCreateArgs(
-	tenantID int64,
+	orgID int64,
 	name string,
 	slug string,
 ) appCreateArgs {
 	return appCreateArgs{
-		tenantID: tenantID,
-		name:     name,
-		slug:     slug,
+		orgID: orgID,
+		name:  name,
+		slug:  slug,
 	}
 }
 
@@ -48,27 +48,27 @@ func (c *Core) AppCreate(ctx context.Context, args appCreateArgs) (*types.Applic
 	}
 
 	return c.appRepo.Create(ctx,
-		args.tenantID,
+		args.orgID,
 		args.name,
 		args.slug,
 		tracer.AuthAccount.ID,
 	)
 }
 
-func (c *Core) AppGetMany(ctx context.Context, tenantID int64) ([]types.Application, error) {
-	return c.appRepo.GetMany(ctx, tenantID)
+func (c *Core) AppGetMany(ctx context.Context, orgID int64) ([]types.Application, error) {
+	return c.appRepo.GetMany(ctx, orgID)
 }
 
 type appGetOneArgs struct {
-	tenantID int64
-	id       *int64
-	uuid     *string
-	slug     *string
+	orgID int64
+	id    *int64
+	uuid  *string
+	slug  *string
 }
 
 func (a *appGetOneArgs) Validate() error {
-	if a.tenantID < 1 {
-		return errors.New("appGetOneArgs.tenantID must be positive integer")
+	if a.orgID < 1 {
+		return errors.New("appGetOneArgs.orgID must be positive integer")
 	}
 	if a.id == nil && a.uuid == nil && a.slug == nil {
 		return errors.New("appGetOneArgs: must provide id, uuid, or slug")
@@ -82,16 +82,16 @@ func (a *appGetOneArgs) Validate() error {
 }
 
 func (c *Core) NewAppGetOneArgs(
-	tenantID int64,
+	orgID int64,
 	id *int64,
 	uuid *string,
 	slug *string,
 ) appGetOneArgs {
 	return appGetOneArgs{
-		tenantID: tenantID,
-		id:       id,
-		uuid:     uuid,
-		slug:     slug,
+		orgID: orgID,
+		id:    id,
+		uuid:  uuid,
+		slug:  slug,
 	}
 }
 
@@ -100,19 +100,19 @@ func (c *Core) AppGetOne(ctx context.Context, args appGetOneArgs) (*types.Applic
 		return nil, err
 	}
 
-	return c.appRepo.GetOne(ctx, args.tenantID, args.id, args.uuid, args.slug)
+	return c.appRepo.GetOne(ctx, args.orgID, args.id, args.uuid, args.slug)
 }
 
 type appUpdateArgs struct {
-	tenantID int64
-	id       int64
-	name     string
-	slug     string
+	orgID int64
+	id    int64
+	name  string
+	slug  string
 }
 
 func (a *appUpdateArgs) Validate() error {
-	if a.tenantID < 1 {
-		return errors.New("appUpdateArgs: tenantID must be positive integer")
+	if a.orgID < 1 {
+		return errors.New("appUpdateArgs: orgID must be positive integer")
 	}
 	if a.id < 1 {
 		return errors.New("appUpdateArgs: id must be positive integer")
@@ -127,16 +127,16 @@ func (a *appUpdateArgs) Validate() error {
 }
 
 func (c *Core) NewAppUpdateArgs(
-	tenantID int64,
+	orgID int64,
 	id int64,
 	name string,
 	slug string,
 ) appUpdateArgs {
 	return appUpdateArgs{
-		id:       id,
-		tenantID: tenantID,
-		name:     name,
-		slug:     slug,
+		id:    id,
+		orgID: orgID,
+		name:  name,
+		slug:  slug,
 	}
 }
 
@@ -151,7 +151,7 @@ func (c *Core) AppUpdate(ctx context.Context, args appUpdateArgs) (*types.Applic
 	}
 
 	return c.appRepo.Update(ctx,
-		args.tenantID,
+		args.orgID,
 		args.id,
 		args.name,
 		args.slug,
@@ -159,6 +159,6 @@ func (c *Core) AppUpdate(ctx context.Context, args appUpdateArgs) (*types.Applic
 	)
 }
 
-func (c *Core) AppDelete(ctx context.Context, tenantID int64, id int64) error {
-	return c.appRepo.Delete(ctx, tenantID, id)
+func (c *Core) AppDelete(ctx context.Context, orgID int64, id int64) error {
+	return c.appRepo.Delete(ctx, orgID, id)
 }

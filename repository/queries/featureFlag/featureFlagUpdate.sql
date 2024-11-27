@@ -8,12 +8,12 @@ SET
 	, modified_by = $6
 
 WHERE
-	    tenant_id = $1
+	    org_id = $1
 	AND application_id = $2
 	AND id = $3
 
 RETURNING
-		tenant_id
+		org_id
 	, application_id
 	, id
 	, uuid

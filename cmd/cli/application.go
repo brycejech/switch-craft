@@ -21,9 +21,9 @@ func registerAppModule(core *core.Core) {
 	/* === CREATE APP COMMAND === */
 	/* -------------------------- */
 	createAppArgs := struct {
-		tenantID int64
-		name     string
-		slug     string
+		orgID int64
+		name  string
+		slug  string
 	}{}
 	var createAppCmd = &cobra.Command{
 		Use:   "create",
@@ -33,7 +33,7 @@ func registerAppModule(core *core.Core) {
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
 			args := core.NewAppCreateArgs(
-				createAppArgs.tenantID,
+				createAppArgs.orgID,
 				createAppArgs.name,
 				createAppArgs.slug,
 			)
@@ -46,8 +46,8 @@ func registerAppModule(core *core.Core) {
 			printJSON(app)
 		},
 	}
-	createAppCmd.Flags().Int64Var(&createAppArgs.tenantID, "tenantId", 0, "application.tenantId")
-	createAppCmd.MarkFlagRequired("tenantId")
+	createAppCmd.Flags().Int64Var(&createAppArgs.orgID, "orgId", 0, "application.orgId")
+	createAppCmd.MarkFlagRequired("orgId")
 	createAppCmd.Flags().StringVar(&createAppArgs.name, "name", "", "application.name")
 	createAppCmd.MarkFlagRequired("name")
 	createAppCmd.Flags().StringVar(&createAppArgs.slug, "slug", "", "application.slug")
@@ -57,7 +57,7 @@ func registerAppModule(core *core.Core) {
 	/* ------------------------ */
 	/* === GET APPS COMMAND === */
 	/* ------------------------ */
-	var getAppsCmdTenantID int64
+	var getAppsCmdOrgID int64
 	var getAppsCmd = &cobra.Command{
 		Use:   "getMany",
 		Short: " Get multiple applications",
@@ -65,7 +65,7 @@ func registerAppModule(core *core.Core) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			apps, err := core.AppGetMany(opCtx, getAppsCmdTenantID)
+			apps, err := core.AppGetMany(opCtx, getAppsCmdOrgID)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -73,18 +73,18 @@ func registerAppModule(core *core.Core) {
 			printJSON(apps)
 		},
 	}
-	getAppsCmd.Flags().Int64Var(&getAppsCmdTenantID, "tenantId", 0, "application.tenantId")
-	getAppsCmd.MarkFlagRequired("tenantId")
+	getAppsCmd.Flags().Int64Var(&getAppsCmdOrgID, "orgId", 0, "application.orgId")
+	getAppsCmd.MarkFlagRequired("orgId")
 	appCmd.AddCommand(getAppsCmd)
 
 	/* ----------------------- */
 	/* === GET APP COMMAND === */
 	/* ----------------------- */
 	var getAppCmdArgs = struct {
-		tenantID int64
-		id       int64
-		uuid     string
-		slug     string
+		orgID int64
+		id    int64
+		uuid  string
+		slug  string
 	}{}
 	var getAppCmd = &cobra.Command{
 		Use:   "getOne",
@@ -109,7 +109,7 @@ func registerAppModule(core *core.Core) {
 			}
 
 			args := core.NewAppGetOneArgs(
-				getAppCmdArgs.tenantID,
+				getAppCmdArgs.orgID,
 				id,
 				uuid,
 				slug,
@@ -123,8 +123,8 @@ func registerAppModule(core *core.Core) {
 			printJSON(app)
 		},
 	}
-	getAppCmd.Flags().Int64Var(&getAppCmdArgs.tenantID, "tenantId", 0, "application.tenantId")
-	getAppCmd.MarkFlagRequired("tenantId")
+	getAppCmd.Flags().Int64Var(&getAppCmdArgs.orgID, "orgId", 0, "application.orgId")
+	getAppCmd.MarkFlagRequired("orgId")
 	getAppCmd.Flags().Int64Var(&getAppCmdArgs.id, "id", 0, "application.id")
 	getAppCmd.Flags().StringVar(&getAppCmdArgs.uuid, "uuid", "", "application.uuid")
 	getAppCmd.Flags().StringVar(&getAppCmdArgs.slug, "slug", "", "application.slug")
@@ -134,10 +134,10 @@ func registerAppModule(core *core.Core) {
 	/* === UPDATE APP COMMAND === */
 	/* -------------------------- */
 	updateAppArgs := struct {
-		tenantID int64
-		id       int64
-		name     string
-		slug     string
+		orgID int64
+		id    int64
+		name  string
+		slug  string
 	}{}
 	var updateAppCmd = &cobra.Command{
 		Use:   "update",
@@ -147,7 +147,7 @@ func registerAppModule(core *core.Core) {
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
 			args := core.NewAppUpdateArgs(
-				updateAppArgs.tenantID,
+				updateAppArgs.orgID,
 				updateAppArgs.id,
 				updateAppArgs.name,
 				updateAppArgs.slug,
@@ -161,8 +161,8 @@ func registerAppModule(core *core.Core) {
 			printJSON(app)
 		},
 	}
-	updateAppCmd.Flags().Int64Var(&updateAppArgs.tenantID, "tenantId", 0, "application.tenantId")
-	updateAppCmd.MarkFlagRequired("tenantId")
+	updateAppCmd.Flags().Int64Var(&updateAppArgs.orgID, "orgId", 0, "application.orgId")
+	updateAppCmd.MarkFlagRequired("orgId")
 	updateAppCmd.Flags().Int64Var(&updateAppArgs.id, "id", 0, "application.id")
 	updateAppCmd.MarkFlagRequired("id")
 	updateAppCmd.Flags().StringVar(&updateAppArgs.name, "name", "", "application.name")
@@ -174,7 +174,7 @@ func registerAppModule(core *core.Core) {
 	/* ---------------------- */
 	/* === DELETE APP CMD === */
 	/* ---------------------- */
-	var deleteAppCmdTenantID int64
+	var deleteAppCmdOrgID int64
 	var deleteAppCmdID int64
 	var deleteAppCmd = &cobra.Command{
 		Use:   "delete",
@@ -183,15 +183,15 @@ func registerAppModule(core *core.Core) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			if err := core.AppDelete(opCtx, deleteAppCmdTenantID, deleteAppCmdID); err != nil {
+			if err := core.AppDelete(opCtx, deleteAppCmdOrgID, deleteAppCmdID); err != nil {
 				log.Fatal(err)
 			}
 
 			fmt.Printf("Application '%v' deleted successfully\n", deleteAppCmdID)
 		},
 	}
-	deleteAppCmd.Flags().Int64Var(&deleteAppCmdTenantID, "tenantId", 0, "application.tenantId")
-	deleteAppCmd.MarkFlagRequired("tenantId")
+	deleteAppCmd.Flags().Int64Var(&deleteAppCmdOrgID, "orgId", 0, "application.orgId")
+	deleteAppCmd.MarkFlagRequired("orgId")
 	deleteAppCmd.Flags().Int64Var(&deleteAppCmdID, "id", 0, "application.id")
 	deleteAppCmd.MarkFlagRequired("id")
 	appCmd.AddCommand(deleteAppCmd)

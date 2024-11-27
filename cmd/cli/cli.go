@@ -25,7 +25,7 @@ func Start(logger *types.Logger, core *core.Core) {
 
 	registerMigrationsModule(core)
 	registerAccountModule(core)
-	registerTenantModule(core)
+	registerOrgModule(core)
 	registerAuthModule(core)
 	registerAppModule(core)
 	registerFeatureFlagModule(core)
