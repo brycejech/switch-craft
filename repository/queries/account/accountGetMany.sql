@@ -3,6 +3,7 @@ SELECT
 	  org_id
 	, id
 	, uuid
+	, is_instance_admin
 	, first_name
 	, last_name
 	, email

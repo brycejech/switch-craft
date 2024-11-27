@@ -149,12 +149,13 @@ func registerAccountModule(core *core.Core) {
 	/* === UPDATE ACCOUNT CMD === */
 	/* -------------------------- */
 	updateAccountCmdArgs := struct {
-		OrgID     int64
-		ID        int64
-		FirstName string
-		LastName  string
-		Email     string
-		Username  string
+		orgID           int64
+		id              int64
+		isInstanceAdmin bool
+		firstName       string
+		lastName        string
+		email           string
+		username        string
 	}{}
 	var updateAccountCmd = &cobra.Command{
 		Use:   "update",
@@ -165,15 +166,16 @@ func registerAccountModule(core *core.Core) {
 
 			var orgID *int64
 			if cmd.Flags().Changed("orgId") {
-				orgID = &updateAccountCmdArgs.OrgID
+				orgID = &updateAccountCmdArgs.orgID
 			}
 			args := core.NewAccountUpdateArgs(
 				orgID,
-				updateAccountCmdArgs.ID,
-				updateAccountCmdArgs.FirstName,
-				updateAccountCmdArgs.LastName,
-				updateAccountCmdArgs.Email,
-				updateAccountCmdArgs.Username,
+				updateAccountCmdArgs.id,
+				updateAccountCmdArgs.isInstanceAdmin,
+				updateAccountCmdArgs.firstName,
+				updateAccountCmdArgs.lastName,
+				updateAccountCmdArgs.email,
+				updateAccountCmdArgs.username,
 			)
 
 			account, err := core.AccountUpdate(opCtx, args)
@@ -185,16 +187,18 @@ func registerAccountModule(core *core.Core) {
 		},
 	}
 
-	updateAccountCmd.Flags().Int64Var(&updateAccountCmdArgs.OrgID, "orgId", 0, "account.orgId")
-	updateAccountCmd.Flags().Int64Var(&updateAccountCmdArgs.ID, "id", 0, "account.id")
+	updateAccountCmd.Flags().Int64Var(&updateAccountCmdArgs.orgID, "orgId", 0, "account.orgId")
+	updateAccountCmd.Flags().Int64Var(&updateAccountCmdArgs.id, "id", 0, "account.id")
 	updateAccountCmd.MarkFlagRequired("id")
-	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.FirstName, "firstName", "", "account.firstName")
+	updateAccountCmd.Flags().BoolVar(&updateAccountCmdArgs.isInstanceAdmin, "isInstanceAdmin", false, "account.isInstanceAdmin")
+	updateAccountCmd.MarkFlagRequired("isInstanceAdmin")
+	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.firstName, "firstName", "", "account.firstName")
 	updateAccountCmd.MarkFlagRequired("firstName")
-	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.LastName, "lastName", "", "account.lastName")
+	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.lastName, "lastName", "", "account.lastName")
 	updateAccountCmd.MarkFlagRequired("lastName")
-	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.Email, "email", "", "account.email")
+	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.email, "email", "", "account.email")
 	updateAccountCmd.MarkFlagRequired("email")
-	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.Username, "username", "", "account.username")
+	updateAccountCmd.Flags().StringVar(&updateAccountCmdArgs.username, "username", "", "account.username")
 	updateAccountCmd.MarkFlagRequired("username")
 	accountCmd.AddCommand(updateAccountCmd)
 

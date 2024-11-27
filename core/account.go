@@ -77,6 +77,7 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 
 	return c.accountRepo.Create(ctx,
 		&args.orgID,
+		false,
 		args.firstName,
 		args.lastName,
 		args.email,
@@ -87,11 +88,12 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 }
 
 type accountCreateGlobalArgs struct {
-	firstName string
-	lastName  string
-	email     string
-	username  string
-	password  string
+	isInstanceAdmin bool
+	firstName       string
+	lastName        string
+	email           string
+	username        string
+	password        string
 }
 
 func (a *accountCreateGlobalArgs) Validate() error {
@@ -102,6 +104,7 @@ func (a *accountCreateGlobalArgs) Validate() error {
 }
 
 func (c *Core) NewAccountCreateGlobalArgs(
+	isInstanceAdmin bool,
 	firstName string,
 	lastName string,
 	email string,
@@ -109,11 +112,12 @@ func (c *Core) NewAccountCreateGlobalArgs(
 	password string,
 ) accountCreateGlobalArgs {
 	return accountCreateGlobalArgs{
-		firstName: firstName,
-		lastName:  lastName,
-		email:     email,
-		username:  username,
-		password:  password,
+		isInstanceAdmin: isInstanceAdmin,
+		firstName:       firstName,
+		lastName:        lastName,
+		email:           email,
+		username:        username,
+		password:        password,
 	}
 }
 
@@ -134,6 +138,7 @@ func (c *Core) AccountCreateGlobal(ctx context.Context, args accountCreateGlobal
 
 	return c.accountRepo.Create(ctx,
 		nil,
+		args.isInstanceAdmin,
 		args.firstName,
 		args.lastName,
 		args.email,
@@ -179,12 +184,13 @@ func (c *Core) AccountGetOne(ctx context.Context, args accountGetOneArgs) (*type
 }
 
 type accountUpdateArgs struct {
-	orgID     *int64
-	id        int64
-	firstName string
-	lastName  string
-	email     string
-	username  string
+	orgID           *int64
+	id              int64
+	isInstanceAdmin bool
+	firstName       string
+	lastName        string
+	email           string
+	username        string
 }
 
 func (a *accountUpdateArgs) Validate() error {
@@ -194,18 +200,20 @@ func (a *accountUpdateArgs) Validate() error {
 func (c *Core) NewAccountUpdateArgs(
 	orgID *int64,
 	id int64,
+	isInstanceAdmin bool,
 	firstName string,
 	lastName string,
 	email string,
 	username string,
 ) accountUpdateArgs {
 	return accountUpdateArgs{
-		orgID:     orgID,
-		id:        id,
-		firstName: firstName,
-		lastName:  lastName,
-		email:     email,
-		username:  username,
+		orgID:           orgID,
+		id:              id,
+		isInstanceAdmin: isInstanceAdmin,
+		firstName:       firstName,
+		lastName:        lastName,
+		email:           email,
+		username:        username,
 	}
 }
 
@@ -219,9 +227,25 @@ func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*type
 		return nil, err
 	}
 
+	existingAccount, err := c.AccountGetOne(ctx, c.NewAccountGetOneArgs(args.orgID, &args.id, nil, nil))
+	if err != nil {
+		return nil, err
+	}
+
+	// Only allow instance admins to modify Account.isInstanceAdmin
+	isInstanceAdmin := existingAccount.IsInstanceAdmin
+	if existingAccount.IsInstanceAdmin != args.isInstanceAdmin {
+		if tracer.AuthAccount.IsInstanceAdmin {
+			isInstanceAdmin = args.isInstanceAdmin
+		} else {
+			return nil, types.ErrOperationNotPermitted
+		}
+	}
+
 	return c.accountRepo.Update(ctx,
 		args.orgID,
 		args.id,
+		isInstanceAdmin,
 		args.firstName,
 		args.lastName,
 		args.email,

@@ -13,14 +13,15 @@ CREATE TABLE account.org (
 );
 
 CREATE TABLE account.account (
-	  org_id      bigint        REFERENCES account.org(id) ON DELETE CASCADE ON UPDATE CASCADE
-	, id          bigint        NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY
-	, uuid        uuid          NOT NULL UNIQUE DEFAULT gen_random_uuid()
-	, first_name  varchar(32)   NOT NULL
-	, last_name   varchar(32)   NOT NULL
-	, email       varchar(64)   NOT NULL
-	, username    varchar(64)   NOT NULL UNIQUE
-	, password    varchar(128)
+	  org_id             bigint        REFERENCES account.org(id) ON DELETE CASCADE ON UPDATE CASCADE
+	, id                 bigint        NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY
+	, uuid               uuid          NOT NULL UNIQUE DEFAULT gen_random_uuid()
+	, is_instance_admin  bool          NOT NULL DEFAULT FALSE
+	, first_name         varchar(32)   NOT NULL
+	, last_name          varchar(32)   NOT NULL
+	, email              varchar(64)   NOT NULL
+	, username           varchar(64)   NOT NULL UNIQUE
+	, password           varchar(128)
 
 	, created      timestamp with time zone  NOT NULL DEFAULT (now() at time zone 'utc')
 	, created_by   bigint                    REFERENCES account.account(id)

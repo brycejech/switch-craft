@@ -71,6 +71,7 @@ type Repo interface {
 type AccountRepo interface {
 	Create(ctx context.Context,
 		orgID *int64,
+		isInstanceAdmin bool,
 		firstName string,
 		lastName string,
 		email string,
@@ -88,6 +89,7 @@ type AccountRepo interface {
 	Update(ctx context.Context,
 		orgID *int64,
 		id int64,
+		isInstanceAdmin bool,
 		firstName string,
 		lastName string,
 		email string,
