@@ -51,7 +51,7 @@ func (c *Core) FeatFlagCreate(ctx context.Context, args featFlagCreateArgs) (*ty
 	}
 
 	var (
-		org *types.Org
+		org *types.Organization
 		app *types.Application
 	)
 
@@ -76,7 +76,7 @@ func (c *Core) FeatFlagGetMany(ctx context.Context,
 	appSlug string,
 ) ([]types.FeatureFlag, error) {
 	var (
-		org *types.Org
+		org *types.Organization
 		app *types.Application
 		err error
 	)
@@ -141,7 +141,7 @@ func (c *Core) FeatFlagGetOne(ctx context.Context, args featFlagGetOneArgs) (*ty
 	}
 
 	var (
-		org *types.Org
+		org *types.Organization
 		app *types.Application
 		err error
 	)
@@ -217,7 +217,7 @@ func (c *Core) FeatFlagUpdate(ctx context.Context, args featFlagUpdateArgs) (*ty
 	}
 
 	var (
-		org *types.Org
+		org *types.Organization
 		app *types.Application
 	)
 	if org, err = c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &args.orgSlug)); err != nil {
@@ -243,7 +243,7 @@ func (c *Core) FeatFlagDelete(ctx context.Context,
 	id int64,
 ) error {
 	var (
-		org *types.Org
+		org *types.Organization
 		app *types.Application
 		err error
 	)

@@ -105,20 +105,20 @@ type OrgRepo interface {
 		slug string,
 		owner int64,
 		createdBy int64,
-	) (*types.Org, error)
-	GetMany(ctx context.Context) ([]types.Org, error)
+	) (*types.Organization, error)
+	GetMany(ctx context.Context) ([]types.Organization, error)
 	GetOne(ctx context.Context,
 		id *int64,
 		uuid *string,
 		slug *string,
-	) (*types.Org, error)
+	) (*types.Organization, error)
 	Update(ctx context.Context,
 		id int64,
 		name string,
 		slug string,
 		owner int64,
 		modifiedBy int64,
-	) (*types.Org, error)
+	) (*types.Organization, error)
 	Delete(ctx context.Context, id int64) error
 }
 

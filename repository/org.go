@@ -28,9 +28,9 @@ func (r *orgRepo) Create(ctx context.Context,
 	slug string,
 	owner int64,
 	createdBy int64,
-) (*types.Org, error) {
+) (*types.Organization, error) {
 	var (
-		org  types.Org
+		org  types.Organization
 		rows pgx.Rows
 		err  error
 	)
@@ -45,16 +45,16 @@ func (r *orgRepo) Create(ctx context.Context,
 		return nil, handleError(ctx, r.logger, err)
 	}
 
-	if org, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Org]); err != nil {
+	if org, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Organization]); err != nil {
 		return nil, handleError(ctx, r.logger, err)
 	}
 
 	return &org, nil
 }
 
-func (r *orgRepo) GetMany(ctx context.Context) ([]types.Org, error) {
+func (r *orgRepo) GetMany(ctx context.Context) ([]types.Organization, error) {
 	var (
-		orgs []types.Org
+		orgs []types.Organization
 		rows pgx.Rows
 		err  error
 	)
@@ -63,7 +63,7 @@ func (r *orgRepo) GetMany(ctx context.Context) ([]types.Org, error) {
 		return nil, handleError(ctx, r.logger, err)
 	}
 
-	if orgs, err = pgx.CollectRows(rows, pgx.RowToStructByName[types.Org]); err != nil {
+	if orgs, err = pgx.CollectRows(rows, pgx.RowToStructByName[types.Organization]); err != nil {
 		return nil, handleError(ctx, r.logger, err)
 	}
 
@@ -74,13 +74,13 @@ func (r *orgRepo) GetOne(ctx context.Context,
 	id *int64,
 	uuid *string,
 	slug *string,
-) (*types.Org, error) {
+) (*types.Organization, error) {
 	if id == nil && uuid == nil && slug == nil {
 		return nil, errors.New("orgRepository.GetOne must provide at least one of id, uuid, or slug")
 	}
 
 	var (
-		org  types.Org
+		org  types.Organization
 		rows pgx.Rows
 		err  error
 	)
@@ -94,7 +94,7 @@ func (r *orgRepo) GetOne(ctx context.Context,
 		return nil, handleError(ctx, r.logger, err)
 	}
 
-	if org, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Org]); err != nil {
+	if org, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Organization]); err != nil {
 		return nil, handleError(ctx, r.logger, err)
 	}
 
@@ -107,9 +107,9 @@ func (r *orgRepo) Update(ctx context.Context,
 	slug string,
 	owner int64,
 	modifiedBy int64,
-) (*types.Org, error) {
+) (*types.Organization, error) {
 	var (
-		org  types.Org
+		org  types.Organization
 		rows pgx.Rows
 		err  error
 	)
@@ -125,7 +125,7 @@ func (r *orgRepo) Update(ctx context.Context,
 		return nil, handleError(ctx, r.logger, err)
 	}
 
-	if org, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Org]); err != nil {
+	if org, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Organization]); err != nil {
 		return nil, handleError(ctx, r.logger, err)
 	}
 

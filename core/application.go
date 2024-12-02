@@ -62,7 +62,7 @@ func (c *Core) AppCreate(ctx context.Context, args appCreateArgs) (*types.Applic
 
 func (c *Core) AppGetMany(ctx context.Context, orgSlug string) ([]types.Application, error) {
 	var (
-		org *types.Org
+		org *types.Organization
 		err error
 	)
 	if org, err = c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &orgSlug)); err != nil {
@@ -186,7 +186,7 @@ func (c *Core) AppUpdate(ctx context.Context, args appUpdateArgs) (*types.Applic
 
 func (c *Core) AppDelete(ctx context.Context, orgSlug string, appSlug string) error {
 	var (
-		org *types.Org
+		org *types.Organization
 		app *types.Application
 		err error
 	)

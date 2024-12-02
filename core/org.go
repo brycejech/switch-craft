@@ -31,7 +31,7 @@ func (c *Core) NewOrgCreateArgs(
 	}
 }
 
-func (c *Core) OrgCreate(ctx context.Context, args orgCreateArgs) (*types.Org, error) {
+func (c *Core) OrgCreate(ctx context.Context, args orgCreateArgs) (*types.Organization, error) {
 	tracer, err := c.getOperationTracer(ctx)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (c *Core) OrgCreate(ctx context.Context, args orgCreateArgs) (*types.Org, e
 	return c.orgRepo.Create(ctx, args.name, args.slug, args.owner, tracer.AuthAccount.ID)
 }
 
-func (c *Core) OrgGetMany(ctx context.Context) ([]types.Org, error) {
+func (c *Core) OrgGetMany(ctx context.Context) ([]types.Organization, error) {
 	tracer, err := c.getOperationTracer(ctx)
 	if err != nil {
 		return nil, err
@@ -86,7 +86,7 @@ func (c *Core) NewOrgGetOneArgs(id *int64, uuid *string, slug *string) orgGetOne
 	}
 }
 
-func (c *Core) OrgGetOne(ctx context.Context, args orgGetOneArgs) (*types.Org, error) {
+func (c *Core) OrgGetOne(ctx context.Context, args orgGetOneArgs) (*types.Organization, error) {
 	if err := args.Validate(); err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func (c *Core) NewOrgUpdateArgs(
 	}
 }
 
-func (c *Core) OrgUpdate(ctx context.Context, args orgUpdateArgs) (*types.Org, error) {
+func (c *Core) OrgUpdate(ctx context.Context, args orgUpdateArgs) (*types.Organization, error) {
 	tracer, err := c.getOperationTracer(ctx)
 	if err != nil {
 		return nil, err
