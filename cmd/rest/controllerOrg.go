@@ -21,6 +21,30 @@ func newOrgController(logger *types.Logger, core *core.Core) *orgController {
 	}
 }
 
+type orgCreateArgs struct {
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+func (c *orgController) Create(w http.ResponseWriter, r *http.Request) {
+	tracer, _ := r.Context().Value(types.CtxOperationTracer).(types.OperationTracer)
+	body := &orgCreateArgs{}
+	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+		jsonParseError(w, r)
+		return
+	}
+
+	args := c.core.NewOrgCreateArgs(body.Name, body.Slug, tracer.AuthAccount.ID)
+
+	org, err := c.core.OrgCreate(r.Context(), args)
+	if err != nil {
+		internalServerError(w, r)
+		return
+	}
+
+	render(w, r, http.StatusOK, org)
+}
+
 func (c *orgController) GetMany(w http.ResponseWriter, r *http.Request) {
 	orgs, err := c.core.OrgGetMany(r.Context())
 	if err != nil {
@@ -43,30 +67,6 @@ func (c *orgController) GetOne(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		internalServerError(w, r)
-		return
-	}
-
-	render(w, r, http.StatusOK, org)
-}
-
-type orgCreateArgs struct {
-	Name string `json:"name"`
-	Slug string `json:"slug"`
-}
-
-func (c *orgController) Create(w http.ResponseWriter, r *http.Request) {
-	tracer, _ := r.Context().Value(types.CtxOperationTracer).(types.OperationTracer)
-	body := &orgCreateArgs{}
-	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
-		jsonParseError(w, r)
-		return
-	}
-
-	args := c.core.NewOrgCreateArgs(body.Name, body.Slug, tracer.AuthAccount.ID)
-
-	org, err := c.core.OrgCreate(r.Context(), args)
-	if err != nil {
 		internalServerError(w, r)
 		return
 	}

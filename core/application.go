@@ -7,14 +7,14 @@ import (
 )
 
 type appCreateArgs struct {
-	orgID int64
-	name  string
-	slug  string
+	orgSlug string
+	name    string
+	slug    string
 }
 
 func (a *appCreateArgs) Validate() error {
-	if a.orgID < 1 {
-		return errors.New("appCreateArgs.orgID must be positive integer")
+	if a.orgSlug == "" {
+		return errors.New("appCreateArgs.orgSlug cannot be empty")
 	}
 	if a.name == "" {
 		return errors.New("appCreateArgs.name cannot be empty")
@@ -26,14 +26,14 @@ func (a *appCreateArgs) Validate() error {
 }
 
 func (c *Core) NewAppCreateArgs(
-	orgID int64,
+	orgSlug string,
 	name string,
 	slug string,
 ) appCreateArgs {
 	return appCreateArgs{
-		orgID: orgID,
-		name:  name,
-		slug:  slug,
+		orgSlug: orgSlug,
+		name:    name,
+		slug:    slug,
 	}
 }
 
@@ -47,28 +47,41 @@ func (c *Core) AppCreate(ctx context.Context, args appCreateArgs) (*types.Applic
 		return nil, err
 	}
 
+	org, err := c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &args.orgSlug))
+	if err != nil {
+		return nil, err
+	}
+
 	return c.appRepo.Create(ctx,
-		args.orgID,
+		org.ID,
 		args.name,
 		args.slug,
 		tracer.AuthAccount.ID,
 	)
 }
 
-func (c *Core) AppGetMany(ctx context.Context, orgID int64) ([]types.Application, error) {
-	return c.appRepo.GetMany(ctx, orgID)
+func (c *Core) AppGetMany(ctx context.Context, orgSlug string) ([]types.Application, error) {
+	var (
+		org *types.Org
+		err error
+	)
+	if org, err = c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &orgSlug)); err != nil {
+		return nil, err
+	}
+
+	return c.appRepo.GetMany(ctx, org.ID)
 }
 
 type appGetOneArgs struct {
-	orgID int64
-	id    *int64
-	uuid  *string
-	slug  *string
+	orgSlug string
+	id      *int64
+	uuid    *string
+	slug    *string
 }
 
 func (a *appGetOneArgs) Validate() error {
-	if a.orgID < 1 {
-		return errors.New("appGetOneArgs.orgID must be positive integer")
+	if a.orgSlug == "" {
+		return errors.New("appGetOneArgs.orgSlug cannot be empty")
 	}
 	if a.id == nil && a.uuid == nil && a.slug == nil {
 		return errors.New("appGetOneArgs: must provide id, uuid, or slug")
@@ -82,16 +95,16 @@ func (a *appGetOneArgs) Validate() error {
 }
 
 func (c *Core) NewAppGetOneArgs(
-	orgID int64,
+	orgSlug string,
 	id *int64,
 	uuid *string,
 	slug *string,
 ) appGetOneArgs {
 	return appGetOneArgs{
-		orgID: orgID,
-		id:    id,
-		uuid:  uuid,
-		slug:  slug,
+		orgSlug: orgSlug,
+		id:      id,
+		uuid:    uuid,
+		slug:    slug,
 	}
 }
 
@@ -100,19 +113,26 @@ func (c *Core) AppGetOne(ctx context.Context, args appGetOneArgs) (*types.Applic
 		return nil, err
 	}
 
-	return c.appRepo.GetOne(ctx, args.orgID, args.id, args.uuid, args.slug)
+	org, err := c.OrgGetOne(ctx,
+		c.NewOrgGetOneArgs(nil, nil, &args.orgSlug),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.appRepo.GetOne(ctx, org.ID, args.id, args.uuid, args.slug)
 }
 
 type appUpdateArgs struct {
-	orgID int64
-	id    int64
-	name  string
-	slug  string
+	orgSlug string
+	id      int64
+	name    string
+	slug    string
 }
 
 func (a *appUpdateArgs) Validate() error {
-	if a.orgID < 1 {
-		return errors.New("appUpdateArgs: orgID must be positive integer")
+	if a.orgSlug == "" {
+		return errors.New("appUpdateArgs.orgSlug cannot be empty")
 	}
 	if a.id < 1 {
 		return errors.New("appUpdateArgs: id must be positive integer")
@@ -127,16 +147,16 @@ func (a *appUpdateArgs) Validate() error {
 }
 
 func (c *Core) NewAppUpdateArgs(
-	orgID int64,
+	orgSlug string,
 	id int64,
 	name string,
 	slug string,
 ) appUpdateArgs {
 	return appUpdateArgs{
-		id:    id,
-		orgID: orgID,
-		name:  name,
-		slug:  slug,
+		orgSlug: orgSlug,
+		id:      id,
+		name:    name,
+		slug:    slug,
 	}
 }
 
@@ -150,8 +170,13 @@ func (c *Core) AppUpdate(ctx context.Context, args appUpdateArgs) (*types.Applic
 		return nil, err
 	}
 
+	org, err := c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &args.orgSlug))
+	if err != nil {
+		return nil, err
+	}
+
 	return c.appRepo.Update(ctx,
-		args.orgID,
+		org.ID,
 		args.id,
 		args.name,
 		args.slug,
@@ -159,6 +184,19 @@ func (c *Core) AppUpdate(ctx context.Context, args appUpdateArgs) (*types.Applic
 	)
 }
 
-func (c *Core) AppDelete(ctx context.Context, orgID int64, id int64) error {
-	return c.appRepo.Delete(ctx, orgID, id)
+func (c *Core) AppDelete(ctx context.Context, orgSlug string, appSlug string) error {
+	var (
+		org *types.Org
+		app *types.Application
+		err error
+	)
+
+	if org, err = c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &orgSlug)); err != nil {
+		return err
+	}
+	if app, err = c.AppGetOne(ctx, c.NewAppGetOneArgs(orgSlug, nil, nil, &appSlug)); err != nil {
+		return err
+	}
+
+	return c.appRepo.Delete(ctx, org.ID, app.ID)
 }
