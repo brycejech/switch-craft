@@ -1,7 +1,6 @@
 package org
 
 import (
-	"fmt"
 	"net/http"
 	"switchcraft/cmd/rest/restutils"
 )
@@ -9,8 +8,7 @@ import (
 func (c *orgController) GetMany(w http.ResponseWriter, r *http.Request) {
 	orgs, err := c.core.OrgGetMany(r.Context())
 	if err != nil {
-		fmt.Println(err)
-		restutils.InternalServerError(w, r)
+		restutils.HandleCoreErr(w, r, err)
 		return
 	}
 

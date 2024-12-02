@@ -1,10 +1,8 @@
 package featureflag
 
 import (
-	"errors"
 	"net/http"
 	"switchcraft/cmd/rest/restutils"
-	"switchcraft/types"
 )
 
 type featFlagCreateArgs struct {
@@ -30,13 +28,7 @@ func (c *featureFlagController) Create(w http.ResponseWriter, r *http.Request) {
 		c.core.NewFeatFlagCreateArgs(orgSlug, appSlug, body.Name, body.IsEnabled),
 	)
 	if err != nil {
-		if errors.Is(err, types.ErrNotFound) {
-			restutils.NotFound(w, r)
-		} else if errors.Is(err, types.ErrItemExists) {
-			restutils.BadRequest(w, r)
-		} else {
-			restutils.InternalServerError(w, r)
-		}
+		restutils.HandleCoreErr(w, r, err)
 		return
 	}
 

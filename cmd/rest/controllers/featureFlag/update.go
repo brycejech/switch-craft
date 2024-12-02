@@ -1,11 +1,9 @@
 package featureflag
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 	"switchcraft/cmd/rest/restutils"
-	"switchcraft/types"
 )
 
 type featFlagUpdateArgs struct {
@@ -41,13 +39,7 @@ func (c *featureFlagController) Update(w http.ResponseWriter, r *http.Request) {
 		c.core.NewFeatFlagUpdateArgs(orgSlug, appSlug, flagID, body.Name, body.IsEnabled),
 	)
 	if err != nil {
-		if errors.Is(err, types.ErrNotFound) {
-			restutils.NotFound(w, r)
-		} else if errors.Is(err, types.ErrItemExists) {
-			restutils.BadRequest(w, r)
-		} else {
-			restutils.InternalServerError(w, r)
-		}
+		restutils.HandleCoreErr(w, r, err)
 		return
 	}
 

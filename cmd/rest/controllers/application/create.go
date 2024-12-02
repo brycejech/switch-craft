@@ -1,10 +1,8 @@
 package application
 
 import (
-	"errors"
 	"net/http"
 	"switchcraft/cmd/rest/restutils"
-	"switchcraft/types"
 )
 
 type appCreateArgs struct {
@@ -29,13 +27,7 @@ func (c *appController) Create(w http.ResponseWriter, r *http.Request) {
 		c.core.NewAppCreateArgs(orgSlug, body.Name, body.Slug),
 	)
 	if err != nil {
-		if errors.Is(err, types.ErrNotFound) {
-			restutils.NotFound(w, r)
-		} else if errors.Is(err, types.ErrItemExists) {
-			restutils.BadRequest(w, r)
-		} else {
-			restutils.InternalServerError(w, r)
-		}
+		restutils.HandleCoreErr(w, r, err)
 		return
 	}
 

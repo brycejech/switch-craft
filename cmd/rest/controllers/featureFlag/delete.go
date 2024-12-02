@@ -1,11 +1,9 @@
 package featureflag
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 	"switchcraft/cmd/rest/restutils"
-	"switchcraft/types"
 )
 
 func (c *featureFlagController) Delete(w http.ResponseWriter, r *http.Request) {
@@ -28,11 +26,7 @@ func (c *featureFlagController) Delete(w http.ResponseWriter, r *http.Request) {
 
 	err = c.core.FeatFlagDelete(r.Context(), orgSlug, appSlug, flagID)
 	if err != nil {
-		if errors.Is(err, types.ErrNotFound) {
-			restutils.NotFound(w, r)
-		} else {
-			restutils.InternalServerError(w, r)
-		}
+		restutils.HandleCoreErr(w, r, err)
 		return
 	}
 

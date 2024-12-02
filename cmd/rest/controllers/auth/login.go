@@ -15,7 +15,7 @@ type authnResponse struct {
 }
 
 func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
-	args := new(authnArgs)
+	args := &authnArgs{}
 	if err := restutils.DecodeBody(r, args); err != nil {
 		restutils.BadRequest(w, r)
 		return
@@ -29,7 +29,7 @@ func (c *authController) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, err := c.core.AuthCreateJWT(account)
 	if err != nil {
-		restutils.InternalServerError(w, r)
+		restutils.HandleCoreErr(w, r, err)
 		return
 	}
 

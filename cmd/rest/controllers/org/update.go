@@ -1,10 +1,8 @@
 package org
 
 import (
-	"errors"
 	"net/http"
 	"switchcraft/cmd/rest/restutils"
-	"switchcraft/types"
 )
 
 type orgUpdateArgs struct {
@@ -14,8 +12,8 @@ type orgUpdateArgs struct {
 }
 
 func (c *orgController) Update(w http.ResponseWriter, r *http.Request) {
-	var orgSlug string
-	if orgSlug = r.PathValue("orgSlug"); orgSlug == "" {
+	orgSlug := r.PathValue("orgSlug")
+	if orgSlug == "" {
 		restutils.NotFound(w, r)
 		return
 	}
@@ -30,11 +28,7 @@ func (c *orgController) Update(w http.ResponseWriter, r *http.Request) {
 		c.core.NewOrgGetOneArgs(nil, nil, &orgSlug),
 	)
 	if err != nil {
-		if errors.Is(err, types.ErrNotFound) {
-			restutils.NotFound(w, r)
-		} else {
-			restutils.InternalServerError(w, r)
-		}
+		restutils.HandleCoreErr(w, r, err)
 		return
 	}
 
@@ -42,7 +36,7 @@ func (c *orgController) Update(w http.ResponseWriter, r *http.Request) {
 		c.core.NewOrgUpdateArgs(org.ID, body.Name, body.Slug, org.Owner),
 	)
 	if err != nil {
-		restutils.InternalServerError(w, r)
+		restutils.HandleCoreErr(w, r, err)
 		return
 	}
 

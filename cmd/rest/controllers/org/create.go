@@ -20,11 +20,11 @@ func (c *orgController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	args := c.core.NewOrgCreateArgs(body.Name, body.Slug, tracer.AuthAccount.ID)
-
-	org, err := c.core.OrgCreate(r.Context(), args)
+	org, err := c.core.OrgCreate(r.Context(),
+		c.core.NewOrgCreateArgs(body.Name, body.Slug, tracer.AuthAccount.ID),
+	)
 	if err != nil {
-		restutils.InternalServerError(w, r)
+		restutils.HandleCoreErr(w, r, err)
 		return
 	}
 

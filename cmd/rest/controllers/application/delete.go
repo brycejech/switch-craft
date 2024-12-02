@@ -1,10 +1,8 @@
 package application
 
 import (
-	"errors"
 	"net/http"
 	"switchcraft/cmd/rest/restutils"
-	"switchcraft/types"
 )
 
 func (c *appController) Delete(w http.ResponseWriter, r *http.Request) {
@@ -16,11 +14,7 @@ func (c *appController) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := c.core.AppDelete(r.Context(), orgSlug, appSlug); err != nil {
-		if errors.Is(err, types.ErrNotFound) {
-			restutils.NotFound(w, r)
-		} else {
-			restutils.InternalServerError(w, r)
-		}
+		restutils.HandleCoreErr(w, r, err)
 		return
 	}
 
