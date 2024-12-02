@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"switchcraft/cmd/rest/restutils"
 	"switchcraft/core"
 	"switchcraft/types"
 	"time"
@@ -39,7 +40,7 @@ func createAuthMiddleware(logger *types.Logger, core *core.Core) func(next http.
 
 			tracer, ok := r.Context().Value(types.CtxOperationTracer).(types.OperationTracer)
 			if !ok {
-				internalServerError(w, r)
+				restutils.InternalServerError(w, r)
 				return
 			}
 
@@ -50,18 +51,18 @@ func createAuthMiddleware(logger *types.Logger, core *core.Core) func(next http.
 
 			if token == "" {
 				logger.Error(tracer, "authorization token not provided", nil)
-				badRequest(w, r)
+				restutils.BadRequest(w, r)
 				return
 			}
 
 			account, err := core.AuthValidateJWT(token)
 			if err != nil {
 				fmt.Println(err)
-				badRequest(w, r)
+				restutils.BadRequest(w, r)
 				return
 			}
 			if account == nil {
-				internalServerError(w, r)
+				restutils.InternalServerError(w, r)
 				return
 			}
 

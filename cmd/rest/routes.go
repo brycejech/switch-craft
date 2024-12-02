@@ -2,19 +2,23 @@ package rest
 
 import (
 	"net/http"
+	"switchcraft/cmd/rest/controllers/application"
+	"switchcraft/cmd/rest/controllers/auth"
+	"switchcraft/cmd/rest/controllers/org"
+	"switchcraft/cmd/rest/restutils"
 	"switchcraft/core"
 	"switchcraft/types"
 )
 
 func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
-	authController := newAuthController(logger, core)
-	orgController := newOrgController(logger, core)
-	appController := newAppController(logger, core)
+	authController := auth.NewAuthController(logger, core)
+	orgController := org.NewOrgController(logger, core)
+	appController := application.NewAppController(logger, core)
 
 	authMiddleware := createAuthMiddleware(logger, core)
 
 	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		render(w, r, 200, map[string]any{
+		restutils.Render(w, r, 200, map[string]any{
 			"message": "Welcome to the SwitchCraft REST API",
 		})
 	})

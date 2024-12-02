@@ -1,4 +1,4 @@
-package rest
+package restutils
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ type HTTPStatusCode int
 
 var logger = types.NewLogger(types.LogLevelInfo)
 
-func render(w http.ResponseWriter, r *http.Request, status HTTPStatusCode, data any) {
+func Render(w http.ResponseWriter, r *http.Request, status HTTPStatusCode, data any) {
 	trace, ok := r.Context().Value(types.CtxOperationTracer).(types.OperationTracer)
 	if !ok {
 		fmt.Println("rest.render invalid operation context")
@@ -57,22 +57,26 @@ func render(w http.ResponseWriter, r *http.Request, status HTTPStatusCode, data 
 	})
 }
 
-func badRequest(w http.ResponseWriter, r *http.Request) {
-	render(w, r, http.StatusBadRequest, "Bad request")
+func BadRequest(w http.ResponseWriter, r *http.Request) {
+	Render(w, r, http.StatusBadRequest, "Bad request")
 }
 
-func unauthorized(w http.ResponseWriter, r *http.Request) {
-	render(w, r, http.StatusUnauthorized, "Unauthorized")
+func Unauthorized(w http.ResponseWriter, r *http.Request) {
+	Render(w, r, http.StatusUnauthorized, "Unauthorized")
 }
 
-func internalServerError(w http.ResponseWriter, r *http.Request) {
-	render(w, r, http.StatusInternalServerError, "Internal server error")
+func InternalServerError(w http.ResponseWriter, r *http.Request) {
+	Render(w, r, http.StatusInternalServerError, "Internal server error")
 }
 
-func jsonParseError(w http.ResponseWriter, r *http.Request) {
-	render(w, r, http.StatusBadRequest, "JSON parse error")
+func JSONParseError(w http.ResponseWriter, r *http.Request) {
+	Render(w, r, http.StatusBadRequest, "JSON parse error")
 }
 
-func notFound(w http.ResponseWriter, r *http.Request) {
-	render(w, r, http.StatusNotFound, "Not found")
+func NotFound(w http.ResponseWriter, r *http.Request) {
+	Render(w, r, http.StatusNotFound, "Not found")
+}
+
+func OK(w http.ResponseWriter, r *http.Request) {
+	Render(w, r, http.StatusOK, "OK")
 }

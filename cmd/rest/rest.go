@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -42,8 +41,4 @@ func Start(logger *types.Logger, core *core.Core, port string) *http.Server {
 	wg.Wait()
 
 	return server
-}
-
-func decodeBody(r *http.Request, v any) error {
-	return json.NewDecoder(r.Body).Decode(v)
 }
