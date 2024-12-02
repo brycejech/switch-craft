@@ -1,7 +1,6 @@
 package org
 
 import (
-	"encoding/json"
 	"net/http"
 	"switchcraft/cmd/rest/restutils"
 	"switchcraft/types"
@@ -14,8 +13,9 @@ type orgCreateArgs struct {
 
 func (c *orgController) Create(w http.ResponseWriter, r *http.Request) {
 	tracer, _ := r.Context().Value(types.CtxOperationTracer).(types.OperationTracer)
+
 	body := &orgCreateArgs{}
-	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+	if err := restutils.DecodeBody(r, body); err != nil {
 		restutils.JSONParseError(w, r)
 		return
 	}

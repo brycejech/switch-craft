@@ -1,7 +1,6 @@
 package application
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"switchcraft/cmd/rest/restutils"
@@ -21,7 +20,7 @@ func (c *appController) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body := &appCreateArgs{}
-	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+	if err := restutils.DecodeBody(r, body); err != nil {
 		restutils.JSONParseError(w, r)
 		return
 	}

@@ -1,7 +1,6 @@
 package org
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"switchcraft/cmd/rest/restutils"
@@ -15,15 +14,15 @@ type orgUpdateArgs struct {
 }
 
 func (c *orgController) Update(w http.ResponseWriter, r *http.Request) {
-	body := &orgUpdateArgs{}
-	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
-		restutils.JSONParseError(w, r)
+	var orgSlug string
+	if orgSlug = r.PathValue("orgSlug"); orgSlug == "" {
+		restutils.NotFound(w, r)
 		return
 	}
 
-	var orgSlug string
-	if orgSlug := r.PathValue("orgSlug"); orgSlug == "" {
-		restutils.NotFound(w, r)
+	body := &orgUpdateArgs{}
+	if err := restutils.DecodeBody(r, body); err != nil {
+		restutils.JSONParseError(w, r)
 		return
 	}
 
@@ -33,9 +32,9 @@ func (c *orgController) Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, types.ErrNotFound) {
 			restutils.NotFound(w, r)
-			return
+		} else {
+			restutils.InternalServerError(w, r)
 		}
-		restutils.InternalServerError(w, r)
 		return
 	}
 
