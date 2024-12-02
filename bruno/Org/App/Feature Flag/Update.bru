@@ -1,0 +1,18 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/org/{{orgSlug}}/app/{{appSlug}}/flag/1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "SHOW_THING",
+    "isEnabled": true
+  }
+}

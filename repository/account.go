@@ -158,7 +158,7 @@ func (r *accountRepo) Delete(ctx context.Context, orgID *int64, id int64) error 
 	}
 
 	if numDeleted < 1 {
-		return errors.New("no rows deleted")
+		return types.ErrNotFound
 	}
 
 	if numDeleted > 1 {

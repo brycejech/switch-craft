@@ -6,41 +6,41 @@ import (
 	"switchcraft/types"
 )
 
-type featureFlagCreateArgs struct {
-	orgID     int64
-	appID     int64
+type featFlagCreateArgs struct {
+	orgSlug   string
+	appSlug   string
 	name      string
 	isEnabled bool
 }
 
-func (a *featureFlagCreateArgs) Validate() error {
-	if a.orgID < 1 {
-		return errors.New("featureFlagCreateArgs.orgID must be positive integer")
+func (a *featFlagCreateArgs) Validate() error {
+	if a.orgSlug == "" {
+		return errors.New("featFlagCreateArgs.orgSlug cannot be empty")
 	}
-	if a.appID < 1 {
-		return errors.New("featureFlagCreateArgs.appID must be positive integer")
+	if a.appSlug == "" {
+		return errors.New("featFlagCreateArgs.appSlug cannot be empty")
 	}
 	if a.name == "" {
-		return errors.New("featureFlagCreateArgs.name cannot be empty")
+		return errors.New("featFlagCreateArgs.name cannot be empty")
 	}
 	return nil
 }
 
-func (c *Core) NewFeatureFlagCreateArgs(
-	orgID int64,
-	appID int64,
+func (c *Core) NewFeatFlagCreateArgs(
+	orgSlug string,
+	appSlug string,
 	name string,
 	isEnabled bool,
-) featureFlagCreateArgs {
-	return featureFlagCreateArgs{
-		orgID:     orgID,
-		appID:     appID,
+) featFlagCreateArgs {
+	return featFlagCreateArgs{
+		orgSlug:   orgSlug,
+		appSlug:   appSlug,
 		name:      name,
 		isEnabled: isEnabled,
 	}
 }
 
-func (c *Core) FeatureFlagCreate(ctx context.Context, args featureFlagCreateArgs) (*types.FeatureFlag, error) {
+func (c *Core) FeatFlagCreate(ctx context.Context, args featFlagCreateArgs) (*types.FeatureFlag, error) {
 	tracer, err := c.getOperationTracer(ctx)
 	if err != nil {
 		return nil, err
@@ -50,117 +50,163 @@ func (c *Core) FeatureFlagCreate(ctx context.Context, args featureFlagCreateArgs
 		return nil, err
 	}
 
+	var (
+		org *types.Org
+		app *types.Application
+	)
+
+	if org, err = c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &args.orgSlug)); err != nil {
+		return nil, err
+	}
+	if app, err = c.AppGetOne(ctx, c.NewAppGetOneArgs(org.Slug, nil, nil, &args.appSlug)); err != nil {
+		return nil, err
+	}
+
 	return c.featureFlagRepo.Create(ctx,
-		args.orgID,
-		args.appID,
+		org.ID,
+		app.ID,
 		args.name,
 		args.isEnabled,
 		tracer.AuthAccount.ID,
 	)
 }
 
-func (c *Core) FeatureFlagGetMany(ctx context.Context,
-	orgID int64,
-	appID int64,
+func (c *Core) FeatFlagGetMany(ctx context.Context,
+	orgSlug string,
+	appSlug string,
 ) ([]types.FeatureFlag, error) {
-	return c.featureFlagRepo.GetMany(ctx, orgID, appID)
-}
+	var (
+		org *types.Org
+		app *types.Application
+		err error
+	)
 
-type featureFlagGetOneArgs struct {
-	orgID int64
-	appID int64
-	id    *int64
-	uuid  *string
-	name  *string
-}
-
-func (a *featureFlagGetOneArgs) Validate() error {
-	if a.orgID < 1 {
-		return errors.New("featureFlagGetOneArgs.orgID must be positive integer")
+	if org, err = c.OrgGetOne(ctx,
+		c.NewOrgGetOneArgs(nil, nil, &orgSlug),
+	); err != nil {
+		return nil, err
 	}
-	if a.appID < 1 {
-		return errors.New("featureFlagGetOneArgs.appID must be positive integer")
+	if app, err = c.AppGetOne(ctx,
+		c.NewAppGetOneArgs(orgSlug, nil, nil, &appSlug),
+	); err != nil {
+		return nil, err
+	}
+
+	return c.featureFlagRepo.GetMany(ctx, org.ID, app.ID)
+}
+
+type featFlagGetOneArgs struct {
+	orgSlug string
+	appSlug string
+	id      *int64
+	uuid    *string
+	name    *string
+}
+
+func (a *featFlagGetOneArgs) Validate() error {
+	if a.orgSlug == "" {
+		return errors.New("featFlagGetOneArgs.orgSlug cannot be empty")
+	}
+	if a.appSlug == "" {
+		return errors.New("featFlagGetOneArgs.appSlug cannot be empty")
 	}
 	if a.id == nil && a.uuid == nil && a.name == nil {
-		return errors.New("featureFlagGetOneArgs: must provide id, uuid, or name")
+		return errors.New("featFlagGetOneArgs: must provide id, uuid, or name")
 	}
 	if a.id != nil && *a.id < 1 {
-		return errors.New("featureFlagGetOneArgs.id must be positive integer")
+		return errors.New("featFlagGetOneArgs.id must be positive integer")
 	}
 	return nil
 }
 
-func (c *Core) NewFeatureFlagGetOneArgs(
-	orgID int64,
-	appID int64,
+func (c *Core) NewFeatFlagGetOneArgs(
+	orgSlug string,
+	appSlug string,
 	id *int64,
 	uuid *string,
 	name *string,
-) featureFlagGetOneArgs {
-	return featureFlagGetOneArgs{
-		orgID: orgID,
-		appID: appID,
-		id:    id,
-		uuid:  uuid,
-		name:  name,
+) featFlagGetOneArgs {
+	return featFlagGetOneArgs{
+		orgSlug: orgSlug,
+		appSlug: appSlug,
+		id:      id,
+		uuid:    uuid,
+		name:    name,
 	}
 }
 
-func (c *Core) FeatureFlagGetOne(ctx context.Context, args featureFlagGetOneArgs) (*types.FeatureFlag, error) {
+func (c *Core) FeatFlagGetOne(ctx context.Context, args featFlagGetOneArgs) (*types.FeatureFlag, error) {
 	if err := args.Validate(); err != nil {
 		return nil, err
 	}
 
+	var (
+		org *types.Org
+		app *types.Application
+		err error
+	)
+
+	if org, err = c.OrgGetOne(ctx,
+		c.NewOrgGetOneArgs(nil, nil, &args.orgSlug),
+	); err != nil {
+		return nil, err
+	}
+	if app, err = c.AppGetOne(ctx,
+		c.NewAppGetOneArgs(org.Slug, nil, nil, &args.appSlug),
+	); err != nil {
+		return nil, err
+	}
+
 	return c.featureFlagRepo.GetOne(ctx,
-		args.orgID,
-		args.appID,
+		org.ID,
+		app.ID,
 		args.id,
 		args.uuid,
 		args.name,
 	)
 }
 
-type featureFlagUpdateArgs struct {
-	orgID     int64
-	appID     int64
+type featFlagUpdateArgs struct {
+	orgSlug   string
+	appSlug   string
 	id        int64
 	name      string
 	isEnabled bool
 }
 
-func (a *featureFlagUpdateArgs) Validate() error {
-	if a.orgID < 1 {
-		return errors.New("featureFlagUpdateArgs.orgID must be positive integer")
+func (a *featFlagUpdateArgs) Validate() error {
+	if a.orgSlug == "" {
+		return errors.New("featFlagUpdateArgs.orgSlug cannot be empty")
 	}
-	if a.appID < 1 {
-		return errors.New("featureFlagUpdateArgs.appID must be positive integer")
+	if a.appSlug == "" {
+		return errors.New("featFlagUpdateArgs.appSlug cannot be empty")
 	}
 	if a.id < 1 {
-		return errors.New("featureFlagUpdateArgs.id must be positive integer")
+		return errors.New("featFlagUpdateArgs.id must be positive integer")
 	}
 	if a.name == "" {
-		return errors.New("featureFlagUpdateArgs.name cannot be empty")
+		return errors.New("featFlagUpdateArgs.name cannot be empty")
 	}
 	return nil
 }
 
-func (c *Core) NewFeatureFlagUpdateArgs(
-	orgID int64,
-	appID int64,
+func (c *Core) NewFeatFlagUpdateArgs(
+	orgSlug string,
+	appSlug string,
 	id int64,
 	name string,
 	isEnabled bool,
-) featureFlagUpdateArgs {
-	return featureFlagUpdateArgs{
-		orgID:     orgID,
-		appID:     appID,
+) featFlagUpdateArgs {
+	return featFlagUpdateArgs{
+		orgSlug:   orgSlug,
+		appSlug:   appSlug,
 		id:        id,
 		name:      name,
 		isEnabled: isEnabled,
 	}
 }
 
-func (c *Core) FeatureFlagUpdate(ctx context.Context, args featureFlagUpdateArgs) (*types.FeatureFlag, error) {
+func (c *Core) FeatFlagUpdate(ctx context.Context, args featFlagUpdateArgs) (*types.FeatureFlag, error) {
 	tracer, err := c.getOperationTracer(ctx)
 	if err != nil {
 		return nil, err
@@ -170,9 +216,20 @@ func (c *Core) FeatureFlagUpdate(ctx context.Context, args featureFlagUpdateArgs
 		return nil, err
 	}
 
+	var (
+		org *types.Org
+		app *types.Application
+	)
+	if org, err = c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &args.orgSlug)); err != nil {
+		return nil, err
+	}
+	if app, err = c.AppGetOne(ctx, c.NewAppGetOneArgs(org.Slug, nil, nil, &args.appSlug)); err != nil {
+		return nil, err
+	}
+
 	return c.featureFlagRepo.Update(ctx,
-		args.orgID,
-		args.appID,
+		org.ID,
+		app.ID,
 		args.id,
 		args.name,
 		args.isEnabled,
@@ -180,14 +237,27 @@ func (c *Core) FeatureFlagUpdate(ctx context.Context, args featureFlagUpdateArgs
 	)
 }
 
-func (c *Core) FeatureFlagDelete(ctx context.Context,
-	orgID int64,
-	appID int64,
+func (c *Core) FeatFlagDelete(ctx context.Context,
+	orgSlug string,
+	appSlug string,
 	id int64,
 ) error {
+	var (
+		org *types.Org
+		app *types.Application
+		err error
+	)
+
+	if org, err = c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &orgSlug)); err != nil {
+		return err
+	}
+	if app, err = c.AppGetOne(ctx, c.NewAppGetOneArgs(org.Slug, nil, nil, &appSlug)); err != nil {
+		return err
+	}
+
 	return c.featureFlagRepo.Delete(ctx,
-		orgID,
-		appID,
+		org.ID,
+		app.ID,
 		id,
 	)
 }

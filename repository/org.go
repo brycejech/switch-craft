@@ -141,7 +141,7 @@ func (r *orgRepo) Delete(ctx context.Context, id int64) error {
 	}
 
 	if numDeleted < 1 {
-		return errors.New("no rows deleted")
+		return types.ErrNotFound
 	}
 
 	if numDeleted > 1 {

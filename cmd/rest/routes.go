@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"switchcraft/cmd/rest/controllers/application"
 	"switchcraft/cmd/rest/controllers/auth"
+	featureflag "switchcraft/cmd/rest/controllers/featureFlag"
 	"switchcraft/cmd/rest/controllers/org"
 	"switchcraft/cmd/rest/restutils"
 	"switchcraft/core"
@@ -14,6 +15,7 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	authController := auth.NewAuthController(logger, core)
 	orgController := org.NewOrgController(logger, core)
 	appController := application.NewAppController(logger, core)
+	featFlagController := featureflag.NewFeatureFlagController(logger, core)
 
 	authMiddleware := createAuthMiddleware(logger, core)
 
@@ -37,4 +39,11 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	router.HandleFunc("GET /org/{orgSlug}/app/{appSlug}", authMiddleware(appController.GetOne))
 	router.HandleFunc("PUT /org/{orgSlug}/app/{appSlug}", authMiddleware(appController.Update))
 	router.HandleFunc("DELETE /org/{orgSlug}/app/{appSlug}", authMiddleware(appController.Delete))
+
+	/* === FEATURE FLAG ROUTES === */
+	router.HandleFunc("POST /org/{orgSlug}/app/{appSlug}/flag", authMiddleware(featFlagController.Create))
+	router.HandleFunc("GET /org/{orgSlug}/app/{appSlug}/flag", authMiddleware(featFlagController.GetMany))
+	router.HandleFunc("GET /org/{orgSlug}/app/{appSlug}/flag/{flagID}", authMiddleware(featFlagController.GetOne))
+	router.HandleFunc("PUT /org/{orgSlug}/app/{appSlug}/flag/{flagID}", authMiddleware(featFlagController.Update))
+	router.HandleFunc("DELETE /org/{orgSlug}/app/{appSlug}/flag/{flagID}", authMiddleware(featFlagController.Delete))
 }

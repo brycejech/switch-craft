@@ -160,7 +160,7 @@ func (r *appRepo) Delete(ctx context.Context,
 	}
 
 	if numDeleted < 1 {
-		return errors.New("no rows deleted")
+		return types.ErrNotFound
 	}
 
 	if numDeleted > 1 {

@@ -1,0 +1,11 @@
+meta {
+  name: Delete
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{host}}/org/{{orgSlug}}/app/{{appSlug}}/flag/1
+  body: none
+  auth: inherit
+}
