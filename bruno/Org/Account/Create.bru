@@ -1,0 +1,21 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/org/{{orgSlug}}/account
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "",
+    "lastName": "",
+    "email": "",
+    "username": "",
+    "password": ""
+  }
+}

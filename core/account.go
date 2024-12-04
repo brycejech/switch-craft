@@ -7,7 +7,7 @@ import (
 )
 
 type accountCreateArgs struct {
-	orgID     int64
+	orgSlug   string
 	firstName string
 	lastName  string
 	email     string
@@ -16,8 +16,8 @@ type accountCreateArgs struct {
 }
 
 func (a *accountCreateArgs) Validate() error {
-	if a.orgID < 1 {
-		return errors.New("accountCreateArgs.orgID must be positive integer")
+	if a.orgSlug == "" {
+		return errors.New("accountCreateArgs.orgSlug cannot be empty")
 	}
 	if a.firstName == "" {
 		return errors.New("accountCreateArgs.firstName cannot be empty")
@@ -35,7 +35,7 @@ func (a *accountCreateArgs) Validate() error {
 }
 
 func (c *Core) NewAccountCreateArgs(
-	orgID int64,
+	orgSlug string,
 	firstName string,
 	lastName string,
 	email string,
@@ -43,7 +43,7 @@ func (c *Core) NewAccountCreateArgs(
 	password *string,
 ) accountCreateArgs {
 	return accountCreateArgs{
-		orgID:     orgID,
+		orgSlug:   orgSlug,
 		firstName: firstName,
 		lastName:  lastName,
 		email:     email,
@@ -62,6 +62,11 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 		return nil, err
 	}
 
+	org, err := c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &args.orgSlug))
+	if err != nil {
+		return nil, err
+	}
+
 	var password *string
 	if args.password != nil {
 		tmpPass, err := c.AuthPasswordHash(*args.password)
@@ -76,7 +81,7 @@ func (c *Core) AccountCreate(ctx context.Context, args accountCreateArgs) (*type
 	}
 
 	return c.accountRepo.Create(ctx,
-		&args.orgID,
+		&org.ID,
 		false,
 		args.firstName,
 		args.lastName,
@@ -148,12 +153,21 @@ func (c *Core) AccountCreateGlobal(ctx context.Context, args accountCreateGlobal
 	)
 }
 
-func (c *Core) AccountGetMany(ctx context.Context, orgID *int64) ([]types.Account, error) {
-	return c.accountRepo.GetMany(ctx, orgID)
+func (c *Core) AccountGetMany(ctx context.Context, orgSlug *string) ([]types.Account, error) {
+	if orgSlug == nil {
+		return c.accountRepo.GetMany(ctx, nil)
+	}
+
+	org, err := c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, orgSlug))
+	if err != nil {
+		return nil, err
+	}
+
+	return c.accountRepo.GetMany(ctx, &org.ID)
 }
 
 type accountGetOneArgs struct {
-	orgID    *int64
+	orgSlug  *string
 	id       *int64
 	uuid     *string
 	username *string
@@ -166,9 +180,9 @@ func (a *accountGetOneArgs) Validate() error {
 	return nil
 }
 
-func (c *Core) NewAccountGetOneArgs(orgID *int64, id *int64, uuid *string, username *string) accountGetOneArgs {
+func (c *Core) NewAccountGetOneArgs(orgSlug *string, id *int64, uuid *string, username *string) accountGetOneArgs {
 	return accountGetOneArgs{
-		orgID:    orgID,
+		orgSlug:  orgSlug,
 		id:       id,
 		uuid:     uuid,
 		username: username,
@@ -180,11 +194,23 @@ func (c *Core) AccountGetOne(ctx context.Context, args accountGetOneArgs) (*type
 		return nil, err
 	}
 
-	return c.accountRepo.GetOne(ctx, args.orgID, args.id, args.uuid, args.username)
+	if args.orgSlug == nil {
+		return c.accountRepo.GetOne(ctx, nil, args.id, args.uuid, args.username)
+	}
+
+	org, err := c.OrgGetOne(ctx,
+		c.NewOrgGetOneArgs(nil, nil, args.orgSlug),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.accountRepo.GetOne(ctx, &org.ID, args.id, args.uuid, args.username)
+
 }
 
 type accountUpdateArgs struct {
-	orgID           *int64
+	orgSlug         *string
 	id              int64
 	isInstanceAdmin bool
 	firstName       string
@@ -198,7 +224,7 @@ func (a *accountUpdateArgs) Validate() error {
 }
 
 func (c *Core) NewAccountUpdateArgs(
-	orgID *int64,
+	orgSlug *string,
 	id int64,
 	isInstanceAdmin bool,
 	firstName string,
@@ -207,7 +233,7 @@ func (c *Core) NewAccountUpdateArgs(
 	username string,
 ) accountUpdateArgs {
 	return accountUpdateArgs{
-		orgID:           orgID,
+		orgSlug:         orgSlug,
 		id:              id,
 		isInstanceAdmin: isInstanceAdmin,
 		firstName:       firstName,
@@ -227,7 +253,7 @@ func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*type
 		return nil, err
 	}
 
-	existingAccount, err := c.AccountGetOne(ctx, c.NewAccountGetOneArgs(args.orgID, &args.id, nil, nil))
+	existingAccount, err := c.AccountGetOne(ctx, c.NewAccountGetOneArgs(args.orgSlug, &args.id, nil, nil))
 	if err != nil {
 		return nil, err
 	}
@@ -242,8 +268,28 @@ func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*type
 		}
 	}
 
+	if args.orgSlug == nil {
+		return c.accountRepo.Update(ctx,
+			nil,
+			args.id,
+			isInstanceAdmin,
+			args.firstName,
+			args.lastName,
+			args.email,
+			args.username,
+			tracer.AuthAccount.ID,
+		)
+	}
+
+	org, err := c.OrgGetOne(ctx,
+		c.NewOrgGetOneArgs(nil, nil, args.orgSlug),
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	return c.accountRepo.Update(ctx,
-		args.orgID,
+		&org.ID,
 		args.id,
 		isInstanceAdmin,
 		args.firstName,
@@ -252,8 +298,18 @@ func (c *Core) AccountUpdate(ctx context.Context, args accountUpdateArgs) (*type
 		args.username,
 		tracer.AuthAccount.ID,
 	)
+
 }
 
-func (c *Core) AccountDelete(ctx context.Context, orgID *int64, id int64) error {
-	return c.accountRepo.Delete(ctx, orgID, id)
+func (c *Core) AccountDelete(ctx context.Context, orgSlug *string, id int64) error {
+	if orgSlug == nil {
+		return c.accountRepo.Delete(ctx, nil, id)
+	}
+
+	org, err := c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, orgSlug))
+	if err != nil {
+		return err
+	}
+
+	return c.accountRepo.Delete(ctx, &org.ID, id)
 }
