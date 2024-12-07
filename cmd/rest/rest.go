@@ -13,8 +13,6 @@ import (
 
 const rwTimeout = 15 * time.Second
 
-type handler func(http.ResponseWriter, *http.Request)
-
 func Start(logger *types.Logger, core *core.Core, port string) *http.Server {
 	mux := http.NewServeMux()
 

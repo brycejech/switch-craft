@@ -1,7 +1,6 @@
 
 INSERT INTO account.account(
 	  org_id
-	, is_instance_admin
 	, first_name
 	, last_name
 	, email
@@ -18,7 +17,6 @@ VALUES (
 	, $5
 	, $6
 	, $7
-	, $8
 )
 
 RETURNING

@@ -1,4 +1,4 @@
-package account
+package orgaccount
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"switchcraft/cmd/rest/restutils"
 )
 
-func (c *accountController) GetOneOrgAccount(w http.ResponseWriter, r *http.Request) {
+func (c *orgAccountController) GetOneOrgAccount(w http.ResponseWriter, r *http.Request) {
 	orgSlug := r.PathValue("orgSlug")
 	accountIDStr := r.PathValue("accountID")
 	if orgSlug == "" || accountIDStr == "" {
@@ -21,8 +21,8 @@ func (c *accountController) GetOneOrgAccount(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	account, err := c.core.AccountGetOne(r.Context(),
-		c.core.NewAccountGetOneArgs(&orgSlug, &accountID, nil, nil),
+	account, err := c.core.OrgAccountGetOne(r.Context(),
+		c.core.NewOrgAccountGetOneArgs(orgSlug, &accountID, nil, nil),
 	)
 	if err != nil {
 		restutils.HandleCoreErr(w, r, err)

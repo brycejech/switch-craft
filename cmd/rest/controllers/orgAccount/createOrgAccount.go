@@ -1,4 +1,4 @@
-package account
+package orgaccount
 
 import (
 	"net/http"
@@ -13,7 +13,7 @@ type createOrgAccountArgs struct {
 	Password  *string `json:"password"`
 }
 
-func (c *accountController) CretaeOrgAccount(w http.ResponseWriter, r *http.Request) {
+func (c *orgAccountController) CreateOrgAccount(w http.ResponseWriter, r *http.Request) {
 	orgSlug := r.PathValue("orgSlug")
 	if orgSlug == "" {
 		restutils.NotFound(w, r)
@@ -26,8 +26,8 @@ func (c *accountController) CretaeOrgAccount(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	account, err := c.core.AccountCreate(r.Context(),
-		c.core.NewAccountCreateArgs(
+	account, err := c.core.OrgAccountCreate(r.Context(),
+		c.core.NewOrgAccountCreateArgs(
 			orgSlug,
 			body.FirstName,
 			body.LastName,

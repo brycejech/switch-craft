@@ -145,9 +145,7 @@ func (r *orgRepo) Delete(ctx context.Context, id int64) error {
 	}
 
 	if numDeleted > 1 {
-		return errors.New(
-			fmt.Sprintf("expected to delete 1 row, deleted %v", numDeleted),
-		)
+		return fmt.Errorf("expected to delete 1 row, deleted %v", numDeleted)
 	}
 
 	return nil

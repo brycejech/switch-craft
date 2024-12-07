@@ -35,7 +35,7 @@ func main() {
 		logger          = types.NewLogger(types.LogLevelInfo)
 		db              = mustInitDb(globalCtx)
 		repo            = repository.NewRepository(logger, db)
-		accountRepo     = repository.NewAccountRepository(logger, db)
+		accountRepo     = repository.NewOrgAccountRepository(logger, db)
 		orgRepo         = repository.NewOrgRepository(logger, db)
 		applicationRepo = repository.NewAppRepository(logger, db)
 		featureFlagRepo = repository.NewFeatureFlagRepository(logger, db)

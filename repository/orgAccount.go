@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"switchcraft/repository/queries"
 	"switchcraft/types"
@@ -11,21 +10,20 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewAccountRepository(logger *types.Logger, db *pgxpool.Pool) *accountRepo {
-	return &accountRepo{
+func NewOrgAccountRepository(logger *types.Logger, db *pgxpool.Pool) *orgAccountRepo {
+	return &orgAccountRepo{
 		logger: logger,
 		db:     db,
 	}
 }
 
-type accountRepo struct {
+type orgAccountRepo struct {
 	logger *types.Logger
 	db     *pgxpool.Pool
 }
 
-func (r *accountRepo) Create(ctx context.Context,
-	orgID *int64,
-	isInstanceAdmin bool,
+func (r *orgAccountRepo) Create(ctx context.Context,
+	orgID int64,
 	firstName string,
 	lastName string,
 	email string,
@@ -42,9 +40,8 @@ func (r *accountRepo) Create(ctx context.Context,
 
 	if rows, err = r.db.Query(
 		ctx,
-		queries.AccountCreate,
+		queries.OrgAccountCreate,
 		orgID,
-		isInstanceAdmin,
 		firstName,
 		lastName,
 		email,
@@ -62,7 +59,7 @@ func (r *accountRepo) Create(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepo) GetMany(ctx context.Context, orgID *int64) ([]types.Account, error) {
+func (r *orgAccountRepo) GetMany(ctx context.Context, orgID int64) ([]types.Account, error) {
 
 	var (
 		accounts []types.Account
@@ -70,7 +67,7 @@ func (r *accountRepo) GetMany(ctx context.Context, orgID *int64) ([]types.Accoun
 		err      error
 	)
 
-	if rows, err = r.db.Query(ctx, queries.AccountGetMany, orgID); err != nil {
+	if rows, err = r.db.Query(ctx, queries.OrgAccountGetMany, orgID); err != nil {
 		return nil, handleError(ctx, r.logger, err)
 	}
 
@@ -81,8 +78,8 @@ func (r *accountRepo) GetMany(ctx context.Context, orgID *int64) ([]types.Accoun
 	return accounts, nil
 }
 
-func (r *accountRepo) GetOne(ctx context.Context,
-	orgID *int64,
+func (r *orgAccountRepo) GetOne(ctx context.Context,
+	orgID int64,
 	id *int64,
 	uuid *string,
 	username *string,
@@ -95,7 +92,7 @@ func (r *accountRepo) GetOne(ctx context.Context,
 	)
 
 	if rows, err = r.db.Query(ctx,
-		queries.AccountGetOne,
+		queries.OrgAccountGetOne,
 		orgID,
 		id,
 		uuid,
@@ -111,10 +108,9 @@ func (r *accountRepo) GetOne(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepo) Update(ctx context.Context,
-	orgID *int64,
+func (r *orgAccountRepo) Update(ctx context.Context,
+	orgID int64,
 	id int64,
-	isInstanceAdmin bool,
 	firstName string,
 	lastName string,
 	email string,
@@ -129,10 +125,9 @@ func (r *accountRepo) Update(ctx context.Context,
 	)
 
 	if rows, err = r.db.Query(ctx,
-		queries.AccountUpdate,
+		queries.OrgAccountUpdate,
 		orgID,
 		id,
-		isInstanceAdmin,
 		firstName,
 		lastName,
 		email,
@@ -149,8 +144,8 @@ func (r *accountRepo) Update(ctx context.Context,
 	return &account, nil
 }
 
-func (r *accountRepo) Delete(ctx context.Context, orgID *int64, id int64) error {
-	row := r.db.QueryRow(ctx, queries.AccountDelete, orgID, id)
+func (r *orgAccountRepo) Delete(ctx context.Context, orgID int64, id int64) error {
+	row := r.db.QueryRow(ctx, queries.OrgAccountDelete, orgID, id)
 
 	var numDeleted int64
 	if err := row.Scan(&numDeleted); err != nil {
@@ -162,8 +157,30 @@ func (r *accountRepo) Delete(ctx context.Context, orgID *int64, id int64) error 
 	}
 
 	if numDeleted > 1 {
-		return errors.New(fmt.Sprintf("expected to delete 1 row, deleted %v", numDeleted))
+		return fmt.Errorf("expected to delete 1 row, deleted %v", numDeleted)
 	}
 
 	return nil
+}
+
+func (r *orgAccountRepo) GetByUsername(ctx context.Context, username string) (*types.Account, error) {
+
+	var (
+		account types.Account
+		rows    pgx.Rows
+		err     error
+	)
+
+	if rows, err = r.db.Query(ctx,
+		queries.AccountGetByUsername,
+		username,
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	if account, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Account]); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	return &account, nil
 }

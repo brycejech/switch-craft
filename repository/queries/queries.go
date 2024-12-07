@@ -4,24 +4,27 @@ import (
 	"embed"
 )
 
-/* ----------------------- */
-/* === ACCOUNT QUERIES === */
-/* ----------------------- */
+/* --------------------------- */
+/* === ORG ACCOUNT QUERIES === */
+/* --------------------------- */
 
-//go:embed account/accountCreate.sql
-var AccountCreate string
+//go:embed orgAccount/orgAccountCreate.sql
+var OrgAccountCreate string
 
-//go:embed account/accountGetMany.sql
-var AccountGetMany string
+//go:embed orgAccount/orgAccountGetMany.sql
+var OrgAccountGetMany string
 
-//go:embed account/accountGetOne.sql
-var AccountGetOne string
+//go:embed orgAccount/orgAccountGetOne.sql
+var OrgAccountGetOne string
 
-//go:embed account/accountUpdate.sql
-var AccountUpdate string
+//go:embed orgAccount/orgAccountUpdate.sql
+var OrgAccountUpdate string
 
-//go:embed account/accountDelete.sql
-var AccountDelete string
+//go:embed orgAccount/orgAccountDelete.sql
+var OrgAccountDelete string
+
+//go:embed orgAccount/accountGetByUsername.sql
+var AccountGetByUsername string
 
 /* ---------------------- */
 /* === ORG QUERIES === */

@@ -24,7 +24,7 @@ func Start(logger *types.Logger, core *core.Core) {
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 
 	registerMigrationsModule(core)
-	registerAccountModule(core)
+	registerOrgAccountModule(core)
 	registerOrgModule(core)
 	registerAuthModule(core)
 	registerAppModule(core)
@@ -35,7 +35,7 @@ func Start(logger *types.Logger, core *core.Core) {
 }
 
 // TODO: This should just return opCtx with account embedded
-func mustAuthn(core *core.Core) (account *types.Account) {
+func mustAuthn(core *core.Core) *types.Account {
 	var (
 		username = os.Getenv("SWITCHCRAFT_USER")
 		password = os.Getenv("SWITCHCRAFT_PASS")

@@ -2,16 +2,15 @@
 UPDATE account.account
 
 SET
-	  is_instance_admin = $3
-	, first_name = $4
-	, last_name = $5
-	, email = $6
-	, username = $7
+	  first_name = $3
+	, last_name = $4
+	, email = $5
+	, username = $6
 	, modified = (now() at time zone 'utc')
-	, modified_by = $8
+	, modified_by = $7
 
 WHERE
-	    ($1::bigint IS NULL OR org_id = $1::bigint)
+	    org_id = $1
 	AND id = $2
 
 RETURNING

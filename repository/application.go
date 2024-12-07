@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"switchcraft/repository/queries"
 	"switchcraft/types"
@@ -164,9 +163,7 @@ func (r *appRepo) Delete(ctx context.Context,
 	}
 
 	if numDeleted > 1 {
-		return errors.New(
-			fmt.Sprintf("expected to delete 1 row, deleted %v", numDeleted),
-		)
+		return fmt.Errorf("expected to delete 1 row, deleted %v", numDeleted)
 	}
 
 	return nil

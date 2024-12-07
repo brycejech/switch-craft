@@ -53,9 +53,7 @@ func (c *Core) Authn(ctx context.Context, username string, password string) (*ty
 		return nil, false
 	}
 
-	if account, err = c.AccountGetOne(ctx,
-		c.NewAccountGetOneArgs(nil, nil, nil, &username),
-	); err != nil {
+	if account, err = c.orgAccountRepo.GetByUsername(ctx, username); err != nil {
 		c.logger.Error(tracer, err.Error(), nil)
 		return nil, false
 	}
@@ -255,11 +253,9 @@ func mapClaimsAccount(accountMap map[string]any) (*types.Account, error) {
 
 func validateJWTSigningKey(key []byte) error {
 	if len(key) != 64 {
-		return errors.New(
-			fmt.Sprintf(
-				"core.validateJWTSigningKey: invalid JWT signing key length - expected 512 bits, got %v",
-				len(key)*8,
-			),
+		return fmt.Errorf(
+			"core.validateJWTSigningKey: invalid JWT signing key length - expected 512 bits, got %v",
+			len(key)*8,
 		)
 	}
 	return nil

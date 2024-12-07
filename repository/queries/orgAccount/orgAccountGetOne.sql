@@ -19,7 +19,7 @@ FROM
 
 WHERE
 
-	    ($1::bigint IS NULL    OR org_id=$1::bigint)
+	    org_id=$1
 	AND ($2::bigint IS NULL    OR id=$2::bigint)
 	AND (COALESCE($3, '') = '' OR uuid=$3::uuid)
 	AND (COALESCE($4, '') = '' OR username=$4::text)

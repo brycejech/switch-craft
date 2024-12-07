@@ -90,17 +90,17 @@ go build . -o switchcraft
 # Migrate database up
 ./switchcraft migrate up
 
-# List accounts
-./switchcraft account getMany
+# List org accounts
+./switchcraft orgAccount getMany
 
-# Get account by ID
-./switchcraft account getOne --id 1
+# Get org account by ID
+./switchcraft orgAccount getOne --id 1
 
-# Get account by UUID
-./switchcraft account getOne --uuid d724ed11-5a8b-4cb9-ac3d-fc72b717ba52
+# Get org account by UUID
+./switchcraft orgAccount getOne --uuid d724ed11-5a8b-4cb9-ac3d-fc72b717ba52
 ```
 
 A more complete `go build` command can be found in `scripts/build.sh`.
 
 Use the `go run` command if you wish to build and run from source rather than pre-compiling, e.g.
-`go run . account getOne --id 1`
+`go run . orgAccount getOne --id 1`

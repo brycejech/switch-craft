@@ -1,4 +1,4 @@
-package account
+package orgaccount
 
 import (
 	"net/http"
@@ -15,7 +15,7 @@ type updateOrgAccountArgs struct {
 	Username  string `json:"username"`
 }
 
-func (c *accountController) UpdateOrgAccount(w http.ResponseWriter, r *http.Request) {
+func (c *orgAccountController) UpdateOrgAccount(w http.ResponseWriter, r *http.Request) {
 	orgSlug := r.PathValue("orgSlug")
 	accountIDStr := r.PathValue("accountID")
 	if orgSlug == "" || accountIDStr == "" {
@@ -38,8 +38,8 @@ func (c *accountController) UpdateOrgAccount(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	account, err := c.core.AccountGetOne(r.Context(),
-		c.core.NewAccountGetOneArgs(&orgSlug, &accountID, nil, nil),
+	account, err := c.core.OrgAccountGetOne(r.Context(),
+		c.core.NewOrgAccountGetOneArgs(orgSlug, &accountID, nil, nil),
 	)
 	if err != nil {
 		restutils.HandleCoreErr(w, r, err)
@@ -50,7 +50,7 @@ func (c *accountController) UpdateOrgAccount(w http.ResponseWriter, r *http.Requ
 
 	if account.ID != body.ID {
 		restutils.BadRequest(w, r)
-		c.logger.Warn(tracer, "Account update ID mismatch detected", map[string]any{
+		c.logger.Warn(tracer, "Org account update ID mismatch detected", map[string]any{
 			"user":            tracer.AuthAccount.Username,
 			"requestBody":     body,
 			"existingAccount": account,
@@ -58,11 +58,10 @@ func (c *accountController) UpdateOrgAccount(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	updatedAccount, err := c.core.AccountUpdate(r.Context(),
-		c.core.NewAccountUpdateArgs(
-			&orgSlug,
+	updatedAccount, err := c.core.OrgAccountUpdate(r.Context(),
+		c.core.NewOrgAccountUpdateArgs(
+			orgSlug,
 			account.ID,
-			account.IsInstanceAdmin,
 			body.FirstName,
 			body.LastName,
 			body.Email,

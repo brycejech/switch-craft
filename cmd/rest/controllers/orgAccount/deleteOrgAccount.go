@@ -1,4 +1,4 @@
-package account
+package orgaccount
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"switchcraft/cmd/rest/restutils"
 )
 
-func (c *accountController) DeleteOrgAccount(w http.ResponseWriter, r *http.Request) {
+func (c *orgAccountController) DeleteOrgAccount(w http.ResponseWriter, r *http.Request) {
 	orgSlug := r.PathValue("orgSlug")
 	accountIDStr := r.PathValue("accountID")
 	if orgSlug == "" || accountIDStr == "" {
@@ -23,8 +23,9 @@ func (c *accountController) DeleteOrgAccount(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if err := c.core.AccountDelete(r.Context(), &orgSlug, accountID); err != nil {
+	if err := c.core.OrgAccountDelete(r.Context(), orgSlug, accountID); err != nil {
 		restutils.HandleCoreErr(w, r, err)
+		return
 	}
 
 	restutils.OK(w, r)

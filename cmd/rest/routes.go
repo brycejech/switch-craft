@@ -2,11 +2,11 @@ package rest
 
 import (
 	"net/http"
-	"switchcraft/cmd/rest/controllers/account"
 	"switchcraft/cmd/rest/controllers/application"
 	"switchcraft/cmd/rest/controllers/auth"
 	featureflag "switchcraft/cmd/rest/controllers/featureFlag"
 	"switchcraft/cmd/rest/controllers/org"
+	orgaccount "switchcraft/cmd/rest/controllers/orgAccount"
 	"switchcraft/cmd/rest/restutils"
 	"switchcraft/core"
 	"switchcraft/types"
@@ -15,7 +15,7 @@ import (
 func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	authController := auth.NewAuthController(logger, core)
 	orgController := org.NewOrgController(logger, core)
-	accountController := account.NewAccountController(logger, core)
+	orgAccountController := orgaccount.NewOrgAccountController(logger, core)
 	appController := application.NewAppController(logger, core)
 	featFlagController := featureflag.NewFeatureFlagController(logger, core)
 
@@ -36,11 +36,11 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	router.HandleFunc("PUT /org/{orgSlug}", authMiddleware(orgController.Update))
 
 	/* === ORG ACCOUNT ROUTES === */
-	router.HandleFunc("POST /org/{orgSlug}/account", authMiddleware(accountController.CretaeOrgAccount))
-	router.HandleFunc("GET /org/{orgSlug}/account", authMiddleware(accountController.GetOrgAccounts))
-	router.HandleFunc("GET /org/{orgSlug}/account/{accountID}", authMiddleware(accountController.GetOneOrgAccount))
-	router.HandleFunc("PUT /org/{orgSlug}/account/{accountID}", authMiddleware(accountController.UpdateOrgAccount))
-	router.HandleFunc("DELETE /org/{orgSlug}/account/{accountID}", authMiddleware(accountController.DeleteOrgAccount))
+	router.HandleFunc("POST /org/{orgSlug}/account", authMiddleware(orgAccountController.CreateOrgAccount))
+	router.HandleFunc("GET /org/{orgSlug}/account", authMiddleware(orgAccountController.GetOrgAccounts))
+	router.HandleFunc("GET /org/{orgSlug}/account/{accountID}", authMiddleware(orgAccountController.GetOneOrgAccount))
+	router.HandleFunc("PUT /org/{orgSlug}/account/{accountID}", authMiddleware(orgAccountController.UpdateOrgAccount))
+	router.HandleFunc("DELETE /org/{orgSlug}/account/{accountID}", authMiddleware(orgAccountController.DeleteOrgAccount))
 
 	/* === APPLICATION ROUTES === */
 	router.HandleFunc("POST /org/{orgSlug}/app", authMiddleware(appController.Create))
