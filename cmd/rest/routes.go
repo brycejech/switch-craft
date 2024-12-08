@@ -5,6 +5,7 @@ import (
 	"switchcraft/cmd/rest/controllers/application"
 	"switchcraft/cmd/rest/controllers/auth"
 	featureflag "switchcraft/cmd/rest/controllers/featureFlag"
+	globalaccount "switchcraft/cmd/rest/controllers/globalAccount"
 	"switchcraft/cmd/rest/controllers/org"
 	orgaccount "switchcraft/cmd/rest/controllers/orgAccount"
 	"switchcraft/cmd/rest/restutils"
@@ -14,6 +15,7 @@ import (
 
 func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	authController := auth.NewAuthController(logger, core)
+	globalAccountController := globalaccount.NewGlobalAccountController(logger, core)
 	orgController := org.NewOrgController(logger, core)
 	orgAccountController := orgaccount.NewOrgAccountController(logger, core)
 	appController := application.NewAppController(logger, core)
@@ -28,6 +30,13 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	})
 
 	router.HandleFunc("POST /authn", authController.Login)
+
+	/* === GLOBAL ACCOUNT ROUTES === */
+	router.HandleFunc("POST /account", authMiddleware(globalAccountController.Create))
+	router.HandleFunc("GET /account", authMiddleware(globalAccountController.GetMany))
+	router.HandleFunc("GET /account/{accountID}", authMiddleware(globalAccountController.GetOne))
+	router.HandleFunc("PUT /account/{accountID}", authMiddleware(globalAccountController.Update))
+	router.HandleFunc("DELETE /account/{accountID}", authMiddleware(globalAccountController.Delete))
 
 	/* === ORGANIZATION ROUTES === */
 	router.HandleFunc("POST /org", authMiddleware(orgController.Create))

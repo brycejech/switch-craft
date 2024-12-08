@@ -4,6 +4,28 @@ import (
 	"embed"
 )
 
+/* ------------------------------ */
+/* === GLOBAL ACCOUNT QUERIES === */
+/* ------------------------------ */
+
+//go:embed globalAccount/globalAccountCreate.sql
+var GlobalAccountCreate string
+
+//go:embed globalAccount/globalAccountGetMany.sql
+var GlobalAccountGetMany string
+
+//go:embed globalAccount/globalAccountGetOne.sql
+var GlobalAccountGetOne string
+
+//go:embed globalAccount/globalAccountUpdate.sql
+var GlobalAccountUpdate string
+
+//go:embed globalAccount/globalAccountDelete.sql
+var GlobalAccountDelete string
+
+//go:embed globalAccount/accountGetByUsername.sql
+var AccountGetByUsername string
+
 /* --------------------------- */
 /* === ORG ACCOUNT QUERIES === */
 /* --------------------------- */
@@ -22,9 +44,6 @@ var OrgAccountUpdate string
 
 //go:embed orgAccount/orgAccountDelete.sql
 var OrgAccountDelete string
-
-//go:embed orgAccount/accountGetByUsername.sql
-var AccountGetByUsername string
 
 /* ---------------------- */
 /* === ORG QUERIES === */

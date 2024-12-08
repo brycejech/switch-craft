@@ -32,19 +32,21 @@ func main() {
 	jwtSigningKeyBytes := mustGetJWTSigningKey(jwtSigningKey)
 
 	var (
-		logger          = types.NewLogger(types.LogLevelInfo)
-		db              = mustInitDb(globalCtx)
-		repo            = repository.NewRepository(logger, db)
-		accountRepo     = repository.NewOrgAccountRepository(logger, db)
-		orgRepo         = repository.NewOrgRepository(logger, db)
-		applicationRepo = repository.NewAppRepository(logger, db)
-		featureFlagRepo = repository.NewFeatureFlagRepository(logger, db)
+		logger            = types.NewLogger(types.LogLevelInfo)
+		db                = mustInitDb(globalCtx)
+		repo              = repository.NewRepository(logger, db)
+		globalAccountRepo = repository.NewGlobalAccountRepository(logger, db)
+		orgAccountRepo    = repository.NewOrgAccountRepository(logger, db)
+		orgRepo           = repository.NewOrgRepository(logger, db)
+		applicationRepo   = repository.NewAppRepository(logger, db)
+		featureFlagRepo   = repository.NewFeatureFlagRepository(logger, db)
 	)
 
 	switchcraft := core.NewCore(
 		logger,
 		repo,
-		accountRepo,
+		globalAccountRepo,
+		orgAccountRepo,
 		orgRepo,
 		applicationRepo,
 		featureFlagRepo,

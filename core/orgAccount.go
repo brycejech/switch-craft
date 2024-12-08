@@ -91,67 +91,6 @@ func (c *Core) OrgAccountCreate(ctx context.Context, args orgAccountCreateArgs) 
 	)
 }
 
-// type accountCreateGlobalArgs struct {
-// 	isInstanceAdmin bool
-// 	firstName       string
-// 	lastName        string
-// 	email           string
-// 	username        string
-// 	password        string
-// }
-
-// func (a *accountCreateGlobalArgs) Validate() error {
-// 	if len(a.password) < 12 {
-// 		return errors.New("accountCreateGlobalArgs.password must be at least 12 characters")
-// 	}
-// 	return nil
-// }
-
-// func (c *Core) NewAccountCreateGlobalArgs(
-// 	isInstanceAdmin bool,
-// 	firstName string,
-// 	lastName string,
-// 	email string,
-// 	username string,
-// 	password string,
-// ) accountCreateGlobalArgs {
-// 	return accountCreateGlobalArgs{
-// 		isInstanceAdmin: isInstanceAdmin,
-// 		firstName:       firstName,
-// 		lastName:        lastName,
-// 		email:           email,
-// 		username:        username,
-// 		password:        password,
-// 	}
-// }
-
-// func (c *Core) AccountCreateGlobal(ctx context.Context, args accountCreateGlobalArgs) (*types.Account, error) {
-// 	tracer, err := c.getOperationTracer(ctx)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	if err := args.Validate(); err != nil {
-// 		return nil, err
-// 	}
-
-// 	hashedPassword, err := c.AuthPasswordHash(args.password)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return c.accountRepo.Create(ctx,
-// 		nil,
-// 		args.isInstanceAdmin,
-// 		args.firstName,
-// 		args.lastName,
-// 		args.email,
-// 		args.username,
-// 		&hashedPassword,
-// 		tracer.AuthAccount.ID,
-// 	)
-// }
-
 func (c *Core) OrgAccountGetMany(ctx context.Context, orgSlug string) ([]types.Account, error) {
 	if orgSlug == "" {
 		return nil, errors.New("core.OrgAccountGetMany orgSlug cannot be empty")
@@ -281,8 +220,4 @@ func (c *Core) OrgAccountDelete(ctx context.Context, orgSlug string, id int64) e
 	}
 
 	return c.orgAccountRepo.Delete(ctx, org.ID, id)
-}
-
-func (c *Core) AccountGetByUsername(ctx context.Context, username string) (*types.Account, error) {
-	return c.orgAccountRepo.GetByUsername(ctx, username)
 }

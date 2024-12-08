@@ -1,0 +1,22 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/account
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "isInstanceAdmin": false,
+    "firstName": "",
+    "lastName": "",
+    "email": "",
+    "username": "",
+    "password": ""
+  }
+}

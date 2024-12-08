@@ -10,25 +10,25 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewOrgAccountRepository(logger *types.Logger, db *pgxpool.Pool) *orgAccountRepo {
-	return &orgAccountRepo{
+type globalAccountRepo struct {
+	logger *types.Logger
+	db     *pgxpool.Pool
+}
+
+func NewGlobalAccountRepository(logger *types.Logger, db *pgxpool.Pool) *globalAccountRepo {
+	return &globalAccountRepo{
 		logger: logger,
 		db:     db,
 	}
 }
 
-type orgAccountRepo struct {
-	logger *types.Logger
-	db     *pgxpool.Pool
-}
-
-func (r *orgAccountRepo) Create(ctx context.Context,
-	orgID int64,
+func (r *globalAccountRepo) Create(ctx context.Context,
+	isInstanceAdmin bool,
 	firstName string,
 	lastName string,
 	email string,
 	username string,
-	password *string,
+	password string,
 	createdBy int64,
 ) (*types.Account, error) {
 
@@ -40,8 +40,8 @@ func (r *orgAccountRepo) Create(ctx context.Context,
 
 	if rows, err = r.db.Query(
 		ctx,
-		queries.OrgAccountCreate,
-		orgID,
+		queries.GlobalAccountCreate,
+		isInstanceAdmin,
 		firstName,
 		lastName,
 		email,
@@ -59,7 +59,7 @@ func (r *orgAccountRepo) Create(ctx context.Context,
 	return &account, nil
 }
 
-func (r *orgAccountRepo) GetMany(ctx context.Context, orgID int64) ([]types.Account, error) {
+func (r *globalAccountRepo) GetMany(ctx context.Context) ([]types.Account, error) {
 
 	var (
 		accounts []types.Account
@@ -67,7 +67,7 @@ func (r *orgAccountRepo) GetMany(ctx context.Context, orgID int64) ([]types.Acco
 		err      error
 	)
 
-	if rows, err = r.db.Query(ctx, queries.OrgAccountGetMany, orgID); err != nil {
+	if rows, err = r.db.Query(ctx, queries.GlobalAccountGetMany); err != nil {
 		return nil, handleError(ctx, r.logger, err)
 	}
 
@@ -78,8 +78,7 @@ func (r *orgAccountRepo) GetMany(ctx context.Context, orgID int64) ([]types.Acco
 	return accounts, nil
 }
 
-func (r *orgAccountRepo) GetOne(ctx context.Context,
-	orgID int64,
+func (r *globalAccountRepo) GetOne(ctx context.Context,
 	id *int64,
 	uuid *string,
 	username *string,
@@ -92,8 +91,7 @@ func (r *orgAccountRepo) GetOne(ctx context.Context,
 	)
 
 	if rows, err = r.db.Query(ctx,
-		queries.OrgAccountGetOne,
-		orgID,
+		queries.GlobalAccountGetOne,
 		id,
 		uuid,
 		username,
@@ -108,9 +106,9 @@ func (r *orgAccountRepo) GetOne(ctx context.Context,
 	return &account, nil
 }
 
-func (r *orgAccountRepo) Update(ctx context.Context,
-	orgID int64,
+func (r *globalAccountRepo) Update(ctx context.Context,
 	id int64,
+	isInstanceAdmin bool,
 	firstName string,
 	lastName string,
 	email string,
@@ -125,9 +123,9 @@ func (r *orgAccountRepo) Update(ctx context.Context,
 	)
 
 	if rows, err = r.db.Query(ctx,
-		queries.OrgAccountUpdate,
-		orgID,
+		queries.GlobalAccountUpdate,
 		id,
+		isInstanceAdmin,
 		firstName,
 		lastName,
 		email,
@@ -144,8 +142,8 @@ func (r *orgAccountRepo) Update(ctx context.Context,
 	return &account, nil
 }
 
-func (r *orgAccountRepo) Delete(ctx context.Context, orgID int64, id int64) error {
-	row := r.db.QueryRow(ctx, queries.OrgAccountDelete, orgID, id)
+func (r *globalAccountRepo) Delete(ctx context.Context, id int64) error {
+	row := r.db.QueryRow(ctx, queries.GlobalAccountDelete, id)
 
 	var numDeleted int64
 	if err := row.Scan(&numDeleted); err != nil {
@@ -161,4 +159,26 @@ func (r *orgAccountRepo) Delete(ctx context.Context, orgID int64, id int64) erro
 	}
 
 	return nil
+}
+
+func (r *globalAccountRepo) GetByUsername(ctx context.Context, username string) (*types.Account, error) {
+
+	var (
+		account types.Account
+		rows    pgx.Rows
+		err     error
+	)
+
+	if rows, err = r.db.Query(ctx,
+		queries.AccountGetByUsername,
+		username,
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	if account, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Account]); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	return &account, nil
 }

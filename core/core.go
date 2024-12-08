@@ -10,6 +10,7 @@ import (
 func NewCore(
 	logger *types.Logger,
 	repo Repo,
+	globalAccountRepo GlobalAccountRepo,
 	orgAccountRepo OrgAccountRepo,
 	orgRepo OrgRepo,
 	appRepo AppRepo,
@@ -17,24 +18,26 @@ func NewCore(
 	jwtSigningKey []byte,
 ) *Core {
 	return &Core{
-		logger:          logger,
-		repository:      repo,
-		orgAccountRepo:  orgAccountRepo,
-		orgRepo:         orgRepo,
-		appRepo:         appRepo,
-		featureFlagRepo: featureFlagRepo,
-		jwtSigningKey:   jwtSigningKey,
+		logger:            logger,
+		repository:        repo,
+		globalAccountRepo: globalAccountRepo,
+		orgAccountRepo:    orgAccountRepo,
+		orgRepo:           orgRepo,
+		appRepo:           appRepo,
+		featureFlagRepo:   featureFlagRepo,
+		jwtSigningKey:     jwtSigningKey,
 	}
 }
 
 type Core struct {
-	logger          *types.Logger
-	repository      Repo
-	orgAccountRepo  OrgAccountRepo
-	orgRepo         OrgRepo
-	appRepo         AppRepo
-	featureFlagRepo FeatureFlagRepo
-	jwtSigningKey   []byte
+	logger            *types.Logger
+	repository        Repo
+	globalAccountRepo GlobalAccountRepo
+	orgAccountRepo    OrgAccountRepo
+	orgRepo           OrgRepo
+	appRepo           AppRepo
+	featureFlagRepo   FeatureFlagRepo
+	jwtSigningKey     []byte
 }
 
 func (c *Core) getOperationTracer(ctx context.Context) (types.OperationTracer, error) {
@@ -68,6 +71,35 @@ type Repo interface {
 	MigrateDown() error
 }
 
+type GlobalAccountRepo interface {
+	Create(ctx context.Context,
+		isInstanceAdmin bool,
+		firstName string,
+		lastName string,
+		email string,
+		username string,
+		password string,
+		createdBy int64,
+	) (*types.Account, error)
+	GetMany(ctx context.Context) ([]types.Account, error)
+	GetOne(ctx context.Context,
+		id *int64,
+		uuid *string,
+		username *string,
+	) (*types.Account, error)
+	Update(ctx context.Context,
+		id int64,
+		isInstanceAdmin bool,
+		firstName string,
+		lastName string,
+		email string,
+		username string,
+		modifiedBy int64,
+	) (*types.Account, error)
+	Delete(ctx context.Context, id int64) error
+	GetByUsername(ctx context.Context, username string) (*types.Account, error)
+}
+
 type OrgAccountRepo interface {
 	Create(ctx context.Context,
 		orgID int64,
@@ -95,7 +127,6 @@ type OrgAccountRepo interface {
 		modifiedBy int64,
 	) (*types.Account, error)
 	Delete(ctx context.Context, orgID int64, id int64) error
-	GetByUsername(ctx context.Context, username string) (*types.Account, error)
 }
 
 type OrgRepo interface {

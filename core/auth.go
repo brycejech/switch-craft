@@ -53,7 +53,7 @@ func (c *Core) Authn(ctx context.Context, username string, password string) (*ty
 		return nil, false
 	}
 
-	if account, err = c.orgAccountRepo.GetByUsername(ctx, username); err != nil {
+	if account, err = c.globalAccountRepo.GetByUsername(ctx, username); err != nil {
 		c.logger.Error(tracer, err.Error(), nil)
 		return nil, false
 	}

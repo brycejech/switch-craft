@@ -1,0 +1,22 @@
+meta {
+  name: Update
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/account/4
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": 1,
+    "isInstanceAdmin": false,
+    "firstName": "",
+    "lastName": "",
+    "email": "",
+    "username": ""
+  }
+}
