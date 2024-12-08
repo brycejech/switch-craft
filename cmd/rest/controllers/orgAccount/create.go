@@ -13,7 +13,7 @@ type createOrgAccountArgs struct {
 	Password  *string `json:"password"`
 }
 
-func (c *orgAccountController) CreateOrgAccount(w http.ResponseWriter, r *http.Request) {
+func (c *orgAccountController) Create(w http.ResponseWriter, r *http.Request) {
 	orgSlug := r.PathValue("orgSlug")
 	if orgSlug == "" {
 		restutils.NotFound(w, r)

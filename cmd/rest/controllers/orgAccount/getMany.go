@@ -5,7 +5,7 @@ import (
 	"switchcraft/cmd/rest/restutils"
 )
 
-func (c *orgAccountController) GetOrgAccounts(w http.ResponseWriter, r *http.Request) {
+func (c *orgAccountController) GetMany(w http.ResponseWriter, r *http.Request) {
 	orgSlug := r.PathValue("orgSlug")
 	if orgSlug == "" {
 		restutils.NotFound(w, r)

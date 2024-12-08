@@ -2,3 +2,5 @@
 2. Chain middleware
 3. Check tenant permissions
    - Always do this at core layer to prevent logic duplication in each adapter.
+4. Account segment
+5. App config

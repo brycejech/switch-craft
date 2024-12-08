@@ -6,7 +6,7 @@ import (
 	"switchcraft/cmd/rest/restutils"
 )
 
-func (c *orgAccountController) DeleteOrgAccount(w http.ResponseWriter, r *http.Request) {
+func (c *orgAccountController) Delete(w http.ResponseWriter, r *http.Request) {
 	orgSlug := r.PathValue("orgSlug")
 	accountIDStr := r.PathValue("accountID")
 	if orgSlug == "" || accountIDStr == "" {
