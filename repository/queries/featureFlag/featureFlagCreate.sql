@@ -3,6 +3,8 @@ INSERT INTO application.feature_flag (
 	  org_id
 	, application_id
 	, name
+	, label
+	, description
 	, is_enabled
 	, created_by
 )
@@ -13,6 +15,8 @@ VALUES (
 	, $3
 	, $4
 	, $5
+	, $6
+	, $7
 )
 
 RETURNING
@@ -21,6 +25,8 @@ RETURNING
 	, id
 	, uuid
 	, name
+	, label
+	, description
 	, is_enabled
 	, created
 	, created_by

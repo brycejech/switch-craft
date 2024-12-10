@@ -7,10 +7,12 @@ import (
 )
 
 type featFlagCreateArgs struct {
-	orgSlug   string
-	appSlug   string
-	name      string
-	isEnabled bool
+	orgSlug     string
+	appSlug     string
+	name        string
+	label       string
+	description string
+	isEnabled   bool
 }
 
 func (a *featFlagCreateArgs) Validate() error {
@@ -30,13 +32,17 @@ func (c *Core) NewFeatFlagCreateArgs(
 	orgSlug string,
 	appSlug string,
 	name string,
+	label string,
+	description string,
 	isEnabled bool,
 ) featFlagCreateArgs {
 	return featFlagCreateArgs{
-		orgSlug:   orgSlug,
-		appSlug:   appSlug,
-		name:      name,
-		isEnabled: isEnabled,
+		orgSlug:     orgSlug,
+		appSlug:     appSlug,
+		name:        name,
+		label:       label,
+		description: description,
+		isEnabled:   isEnabled,
 	}
 }
 
@@ -66,6 +72,8 @@ func (c *Core) FeatFlagCreate(ctx context.Context, args featFlagCreateArgs) (*ty
 		org.ID,
 		app.ID,
 		args.name,
+		args.label,
+		args.description,
 		args.isEnabled,
 		tracer.AuthAccount.ID,
 	)
@@ -167,11 +175,13 @@ func (c *Core) FeatFlagGetOne(ctx context.Context, args featFlagGetOneArgs) (*ty
 }
 
 type featFlagUpdateArgs struct {
-	orgSlug   string
-	appSlug   string
-	id        int64
-	name      string
-	isEnabled bool
+	orgSlug     string
+	appSlug     string
+	id          int64
+	name        string
+	label       string
+	description string
+	isEnabled   bool
 }
 
 func (a *featFlagUpdateArgs) Validate() error {
@@ -195,14 +205,18 @@ func (c *Core) NewFeatFlagUpdateArgs(
 	appSlug string,
 	id int64,
 	name string,
+	label string,
+	description string,
 	isEnabled bool,
 ) featFlagUpdateArgs {
 	return featFlagUpdateArgs{
-		orgSlug:   orgSlug,
-		appSlug:   appSlug,
-		id:        id,
-		name:      name,
-		isEnabled: isEnabled,
+		orgSlug:     orgSlug,
+		appSlug:     appSlug,
+		id:          id,
+		name:        name,
+		label:       label,
+		description: description,
+		isEnabled:   isEnabled,
 	}
 }
 
@@ -232,6 +246,8 @@ func (c *Core) FeatFlagUpdate(ctx context.Context, args featFlagUpdateArgs) (*ty
 		app.ID,
 		args.id,
 		args.name,
+		args.label,
+		args.description,
 		args.isEnabled,
 		tracer.AuthAccount.ID,
 	)

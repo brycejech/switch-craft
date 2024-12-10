@@ -186,6 +186,8 @@ type FeatureFlagRepo interface {
 		orgID int64,
 		applicationID int64,
 		name string,
+		label string,
+		description string,
 		isEnabled bool,
 		createdBy int64,
 	) (*types.FeatureFlag, error)
@@ -204,7 +206,9 @@ type FeatureFlagRepo interface {
 		orgID int64,
 		applicationID int64,
 		id int64,
-		slug string,
+		name string,
+		label string,
+		description string,
 		isEnabled bool,
 		modifiedBy int64,
 	) (*types.FeatureFlag, error)

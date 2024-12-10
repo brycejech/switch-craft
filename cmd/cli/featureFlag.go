@@ -21,10 +21,12 @@ func registerFeatureFlagModule(core *core.Core) {
 	/* === CREATE FEATURE FLAG COMMAND === */
 	/* ----------------------------------- */
 	createFeatureFlagCmdArgs := struct {
-		orgSlug   string
-		appSlug   string
-		name      string
-		isEnabled bool
+		orgSlug     string
+		appSlug     string
+		name        string
+		label       string
+		description string
+		isEnabled   bool
 	}{}
 	var createFeatureFlagCmd = &cobra.Command{
 		Use:   "create",
@@ -37,6 +39,8 @@ func registerFeatureFlagModule(core *core.Core) {
 				createFeatureFlagCmdArgs.orgSlug,
 				createFeatureFlagCmdArgs.appSlug,
 				createFeatureFlagCmdArgs.name,
+				createFeatureFlagCmdArgs.label,
+				createFeatureFlagCmdArgs.description,
 				createFeatureFlagCmdArgs.isEnabled,
 			)
 
@@ -54,8 +58,10 @@ func registerFeatureFlagModule(core *core.Core) {
 	createFeatureFlagCmd.MarkFlagRequired("applicationSlug")
 	createFeatureFlagCmd.Flags().StringVar(&createFeatureFlagCmdArgs.name, "name", "", "featureFlag.name")
 	createFeatureFlagCmd.MarkFlagRequired("name")
+	createFeatureFlagCmd.Flags().StringVar(&createFeatureFlagCmdArgs.label, "label", "", "featureFlag.label")
+	createFeatureFlagCmd.MarkFlagRequired("label")
+	createFeatureFlagCmd.Flags().StringVar(&createFeatureFlagCmdArgs.description, "description", "", "featureFlag.description")
 	createFeatureFlagCmd.Flags().BoolVar(&createFeatureFlagCmdArgs.isEnabled, "isEnabled", false, "featureFlag.isEnabled")
-	createFeatureFlagCmd.MarkFlagRequired("isEnabled")
 	featureFlagCmd.AddCommand(createFeatureFlagCmd)
 
 	/* --------------------------------- */
@@ -145,11 +151,13 @@ func registerFeatureFlagModule(core *core.Core) {
 	/* === UPDATE FEATURE FLAG COMMAND === */
 	/* ----------------------------------- */
 	updateFeatureFlagCmdArgs := struct {
-		orgSlug   string
-		appSlug   string
-		id        int64
-		name      string
-		isEnabled bool
+		orgSlug     string
+		appSlug     string
+		id          int64
+		name        string
+		label       string
+		description string
+		isEnabled   bool
 	}{}
 	var updateFeatureFlagCmd = &cobra.Command{
 		Use:   "update",
@@ -163,6 +171,8 @@ func registerFeatureFlagModule(core *core.Core) {
 				updateFeatureFlagCmdArgs.appSlug,
 				updateFeatureFlagCmdArgs.id,
 				updateFeatureFlagCmdArgs.name,
+				updateFeatureFlagCmdArgs.label,
+				updateFeatureFlagCmdArgs.description,
 				updateFeatureFlagCmdArgs.isEnabled,
 			)
 
@@ -181,6 +191,9 @@ func registerFeatureFlagModule(core *core.Core) {
 	updateFeatureFlagCmd.MarkFlagRequired("id")
 	updateFeatureFlagCmd.Flags().StringVar(&updateFeatureFlagCmdArgs.name, "name", "", "featureFlag.name")
 	updateFeatureFlagCmd.MarkFlagRequired("name")
+	updateFeatureFlagCmd.Flags().StringVar(&updateFeatureFlagCmdArgs.label, "label", "", "featureFlag.label")
+	updateFeatureFlagCmd.MarkFlagRequired("label")
+	updateFeatureFlagCmd.Flags().StringVar(&updateFeatureFlagCmdArgs.description, "description", "", "featureFlag.description")
 	updateFeatureFlagCmd.Flags().BoolVar(&updateFeatureFlagCmdArgs.isEnabled, "isEnabled", false, "featureFlag.isEnabled")
 	updateFeatureFlagCmd.MarkFlagRequired("isEnabled")
 	featureFlagCmd.AddCommand(updateFeatureFlagCmd)

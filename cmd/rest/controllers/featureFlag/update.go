@@ -4,11 +4,15 @@ import (
 	"net/http"
 	"strconv"
 	"switchcraft/cmd/rest/restutils"
+	"switchcraft/types"
 )
 
 type featFlagUpdateArgs struct {
-	Name      string `json:"name"`
-	IsEnabled bool   `json:"isEnabled"`
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Label       string `json:"label"`
+	Description string `json:"Description"`
+	IsEnabled   bool   `json:"isEnabled"`
 }
 
 func (c *featureFlagController) Update(w http.ResponseWriter, r *http.Request) {
@@ -35,8 +39,27 @@ func (c *featureFlagController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if flagID != body.ID {
+		tracer, _ := r.Context().Value(types.CtxOperationTracer).(types.OperationTracer)
+		c.logger.Warn(tracer, "Potential breakout detected, feature flag ID mismatch", map[string]any{
+			"user":          tracer.AuthAccount.Username,
+			"urlParamId":    flagID,
+			"requestBodyID": body.ID,
+		})
+		restutils.BadRequest(w, r)
+		return
+	}
+
 	flag, err := c.core.FeatFlagUpdate(r.Context(),
-		c.core.NewFeatFlagUpdateArgs(orgSlug, appSlug, flagID, body.Name, body.IsEnabled),
+		c.core.NewFeatFlagUpdateArgs(
+			orgSlug,
+			appSlug,
+			flagID,
+			body.Name,
+			body.Label,
+			body.Description,
+			body.IsEnabled,
+		),
 	)
 	if err != nil {
 		restutils.HandleCoreErr(w, r, err)

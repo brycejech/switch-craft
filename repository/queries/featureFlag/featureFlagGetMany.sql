@@ -5,6 +5,8 @@ SELECT
 	, id
 	, uuid
 	, name
+	, label
+	, description
 	, is_enabled
 	, created
 	, created_by
