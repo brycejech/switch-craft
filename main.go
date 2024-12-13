@@ -37,6 +37,7 @@ func main() {
 		repo              = repository.NewRepository(logger, db)
 		globalAccountRepo = repository.NewGlobalAccountRepository(logger, db)
 		orgAccountRepo    = repository.NewOrgAccountRepository(logger, db)
+		orgGroupRepo      = repository.NewOrgGroupRepository(logger, db)
 		orgRepo           = repository.NewOrgRepository(logger, db)
 		applicationRepo   = repository.NewAppRepository(logger, db)
 		featureFlagRepo   = repository.NewFeatureFlagRepository(logger, db)
@@ -47,6 +48,7 @@ func main() {
 		repo,
 		globalAccountRepo,
 		orgAccountRepo,
+		orgGroupRepo,
 		orgRepo,
 		applicationRepo,
 		featureFlagRepo,

@@ -45,6 +45,25 @@ var OrgAccountUpdate string
 //go:embed orgAccount/orgAccountDelete.sql
 var OrgAccountDelete string
 
+/* ------------------------- */
+/* === ORG GROUP QUERIES === */
+/* ------------------------- */
+
+//go:embed orgGroup/orgGroupCreate.sql
+var OrgGroupCreate string
+
+//go:embed orgGroup/orgGroupGetMany.sql
+var OrgGroupGetMany string
+
+//go:embed orgGroup/orgGroupGetOne.sql
+var OrgGroupGetOne string
+
+//go:embed orgGroup/orgGroupUpdate.sql
+var OrgGroupUpdate string
+
+//go:embed orgGroup/orgGroupDelete.sql
+var OrgGroupDelete string
+
 /* ---------------------- */
 /* === ORG QUERIES === */
 /* ---------------------- */

@@ -143,7 +143,6 @@ func (c *Core) OrgAccountGetOne(ctx context.Context, args orgAccountGetOneArgs) 
 	}
 
 	return c.orgAccountRepo.GetOne(ctx, org.ID, args.id, args.uuid, args.username)
-
 }
 
 type orgAccountUpdateArgs struct {
@@ -206,7 +205,6 @@ func (c *Core) OrgAccountUpdate(ctx context.Context, args orgAccountUpdateArgs) 
 		args.username,
 		tracer.AuthAccount.ID,
 	)
-
 }
 
 func (c *Core) OrgAccountDelete(ctx context.Context, orgSlug string, id int64) error {

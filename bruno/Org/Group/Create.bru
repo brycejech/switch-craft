@@ -1,0 +1,18 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/org/{{orgSlug}}/group
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Beta users",
+    "description": "Group of beta users receiving first access to new features"
+  }
+}

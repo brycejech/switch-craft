@@ -8,6 +8,7 @@ import (
 	"switchcraft/cmd/rest/controllers/globalaccount"
 	"switchcraft/cmd/rest/controllers/org"
 	"switchcraft/cmd/rest/controllers/orgaccount"
+	"switchcraft/cmd/rest/controllers/orggroup"
 	"switchcraft/cmd/rest/restutils"
 	"switchcraft/core"
 	"switchcraft/types"
@@ -19,6 +20,7 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 		globalAccountController = globalaccount.NewGlobalAccountController(logger, core)
 		orgController           = org.NewOrgController(logger, core)
 		orgAccountController    = orgaccount.NewOrgAccountController(logger, core)
+		orgGroupController      = orggroup.NewOrgGroupController(logger, core)
 		appController           = application.NewAppController(logger, core)
 		featFlagController      = featureflag.NewFeatureFlagController(logger, core)
 	)
@@ -52,6 +54,13 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	router.HandleFunc("GET /org/{orgSlug}/account/{accountID}", authMiddleware(orgAccountController.GetOne))
 	router.HandleFunc("PUT /org/{orgSlug}/account/{accountID}", authMiddleware(orgAccountController.Update))
 	router.HandleFunc("DELETE /org/{orgSlug}/account/{accountID}", authMiddleware(orgAccountController.Delete))
+
+	/* === ORG GROUP ROUTES === */
+	router.HandleFunc("POST /org/{orgSlug}/group", authMiddleware(orgGroupController.Create))
+	router.HandleFunc("GET /org/{orgSlug}/group", authMiddleware(orgGroupController.GetMany))
+	router.HandleFunc("GET /org/{orgSlug}/group/{groupID}", authMiddleware(orgGroupController.GetOne))
+	router.HandleFunc("PUT /org/{orgSlug}/group/{groupID}", authMiddleware(orgGroupController.Update))
+	router.HandleFunc("DELETE /org/{orgSlug}/group/{groupID}", authMiddleware(orgGroupController.Delete))
 
 	/* === APPLICATION ROUTES === */
 	router.HandleFunc("POST /org/{orgSlug}/app", authMiddleware(appController.Create))

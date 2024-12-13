@@ -73,34 +73,33 @@ CREATE TABLE application.feature_flag (
 	, UNIQUE (application_id, name)
 );
 
--- CREATE TABLE account.org_group (
--- 	  org_id bigint NOT NULL REFERENCES account.org(id) ON DELETE CASCADE ON UPDATE CASCADE
+CREATE TABLE account.org_group (
+	  org_id bigint NOT NULL REFERENCES account.org(id) ON DELETE CASCADE ON UPDATE CASCADE
 
--- 	, id              int          NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY
--- 	, uuid            uuid         NOT NULL UNIQUE DEFAULT gen_random_uuid()
--- 	, name            varchar(64)  NOT NULL
+	, id              int          NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY
+	, uuid            uuid         NOT NULL UNIQUE DEFAULT gen_random_uuid()
+	, name            varchar(64)  NOT NULL
+	, description     varchar(64)
 
--- 	, created      timestamp with time zone  NOT NULL DEFAULT (now() at time zone 'utc')
--- 	, created_by   bigint                    REFERENCES account.account(id)
--- 	, modified     timestamp with time zone
--- 	, modified_by  bigint                    REFERENCES account.account(id)
+	, created      timestamp with time zone  NOT NULL DEFAULT (now() at time zone 'utc')
+	, created_by   bigint                    REFERENCES account.account(id)
+	, modified     timestamp with time zone
+	, modified_by  bigint                    REFERENCES account.account(id)
 
--- 	, UNIQUE (org_id, name)
--- );
+	, UNIQUE (org_id, name)
+);
 
--- CREATE TABLE account.org_group_account (
--- 	  org_id      bigint  NOT NULL REFERENCES account.org(id) ON DELETE CASCADE ON UPDATE CASCADE
--- 	, group_id    bigint  NOT NULL REFERENCES account.org_group(id) ON DELETE CASCADE ON UPDATE CASCADE
+CREATE TABLE account.org_group_account (
+	  org_id      bigint  NOT NULL REFERENCES account.org(id) ON DELETE CASCADE ON UPDATE CASCADE
+	, group_id    bigint  NOT NULL REFERENCES account.org_group(id) ON DELETE CASCADE ON UPDATE CASCADE
 
--- 	, id          bigint  NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY
--- 	, account_id  bigint  NOT NULL REFERENCES account.account(id) ON DELETE CASCADE ON UPDATE CASCADE
+	, id          bigint  NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY
+	, account_id  bigint  NOT NULL REFERENCES account.account(id) ON DELETE CASCADE ON UPDATE CASCADE
 
--- 	, created      timestamp with time zone  NOT NULL DEFAULT (now() at time zone 'utc')
--- 	, created_by   bigint                    REFERENCES account.account(id)
--- 	, modified     timestamp with time zone
--- 	, modified_by  bigint                    REFERENCES account.account(id)
+	, created      timestamp with time zone  NOT NULL DEFAULT (now() at time zone 'utc')
+	, created_by   bigint                    REFERENCES account.account(id)
 
--- 	UNIQUE (group_id, account_id)
--- );
+	, UNIQUE (group_id, account_id)
+);
 
 END TRANSACTION;

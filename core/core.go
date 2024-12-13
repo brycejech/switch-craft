@@ -12,6 +12,7 @@ func NewCore(
 	repo Repo,
 	globalAccountRepo GlobalAccountRepo,
 	orgAccountRepo OrgAccountRepo,
+	orgGroupRepo OrgGroupRepo,
 	orgRepo OrgRepo,
 	appRepo AppRepo,
 	featureFlagRepo FeatureFlagRepo,
@@ -22,6 +23,7 @@ func NewCore(
 		repository:        repo,
 		globalAccountRepo: globalAccountRepo,
 		orgAccountRepo:    orgAccountRepo,
+		orgGroupRepo:      orgGroupRepo,
 		orgRepo:           orgRepo,
 		appRepo:           appRepo,
 		featureFlagRepo:   featureFlagRepo,
@@ -34,6 +36,7 @@ type Core struct {
 	repository        Repo
 	globalAccountRepo GlobalAccountRepo
 	orgAccountRepo    OrgAccountRepo
+	orgGroupRepo      OrgGroupRepo
 	orgRepo           OrgRepo
 	appRepo           AppRepo
 	featureFlagRepo   FeatureFlagRepo
@@ -127,6 +130,32 @@ type OrgAccountRepo interface {
 		modifiedBy int64,
 	) (*types.Account, error)
 	Delete(ctx context.Context, orgID int64, id int64) error
+}
+
+type OrgGroupRepo interface {
+	Create(ctx context.Context,
+		orgID int64,
+		name string,
+		description string,
+		createdBy int64,
+	) (*types.OrgGroup, error)
+	GetMany(ctx context.Context, orgID int64) ([]types.OrgGroup, error)
+	GetOne(ctx context.Context,
+		orgID int64,
+		id *int64,
+		uuid *string,
+	) (*types.OrgGroup, error)
+	Update(ctx context.Context,
+		orgID int64,
+		id int64,
+		name string,
+		description string,
+		modifiedBy int64,
+	) (*types.OrgGroup, error)
+	Delete(ctx context.Context,
+		orgID int64,
+		id int64,
+	) error
 }
 
 type OrgRepo interface {
