@@ -1,0 +1,11 @@
+meta {
+  name: Get Many Org Accounts
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{host}}/org/{{orgSlug}}/account
+  body: none
+  auth: inherit
+}

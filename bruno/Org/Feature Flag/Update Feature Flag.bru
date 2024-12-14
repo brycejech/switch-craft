@@ -1,0 +1,21 @@
+meta {
+  name: Update Feature Flag
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/org/{{orgSlug}}/app/{{appSlug}}/flag/1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": 1,
+    "name": "",
+    "label": "",
+    "description": "",
+    "isEnabled": true
+  }
+}

@@ -1,0 +1,18 @@
+meta {
+  name: Update Organization
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/org/switchcraft
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "SwitchCraft",
+    "slug": "switchcraft"
+  }
+}

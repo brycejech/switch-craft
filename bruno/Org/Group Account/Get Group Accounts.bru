@@ -1,0 +1,11 @@
+meta {
+  name: Get Group Accounts
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/org/{{orgSlug}}/group/1/account
+  body: none
+  auth: inherit
+}

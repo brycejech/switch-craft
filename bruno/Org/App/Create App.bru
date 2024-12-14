@@ -1,0 +1,18 @@
+meta {
+  name: Create App
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/org/{{orgSlug}}/app
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "SwitchCraft",
+    "slug": "switchcraft"
+  }
+}

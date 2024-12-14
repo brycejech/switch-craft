@@ -1,0 +1,11 @@
+meta {
+  name: Get Feature Flag
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{host}}/org/{{orgSlug}}/app/{{appSlug}}/flag/1
+  body: none
+  auth: inherit
+}

@@ -1,0 +1,11 @@
+meta {
+  name: Delete Org Account
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{host}}/org/{{orgSlug}}/account/3
+  body: none
+  auth: inherit
+}
