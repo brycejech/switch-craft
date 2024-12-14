@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
 	"switchcraft/repository/queries"
 	"switchcraft/types"
 
@@ -60,7 +62,6 @@ func (r *orgAccountRepo) Create(ctx context.Context,
 }
 
 func (r *orgAccountRepo) GetMany(ctx context.Context, orgID int64) ([]types.Account, error) {
-
 	var (
 		accounts []types.Account
 		rows     pgx.Rows
@@ -68,6 +69,32 @@ func (r *orgAccountRepo) GetMany(ctx context.Context, orgID int64) ([]types.Acco
 	)
 
 	if rows, err = r.db.Query(ctx, queries.OrgAccountGetMany, orgID); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	if accounts, err = pgx.CollectRows(rows, pgx.RowToStructByName[types.Account]); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	return accounts, nil
+}
+
+func (r *orgAccountRepo) GetManyByID(ctx context.Context,
+	orgID int64,
+	accountIDs []int64,
+) ([]types.Account, error) {
+	var (
+		accounts []types.Account
+		rows     pgx.Rows
+		err      error
+	)
+
+	accountIDStrs := make([]string, len(accountIDs))
+	for i, a := range accountIDs {
+		accountIDStrs[i] = strconv.FormatInt(a, 10)
+	}
+
+	if rows, err = r.db.Query(ctx, queries.OrgAccountGetManyByID, orgID, strings.Join(accountIDStrs, ",")); err != nil {
 		return nil, handleError(ctx, r.logger, err)
 	}
 

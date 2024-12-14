@@ -185,3 +185,191 @@ func (c *Core) OrgGroupDelete(ctx context.Context, orgSlug string, id int64) err
 
 	return c.orgGroupRepo.Delete(ctx, org.ID, id)
 }
+
+type orgGroupAccountAddArgs struct {
+	orgSlug   string
+	groupID   int64
+	accountID int64
+}
+
+func (a *orgGroupAccountAddArgs) Validate() error {
+	if a.orgSlug == "" {
+		return errors.New("orgGroupAccountAddArgs orgSlug cannot be empty")
+	}
+	if a.groupID < 1 {
+		return errors.New("orgGroupAccountAddArgs groupID must be a positive integer")
+	}
+	if a.accountID < 1 {
+		return errors.New("orgGroupAccountAddArgs accountID must be a positive integer")
+	}
+
+	return nil
+}
+
+func (c *Core) NewOrgGroupAccountAddArgs(
+	orgSlug string,
+	groupID int64,
+	accountID int64,
+) orgGroupAccountAddArgs {
+	return orgGroupAccountAddArgs{
+		orgSlug:   orgSlug,
+		groupID:   groupID,
+		accountID: accountID,
+	}
+}
+
+func (c *Core) OrgGroupAccountAdd(ctx context.Context, args orgGroupAccountAddArgs) (*types.OrgGroupAccount, error) {
+	if err := args.Validate(); err != nil {
+		return nil, err
+	}
+
+	var (
+		org     *types.Organization
+		group   *types.OrgGroup
+		account *types.Account
+		err     error
+	)
+
+	if org, err = c.OrgGetOne(ctx,
+		c.NewOrgGetOneArgs(nil, nil, &args.orgSlug),
+	); err != nil {
+		return nil, err
+	}
+	if group, err = c.OrgGroupGetOne(ctx,
+		c.NewOrgGroupGetOneArgs(args.orgSlug, &args.groupID, nil),
+	); err != nil {
+		return nil, err
+	}
+	if group.OrgID != org.ID {
+		return nil, types.ErrNotFound
+	}
+
+	if account, err = c.OrgAccountGetOne(ctx,
+		c.NewOrgAccountGetOneArgs(args.orgSlug, &args.accountID, nil, nil),
+	); err != nil {
+		return nil, err
+	}
+
+	orgMismatchErr := errors.New("core.OrgGroupAccountAdd account must be org member")
+	if account.OrgID == nil {
+		return nil, orgMismatchErr
+	}
+	if *account.OrgID != org.ID {
+		return nil, orgMismatchErr
+	}
+
+	tracer, err := c.getOperationTracer(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.orgGroupRepo.AddAccount(ctx,
+		org.ID,
+		args.groupID,
+		args.accountID,
+		tracer.AuthAccount.ID,
+	)
+}
+
+func (c *Core) OrgGroupAccountGetAll(ctx context.Context,
+	orgSlug string,
+	groupID int64,
+) ([]types.Account, error) {
+	org, err := c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &orgSlug))
+	if err != nil {
+		return nil, err
+	}
+
+	return c.orgGroupRepo.GetAccounts(ctx, org.ID, groupID)
+}
+
+type orgGroupAccountsSetArgs struct {
+	orgSlug    string
+	groupID    int64
+	accountIDs []int64
+}
+
+func (a *orgGroupAccountsSetArgs) Validate() error {
+	if a.orgSlug == "" {
+		return errors.New("orgGroupAccountsSetArgs orgSlug cannot be empty")
+	}
+	if a.groupID < 1 {
+		return errors.New("orgGroupAccountsSetArgs groupID must be a positive integer")
+	}
+
+	for _, id := range a.accountIDs {
+		if id < 1 {
+			return errors.New("orgGroupAccountsSetArgs accountIDs must be positive integers")
+		}
+	}
+
+	return nil
+}
+
+func (c *Core) NewOrgGroupAccountsSetArgs(
+	orgSlug string,
+	groupID int64,
+	accountIDs []int64,
+) orgGroupAccountsSetArgs {
+	return orgGroupAccountsSetArgs{
+		orgSlug:    orgSlug,
+		groupID:    groupID,
+		accountIDs: accountIDs,
+	}
+}
+
+func (c *Core) OrgGroupAccountsSet(ctx context.Context, args orgGroupAccountsSetArgs) ([]types.Account, error) {
+	if err := args.Validate(); err != nil {
+		return nil, err
+	}
+
+	var (
+		org   *types.Organization
+		group *types.OrgGroup
+		err   error
+	)
+	if org, err = c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &args.orgSlug)); err != nil {
+		return nil, err
+	}
+	if group, err = c.OrgGroupGetOne(ctx, c.NewOrgGroupGetOneArgs(args.orgSlug, &args.groupID, nil)); err != nil {
+		return nil, err
+	}
+	if group.OrgID != org.ID {
+		return nil, types.ErrNotFound
+	}
+
+	existingAccounts, err := c.OrgAccountGetManyByID(ctx, args.orgSlug, args.accountIDs)
+	if err != nil {
+		return nil, err
+	}
+	// Caller tried to add accounts that don't exist or don't belong to org
+	if len(existingAccounts) != len(args.accountIDs) {
+		return nil, types.ErrNotFound
+	}
+
+	orgMismatchErr := errors.New("core.OrgGroupAccountsSet account must be org member")
+	for _, a := range existingAccounts {
+		if a.OrgID == nil {
+			return nil, orgMismatchErr
+		}
+		if *a.OrgID != org.ID {
+			return nil, orgMismatchErr
+		}
+	}
+
+	tracer, _ := c.getOperationTracer(ctx)
+	return c.orgGroupRepo.UpdateAccounts(ctx, org.ID, args.groupID, args.accountIDs, tracer.AuthAccount.ID)
+}
+
+func (c *Core) OrgGroupAccountRemove(ctx context.Context,
+	orgSlug string,
+	groupID int64,
+	accountID int64,
+) error {
+	org, err := c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &orgSlug))
+	if err != nil {
+		return err
+	}
+
+	return c.orgGroupRepo.RemoveAccount(ctx, org.ID, groupID, accountID)
+}

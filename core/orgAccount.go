@@ -104,6 +104,28 @@ func (c *Core) OrgAccountGetMany(ctx context.Context, orgSlug string) ([]types.A
 	return c.orgAccountRepo.GetMany(ctx, org.ID)
 }
 
+func (c *Core) OrgAccountGetManyByID(ctx context.Context,
+	orgSlug string,
+	accountIDs []int64,
+) ([]types.Account, error) {
+	if orgSlug == "" {
+		return nil, errors.New("core.OrgAccountGetManyByID org slug cannot be empty")
+	}
+
+	for _, id := range accountIDs {
+		if id < 1 {
+			return nil, errors.New("core.OrgAccountGetManyByID accountIDs must be positive integer")
+		}
+	}
+
+	org, err := c.OrgGetOne(ctx, c.NewOrgGetOneArgs(nil, nil, &orgSlug))
+	if err != nil {
+		return nil, err
+	}
+
+	return c.orgAccountRepo.GetManyByID(ctx, org.ID, accountIDs)
+}
+
 type orgAccountGetOneArgs struct {
 	orgSlug  string
 	id       *int64

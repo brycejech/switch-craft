@@ -36,6 +36,9 @@ var OrgAccountCreate string
 //go:embed orgAccount/orgAccountGetMany.sql
 var OrgAccountGetMany string
 
+//go:embed orgAccount/orgAccountGetManyById.sql
+var OrgAccountGetManyByID string
+
 //go:embed orgAccount/orgAccountGetOne.sql
 var OrgAccountGetOne string
 
@@ -64,9 +67,25 @@ var OrgGroupUpdate string
 //go:embed orgGroup/orgGroupDelete.sql
 var OrgGroupDelete string
 
-/* ---------------------- */
+/* ------------------------- */
+/* === ORG GROUP QUERIES === */
+/* ------------------------- */
+
+//go:embed orgGroupAccount/orgGroupAccountCreate.sql
+var OrgGroupAccountCreate string
+
+//go:embed orgGroupAccount/orgGroupAccountGetMany.sql
+var OrgGroupAccountGetMany string
+
+//go:embed orgGroupAccount/orgGroupAccountDeleteOne.sql
+var OrgGroupAccountDeleteOne string
+
+//go:embed orgGroupAccount/orgGroupAccountDeleteAll.sql
+var OrgGroupAccountDeleteAll string
+
+/* ------------------- */
 /* === ORG QUERIES === */
-/* ---------------------- */
+/* ------------------- */
 
 //go:embed org/orgCreate.sql
 var OrgCreate string

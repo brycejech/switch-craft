@@ -114,6 +114,10 @@ type OrgAccountRepo interface {
 		createdBy int64,
 	) (*types.Account, error)
 	GetMany(ctx context.Context, orgID int64) ([]types.Account, error)
+	GetManyByID(ctx context.Context,
+		orgID int64,
+		accountIDs []int64,
+	) ([]types.Account, error)
 	GetOne(ctx context.Context,
 		orgID int64,
 		id *int64,
@@ -155,6 +159,31 @@ type OrgGroupRepo interface {
 	Delete(ctx context.Context,
 		orgID int64,
 		id int64,
+	) error
+	AddAccount(ctx context.Context,
+		orgID int64,
+		groupID int64,
+		accountID int64,
+		createdBy int64,
+	) (*types.OrgGroupAccount, error)
+	GetAccounts(ctx context.Context,
+		orgID int64,
+		groupID int64,
+	) ([]types.Account, error)
+	UpdateAccounts(ctx context.Context,
+		orgID int64,
+		groupID int64,
+		accountIDs []int64,
+		createdBy int64,
+	) ([]types.Account, error)
+	RemoveAccount(ctx context.Context,
+		orgID int64,
+		groupID int64,
+		accountID int64,
+	) error
+	RemoveAllAccounts(ctx context.Context,
+		orgID int64,
+		groupID int64,
 	) error
 }
 

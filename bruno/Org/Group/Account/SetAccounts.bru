@@ -1,0 +1,20 @@
+meta {
+  name: SetAccounts
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/org/{{orgSlug}}/group/4/account
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+    1,
+    2,
+    3,
+    4
+  ]
+}

@@ -51,6 +51,7 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	/* === ORG ACCOUNT ROUTES === */
 	router.HandleFunc("POST /org/{orgSlug}/account", authMiddleware(orgAccountController.Create))
 	router.HandleFunc("GET /org/{orgSlug}/account", authMiddleware(orgAccountController.GetMany))
+	router.HandleFunc("GET /org/{orgSlug}/account/with-id", authMiddleware(orgAccountController.GetManyByID))
 	router.HandleFunc("GET /org/{orgSlug}/account/{accountID}", authMiddleware(orgAccountController.GetOne))
 	router.HandleFunc("PUT /org/{orgSlug}/account/{accountID}", authMiddleware(orgAccountController.Update))
 	router.HandleFunc("DELETE /org/{orgSlug}/account/{accountID}", authMiddleware(orgAccountController.Delete))
@@ -61,6 +62,21 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	router.HandleFunc("GET /org/{orgSlug}/group/{groupID}", authMiddleware(orgGroupController.GetOne))
 	router.HandleFunc("PUT /org/{orgSlug}/group/{groupID}", authMiddleware(orgGroupController.Update))
 	router.HandleFunc("DELETE /org/{orgSlug}/group/{groupID}", authMiddleware(orgGroupController.Delete))
+
+	/* === ORG GROUP ACCOUNT ROUTES === */
+	router.HandleFunc("GET /org/{orgSlug}/group/{groupID}/account", authMiddleware(orgGroupController.AccountsGet))
+	router.HandleFunc(
+		"PUT /org/{orgSlug}/group/{groupID}/account",
+		authMiddleware(orgGroupController.AccountsSet),
+	)
+	router.HandleFunc(
+		"PUT /org/{orgSlug}/group/{groupID}/account/{accountID}",
+		authMiddleware(orgGroupController.AccountAdd),
+	)
+	router.HandleFunc(
+		"DELETE /org/{orgSlug}/group/{groupID}/account/{accountID}",
+		authMiddleware(orgGroupController.AccountRemove),
+	)
 
 	/* === APPLICATION ROUTES === */
 	router.HandleFunc("POST /org/{orgSlug}/app", authMiddleware(appController.Create))

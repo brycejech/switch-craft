@@ -1,0 +1,19 @@
+meta {
+  name: GetManyById
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{host}}/org/{{orgSlug}}/account/with-id?id=1&id=2&id=3&id=4&id=5
+  body: none
+  auth: inherit
+}
+
+params:query {
+  id: 1
+  id: 2
+  id: 3
+  id: 4
+  id: 5
+}
