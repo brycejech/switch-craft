@@ -13,12 +13,17 @@ func registerAuthModule(core *core.Core) {
 		Use:   "auth",
 		Short: "SwitchCraft CLI auth module",
 	}
-	rootCmd.AddCommand(authCmd)
+	authzCmd(core, authCmd)
+	authValidateJWTCmd(core, authCmd)
+	authHashPasswordCmd(core, authCmd)
+	authComparePasswordCmd(core, authCmd)
+	authCreateSigningKeyCmd(core, authCmd)
 
-	/* --------------------- */
-	/* === AUTHZ COMMAND === */
-	/* --------------------- */
-	var authzCmd = &cobra.Command{
+	rootCmd.AddCommand(authCmd)
+}
+
+func authzCmd(core *core.Core, parentCmd *cobra.Command) {
+	authzCmd := &cobra.Command{
 		Use:   "authorize",
 		Short: "Create signed JWT for current user",
 		Run: func(_ *cobra.Command, _ []string) {
@@ -31,19 +36,19 @@ func registerAuthModule(core *core.Core) {
 			fmt.Println(jwt)
 		},
 	}
-	authCmd.AddCommand(authzCmd)
 
-	/* ---------------------------- */
-	/* === VALIDATE JWT COMMAND === */
-	/* ---------------------------- */
-	var validateJWTCmdToken string
-	var validateJWTCmd = &cobra.Command{
+	parentCmd.AddCommand(authzCmd)
+}
+
+func authValidateJWTCmd(core *core.Core, parentCmd *cobra.Command) {
+	var token string
+	validateJWTCmd := &cobra.Command{
 		Use:   "validateJWT",
 		Short: "Validate a signed JWT",
 		Run: func(_ *cobra.Command, _ []string) {
 			mustAuthn(core)
 
-			account, err := core.AuthValidateJWT(validateJWTCmdToken)
+			account, err := core.AuthValidateJWT(token)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -51,39 +56,39 @@ func registerAuthModule(core *core.Core) {
 			fmt.Printf("JWT is valid for user '%s'\n", account.Username)
 		},
 	}
-	validateJWTCmd.Flags().StringVar(&validateJWTCmdToken, "token", "", "The JWT token to check")
+	validateJWTCmd.Flags().StringVar(&token, "token", "", "The JWT token to check")
 	validateJWTCmd.MarkFlagRequired("token")
-	authCmd.AddCommand(validateJWTCmd)
 
-	/* ----------------------------- */
-	/* === HASH PASSWORD COMMAND === */
-	/* ----------------------------- */
-	var hashPasswordCmdPass string
-	var hashPasswordCmd = &cobra.Command{
+	parentCmd.AddCommand(validateJWTCmd)
+}
+
+func authHashPasswordCmd(core *core.Core, parentCmd *cobra.Command) {
+	var password string
+	hashPasswordCmd := &cobra.Command{
 		Use:   "hashPassword",
 		Short: "Hash a password",
 		Run: func(_ *cobra.Command, _ []string) {
-			hash, err := core.AuthPasswordHash(hashPasswordCmdPass)
+			hash, err := core.AuthPasswordHash(password)
 			if err != nil {
 				log.Fatal(err)
 			}
 			fmt.Println(hash)
 		},
 	}
-	hashPasswordCmd.Flags().StringVar(&hashPasswordCmdPass, "password", "", "The password to hash")
+	hashPasswordCmd.Flags().StringVar(&password, "password", "", "The password to hash")
 	hashPasswordCmd.MarkFlagRequired("password")
-	authCmd.AddCommand(hashPasswordCmd)
 
-	/* -------------------------------- */
-	/* === COMPARE PASSWORD COMMAND === */
-	/* -------------------------------- */
-	var comparePasswordCmdPass string
-	var comparePasswordCmdHash string
-	var comparePasswordCmd = &cobra.Command{
+	parentCmd.AddCommand(hashPasswordCmd)
+}
+
+func authComparePasswordCmd(core *core.Core, parentCmd *cobra.Command) {
+	var password string
+	var hash string
+	comparePasswordCmd := &cobra.Command{
 		Use:   "comparePassword",
 		Short: "Compare a password to a hash",
 		Run: func(_ *cobra.Command, _ []string) {
-			ok, err := core.AuthPasswordCheck(comparePasswordCmdPass, comparePasswordCmdHash)
+			ok, err := core.AuthPasswordCheck(password, hash)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -94,21 +99,21 @@ func registerAuthModule(core *core.Core) {
 			}
 		},
 	}
-	comparePasswordCmd.Flags().StringVar(&comparePasswordCmdPass, "password", "", "The password to compare")
+	comparePasswordCmd.Flags().StringVar(&password, "password", "", "The password to compare")
 	comparePasswordCmd.MarkFlagRequired("password")
-	comparePasswordCmd.Flags().StringVar(&comparePasswordCmdHash, "hash", "", "The hashed password to compare")
+	comparePasswordCmd.Flags().StringVar(&hash, "hash", "", "The hashed password to compare")
 	comparePasswordCmd.MarkFlagRequired("hash")
-	authCmd.AddCommand(comparePasswordCmd)
 
-	/* ---------------------------------- */
-	/* === CREATE SIGNING KEY COMMAND === */
-	/* ---------------------------------- */
-	var createSigningKeyCmdKeyLength uint32
-	var createSigningKeyCmd = &cobra.Command{
+	parentCmd.AddCommand(comparePasswordCmd)
+}
+
+func authCreateSigningKeyCmd(core *core.Core, parentCmd *cobra.Command) {
+	var keyLen uint32
+	createSigningKeyCmd := &cobra.Command{
 		Use:   "createSigningKey",
 		Short: "Create a cryptographically secure signing key encoded to hexadecimal",
 		Run: func(_ *cobra.Command, _ []string) {
-			key, err := core.AuthCreateSigningKey(createSigningKeyCmdKeyLength)
+			key, err := core.AuthCreateSigningKey(keyLen)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -116,7 +121,8 @@ func registerAuthModule(core *core.Core) {
 			fmt.Println(key)
 		},
 	}
-	createSigningKeyCmd.Flags().Uint32Var(&createSigningKeyCmdKeyLength, "bitLength", 0, "Key length in bits. Must be >= 256 and divisible by 8")
+	createSigningKeyCmd.Flags().Uint32Var(&keyLen, "bitLength", 0, "Key length in bits. Must be >= 256 and divisible by 8")
 	createSigningKeyCmd.MarkFlagRequired("bitLength")
-	authCmd.AddCommand(createSigningKeyCmd)
+
+	parentCmd.AddCommand(createSigningKeyCmd)
 }

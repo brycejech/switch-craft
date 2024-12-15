@@ -15,13 +15,49 @@ func registerOrgGroupModule(core *core.Core) {
 		Use:   "orgGroup",
 		Short: "SwitchCraft CLI organization group module",
 	}
-	orgGroupGetManyCmd(core, orgGroupCmd)
 	orgGroupCreateCmd(core, orgGroupCmd)
+	orgGroupGetManyCmd(core, orgGroupCmd)
 	orgGroupGetOneCmd(core, orgGroupCmd)
 	orgGroupUpdateCmd(core, orgGroupCmd)
 	orgGroupDeleteCmd(core, orgGroupCmd)
 
 	rootCmd.AddCommand(orgGroupCmd)
+}
+
+func orgGroupCreateCmd(core *core.Core, parentCmd *cobra.Command) {
+	args := struct {
+		orgSlug     string
+		name        string
+		description string
+	}{}
+	createCmd := &cobra.Command{
+		Use:   "create",
+		Short: "Create new organization group",
+		Run: func(_ *cobra.Command, _ []string) {
+			authAccount := mustAuthn(core)
+			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
+
+			group, err := core.OrgGroupCreate(opCtx,
+				core.NewOrgGroupCreateArgs(
+					args.orgSlug,
+					args.name,
+					args.description,
+				),
+			)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			printJSON(group)
+		},
+	}
+	createCmd.Flags().StringVar(&args.orgSlug, "orgSlug", "", "Organization slug")
+	createCmd.MarkFlagRequired("orgSlug")
+	createCmd.Flags().StringVar(&args.name, "name", "", "group.name")
+	createCmd.MarkFlagRequired("name")
+	createCmd.Flags().StringVar(&args.description, "description", "", "group.description")
+
+	parentCmd.AddCommand(createCmd)
 }
 
 func orgGroupGetManyCmd(core *core.Core, parentCmd *cobra.Command) {
@@ -47,42 +83,6 @@ func orgGroupGetManyCmd(core *core.Core, parentCmd *cobra.Command) {
 	parentCmd.AddCommand(getManyCmd)
 }
 
-func orgGroupCreateCmd(core *core.Core, parentCmd *cobra.Command) {
-	args := struct {
-		orgSlug     string
-		name        string
-		description string
-	}{}
-	createCmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create new organization group",
-		Run: func(_ *cobra.Command, _ []string) {
-			authAccount := mustAuthn(core)
-			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
-
-			args := core.NewOrgGroupCreateArgs(
-				args.orgSlug,
-				args.name,
-				args.description,
-			)
-
-			group, err := core.OrgGroupCreate(opCtx, args)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			printJSON(group)
-		},
-	}
-	createCmd.Flags().StringVar(&args.orgSlug, "orgSlug", "", "Organization slug")
-	createCmd.MarkFlagRequired("orgSlug")
-	createCmd.Flags().StringVar(&args.name, "name", "", "group.name")
-	createCmd.MarkFlagRequired("name")
-	createCmd.Flags().StringVar(&args.description, "description", "", "group.description")
-
-	parentCmd.AddCommand(createCmd)
-}
-
 func orgGroupGetOneCmd(core *core.Core, parentCmd *cobra.Command) {
 	var orgSlug string
 	var groupID int64
@@ -105,13 +105,13 @@ func orgGroupGetOneCmd(core *core.Core, parentCmd *cobra.Command) {
 				uuid = &groupUUID
 			}
 
-			args := core.NewOrgGroupGetOneArgs(
-				orgSlug,
-				id,
-				uuid,
+			group, err := core.OrgGroupGetOne(opCtx,
+				core.NewOrgGroupGetOneArgs(
+					orgSlug,
+					id,
+					uuid,
+				),
 			)
-
-			group, err := core.OrgGroupGetOne(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -141,14 +141,14 @@ func orgGroupUpdateCmd(core *core.Core, parentCmd *cobra.Command) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			args := core.NewOrgGroupUpdateArgs(
-				args.orgSlug,
-				args.id,
-				args.name,
-				args.description,
+			group, err := core.OrgGroupUpdate(opCtx,
+				core.NewOrgGroupUpdateArgs(
+					args.orgSlug,
+					args.id,
+					args.name,
+					args.description,
+				),
 			)
-
-			group, err := core.OrgGroupUpdate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -181,6 +181,7 @@ func orgGroupDeleteCmd(core *core.Core, parentCmd *cobra.Command) {
 			if err := core.OrgGroupDelete(opCtx, orgSlug, groupID); err != nil {
 				log.Fatal(err)
 			}
+
 			fmt.Printf("Organization group '%v' deleted successfully\n", groupID)
 		},
 	}

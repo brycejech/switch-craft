@@ -18,5 +18,6 @@ func registerRestModule(logger *types.Logger, core *core.Core) {
 		},
 	}
 	restCmd.Flags().StringVar(&restPort, "port", "8080", "REST API server port")
+
 	rootCmd.AddCommand(restCmd)
 }

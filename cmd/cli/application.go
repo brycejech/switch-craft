@@ -15,30 +15,35 @@ func registerAppModule(core *core.Core) {
 		Use:   "application",
 		Short: "SwitchCraft CLI application module",
 	}
-	rootCmd.AddCommand(appCmd)
+	appCreateCmd(core, appCmd)
+	appGetManyCmd(core, appCmd)
+	appGetOneCmd(core, appCmd)
+	appUpdateCmd(core, appCmd)
+	appDeleteCmd(core, appCmd)
 
-	/* -------------------------- */
-	/* === CREATE APP COMMAND === */
-	/* -------------------------- */
-	createAppArgs := struct {
+	rootCmd.AddCommand(appCmd)
+}
+
+func appCreateCmd(core *core.Core, parentCmd *cobra.Command) {
+	args := struct {
 		orgSlug string
 		name    string
 		slug    string
 	}{}
-	var createAppCmd = &cobra.Command{
+	createCmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a new application",
 		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			args := core.NewAppCreateArgs(
-				createAppArgs.orgSlug,
-				createAppArgs.name,
-				createAppArgs.slug,
+			app, err := core.AppCreate(opCtx,
+				core.NewAppCreateArgs(
+					args.orgSlug,
+					args.name,
+					args.slug,
+				),
 			)
-
-			app, err := core.AppCreate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -46,26 +51,26 @@ func registerAppModule(core *core.Core) {
 			printJSON(app)
 		},
 	}
-	createAppCmd.Flags().StringVar(&createAppArgs.orgSlug, "orgSlug", "", "Organization slug")
-	createAppCmd.MarkFlagRequired("orgSlug")
-	createAppCmd.Flags().StringVar(&createAppArgs.name, "name", "", "application.name")
-	createAppCmd.MarkFlagRequired("name")
-	createAppCmd.Flags().StringVar(&createAppArgs.slug, "slug", "", "application.slug")
-	createAppCmd.MarkFlagRequired("slug")
-	appCmd.AddCommand(createAppCmd)
+	createCmd.Flags().StringVar(&args.orgSlug, "orgSlug", "", "Organization slug")
+	createCmd.MarkFlagRequired("orgSlug")
+	createCmd.Flags().StringVar(&args.name, "name", "", "application.name")
+	createCmd.MarkFlagRequired("name")
+	createCmd.Flags().StringVar(&args.slug, "slug", "", "application.slug")
+	createCmd.MarkFlagRequired("slug")
 
-	/* ------------------------ */
-	/* === GET APPS COMMAND === */
-	/* ------------------------ */
-	var getAppsCmdOrgSlug string
-	var getAppsCmd = &cobra.Command{
+	parentCmd.AddCommand(createCmd)
+}
+
+func appGetManyCmd(core *core.Core, parentCmd *cobra.Command) {
+	var orgSlug string
+	getManyCmd := &cobra.Command{
 		Use:   "getMany",
 		Short: " Get multiple applications",
 		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			apps, err := core.AppGetMany(opCtx, getAppsCmdOrgSlug)
+			apps, err := core.AppGetMany(opCtx, orgSlug)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -73,20 +78,20 @@ func registerAppModule(core *core.Core) {
 			printJSON(apps)
 		},
 	}
-	getAppsCmd.Flags().StringVar(&getAppsCmdOrgSlug, "orgSlug", "", "Organization slug")
-	getAppsCmd.MarkFlagRequired("orgSlug")
-	appCmd.AddCommand(getAppsCmd)
+	getManyCmd.Flags().StringVar(&orgSlug, "orgSlug", "", "Organization slug")
+	getManyCmd.MarkFlagRequired("orgSlug")
 
-	/* ----------------------- */
-	/* === GET APP COMMAND === */
-	/* ----------------------- */
-	var getAppCmdArgs = struct {
+	parentCmd.AddCommand(getManyCmd)
+}
+
+func appGetOneCmd(core *core.Core, parentCmd *cobra.Command) {
+	var args = struct {
 		orgSlug string
 		id      int64
 		uuid    string
 		slug    string
 	}{}
-	var getAppCmd = &cobra.Command{
+	getOneCmd := &cobra.Command{
 		Use:   "getOne",
 		Short: " Get a single application",
 		Run: func(cmd *cobra.Command, _ []string) {
@@ -99,17 +104,17 @@ func registerAppModule(core *core.Core) {
 				slug *string
 			)
 			if cmd.Flags().Changed("id") {
-				id = &getAppCmdArgs.id
+				id = &args.id
 			}
 			if cmd.Flags().Changed("uuid") {
-				uuid = &getAppCmdArgs.uuid
+				uuid = &args.uuid
 			}
 			if cmd.Flags().Changed("slug") {
-				slug = &getAppCmdArgs.slug
+				slug = &args.slug
 			}
 
 			args := core.NewAppGetOneArgs(
-				getAppCmdArgs.orgSlug,
+				args.orgSlug,
 				id,
 				uuid,
 				slug,
@@ -123,37 +128,37 @@ func registerAppModule(core *core.Core) {
 			printJSON(app)
 		},
 	}
-	getAppCmd.Flags().StringVar(&getAppCmdArgs.orgSlug, "orgSlug", "", "Organization slug")
-	getAppCmd.MarkFlagRequired("orgSlug")
-	getAppCmd.Flags().Int64Var(&getAppCmdArgs.id, "id", 0, "application.id")
-	getAppCmd.Flags().StringVar(&getAppCmdArgs.uuid, "uuid", "", "application.uuid")
-	getAppCmd.Flags().StringVar(&getAppCmdArgs.slug, "slug", "", "application.slug")
-	appCmd.AddCommand(getAppCmd)
+	getOneCmd.Flags().StringVar(&args.orgSlug, "orgSlug", "", "Organization slug")
+	getOneCmd.MarkFlagRequired("orgSlug")
+	getOneCmd.Flags().Int64Var(&args.id, "id", 0, "application.id")
+	getOneCmd.Flags().StringVar(&args.uuid, "uuid", "", "application.uuid")
+	getOneCmd.Flags().StringVar(&args.slug, "slug", "", "application.slug")
 
-	/* -------------------------- */
-	/* === UPDATE APP COMMAND === */
-	/* -------------------------- */
-	updateAppArgs := struct {
+	parentCmd.AddCommand(getOneCmd)
+}
+
+func appUpdateCmd(core *core.Core, parentCmd *cobra.Command) {
+	args := struct {
 		orgSlug string
 		id      int64
 		name    string
 		slug    string
 	}{}
-	var updateAppCmd = &cobra.Command{
+	updateCmd := &cobra.Command{
 		Use:   "update",
 		Short: "Update an existing application",
 		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			args := core.NewAppUpdateArgs(
-				updateAppArgs.orgSlug,
-				updateAppArgs.id,
-				updateAppArgs.name,
-				updateAppArgs.slug,
+			app, err := core.AppUpdate(opCtx,
+				core.NewAppUpdateArgs(
+					args.orgSlug,
+					args.id,
+					args.name,
+					args.slug,
+				),
 			)
-
-			app, err := core.AppUpdate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -161,38 +166,39 @@ func registerAppModule(core *core.Core) {
 			printJSON(app)
 		},
 	}
-	updateAppCmd.Flags().StringVar(&updateAppArgs.orgSlug, "orgSlug", "", "application.orgSlug")
-	updateAppCmd.MarkFlagRequired("orgSlug")
-	updateAppCmd.Flags().Int64Var(&updateAppArgs.id, "id", 0, "application.id")
-	updateAppCmd.MarkFlagRequired("id")
-	updateAppCmd.Flags().StringVar(&updateAppArgs.name, "name", "", "application.name")
-	updateAppCmd.MarkFlagRequired("name")
-	updateAppCmd.Flags().StringVar(&updateAppArgs.slug, "slug", "", "application.slug")
-	updateAppCmd.MarkFlagRequired("slug")
-	appCmd.AddCommand(updateAppCmd)
+	updateCmd.Flags().StringVar(&args.orgSlug, "orgSlug", "", "Organization slug")
+	updateCmd.MarkFlagRequired("orgSlug")
+	updateCmd.Flags().Int64Var(&args.id, "id", 0, "application.id")
+	updateCmd.MarkFlagRequired("id")
+	updateCmd.Flags().StringVar(&args.name, "name", "", "application.name")
+	updateCmd.MarkFlagRequired("name")
+	updateCmd.Flags().StringVar(&args.slug, "slug", "", "application.slug")
+	updateCmd.MarkFlagRequired("slug")
 
-	/* ---------------------- */
-	/* === DELETE APP CMD === */
-	/* ---------------------- */
-	var deleteAppCmdOrgSlug string
-	var deleteAppCmdSlug string
-	var deleteAppCmd = &cobra.Command{
+	parentCmd.AddCommand(updateCmd)
+}
+
+func appDeleteCmd(core *core.Core, parentCmd *cobra.Command) {
+	var orgSlug string
+	var appSlug string
+	deleteCmd := &cobra.Command{
 		Use:   "delete",
 		Short: "Delete an application",
 		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			if err := core.AppDelete(opCtx, deleteAppCmdOrgSlug, deleteAppCmdSlug); err != nil {
+			if err := core.AppDelete(opCtx, orgSlug, appSlug); err != nil {
 				log.Fatal(err)
 			}
 
-			fmt.Printf("Application '%v' deleted successfully\n", deleteAppCmdSlug)
+			fmt.Printf("Application '%v' deleted successfully\n", appSlug)
 		},
 	}
-	deleteAppCmd.Flags().StringVar(&deleteAppCmdOrgSlug, "orgSlug", "", "application.orgSlug")
-	deleteAppCmd.MarkFlagRequired("orgSlug")
-	deleteAppCmd.Flags().StringVar(&deleteAppCmdSlug, "slug", "", "application.slug")
-	deleteAppCmd.MarkFlagRequired("slug")
-	appCmd.AddCommand(deleteAppCmd)
+	deleteCmd.Flags().StringVar(&orgSlug, "orgSlug", "", "Organization slug")
+	deleteCmd.MarkFlagRequired("orgSlug")
+	deleteCmd.Flags().StringVar(&appSlug, "slug", "", "application.slug")
+	deleteCmd.MarkFlagRequired("slug")
+
+	parentCmd.AddCommand(deleteCmd)
 }

@@ -15,58 +15,41 @@ func registerOrgAccountModule(core *core.Core) {
 		Use:   "orgAccount",
 		Short: "SwitchCraft CLI organization account module",
 	}
+	orgAccountCreateCmd(core, orgAccountCmd)
+	orgAccountGetManyCmd(core, orgAccountCmd)
+	orgAccountGetOneCmd(core, orgAccountCmd)
+	orgAccountUpdateCmd(core, orgAccountCmd)
+	orgAccountDeleteCmd(core, orgAccountCmd)
+
 	rootCmd.AddCommand(orgAccountCmd)
 
-	/* ---------------------------- */
-	/* === GET ORG ACCOUNTS CMD === */
-	/* ---------------------------- */
-	var getOrgAccountsOrgSlug string
-	var getOrgAccountsCmd = &cobra.Command{
-		Use:   "getMany",
-		Short: "Get multiple organization accounts",
-		Run: func(cmd *cobra.Command, args []string) {
-			authAccount := mustAuthn(core)
-			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
+}
 
-			accounts, err := core.OrgAccountGetMany(opCtx, getOrgAccountsOrgSlug)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			printJSON(accounts)
-		},
-	}
-	getOrgAccountsCmd.Flags().StringVar(&getOrgAccountsOrgSlug, "orgSlug", "", "Organization slug")
-	getOrgAccountsCmd.MarkFlagRequired("orgSlug")
-	orgAccountCmd.AddCommand(getOrgAccountsCmd)
-
-	/* ------------------------------ */
-	/* === CREATE ORG ACCOUNT CMD === */
-	/* ------------------------------ */
-	createOrgAccountCmdArgs := struct {
-		OrgSlug   string
-		FirstName string
-		LastName  string
-		Email     string
-		Username  string
+func orgAccountCreateCmd(core *core.Core, parentCmd *cobra.Command) {
+	args := struct {
+		orgSlug   string
+		firstName string
+		lastName  string
+		email     string
+		username  string
 	}{}
-	var createOrgAccountCmd = &cobra.Command{
+	createCmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create new organization account",
 		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			args := core.NewOrgAccountCreateArgs(
-				createOrgAccountCmdArgs.OrgSlug,
-				createOrgAccountCmdArgs.FirstName,
-				createOrgAccountCmdArgs.LastName,
-				createOrgAccountCmdArgs.Email,
-				createOrgAccountCmdArgs.Username,
-				nil,
+			account, err := core.OrgAccountCreate(opCtx,
+				core.NewOrgAccountCreateArgs(
+					args.orgSlug,
+					args.firstName,
+					args.lastName,
+					args.email,
+					args.username,
+					nil,
+				),
 			)
-
-			account, err := core.OrgAccountCreate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -74,26 +57,48 @@ func registerOrgAccountModule(core *core.Core) {
 			printJSON(account)
 		},
 	}
+	createCmd.Flags().StringVar(&args.orgSlug, "orgSlug", "", "Organization slug")
+	createCmd.Flags().StringVar(&args.firstName, "firstName", "", "account.firstName")
+	createCmd.MarkFlagRequired("firstName")
+	createCmd.Flags().StringVar(&args.lastName, "lastName", "", "account.lastName")
+	createCmd.MarkFlagRequired("lastName")
+	createCmd.Flags().StringVar(&args.email, "email", "", "account.email")
+	createCmd.MarkFlagRequired("email")
+	createCmd.Flags().StringVar(&args.username, "username", "", "account.username")
+	createCmd.MarkFlagRequired("username")
 
-	createOrgAccountCmd.Flags().StringVar(&createOrgAccountCmdArgs.OrgSlug, "orgSlug", "", "account.orgSlug")
-	createOrgAccountCmd.Flags().StringVar(&createOrgAccountCmdArgs.FirstName, "firstName", "", "account.firstName")
-	createOrgAccountCmd.MarkFlagRequired("firstName")
-	createOrgAccountCmd.Flags().StringVar(&createOrgAccountCmdArgs.LastName, "lastName", "", "account.lastName")
-	createOrgAccountCmd.MarkFlagRequired("lastName")
-	createOrgAccountCmd.Flags().StringVar(&createOrgAccountCmdArgs.Email, "email", "", "account.email")
-	createOrgAccountCmd.MarkFlagRequired("email")
-	createOrgAccountCmd.Flags().StringVar(&createOrgAccountCmdArgs.Username, "username", "", "account.username")
-	createOrgAccountCmd.MarkFlagRequired("username")
-	orgAccountCmd.AddCommand(createOrgAccountCmd)
+	parentCmd.AddCommand(createCmd)
+}
 
-	/* --------------------------- */
-	/* === GET ORG ACCOUNT CMD === */
-	/* --------------------------- */
-	var getOrgAccountOrgSlug string
-	var getOrgAccountID int64
-	var getOrgAccountUUID string
-	var getOrgAccountUsername string
-	var getOrgAccountCmd = &cobra.Command{
+func orgAccountGetManyCmd(core *core.Core, parentCmd *cobra.Command) {
+	var slug string
+	getManyCmd := &cobra.Command{
+		Use:   "getMany",
+		Short: "Get multiple organization accounts",
+		Run: func(cmd *cobra.Command, args []string) {
+			authAccount := mustAuthn(core)
+			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
+
+			accounts, err := core.OrgAccountGetMany(opCtx, slug)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			printJSON(accounts)
+		},
+	}
+	getManyCmd.Flags().StringVar(&slug, "orgSlug", "", "Organization slug")
+	getManyCmd.MarkFlagRequired("orgSlug")
+
+	parentCmd.AddCommand(getManyCmd)
+}
+
+func orgAccountGetOneCmd(core *core.Core, parentCmd *cobra.Command) {
+	var orgSlug string
+	var accountID int64
+	var accountUUID string
+	var accountUsername string
+	getOneCmd := &cobra.Command{
 		Use:   "getOne",
 		Short: "Get an organization account by id, uuid, or username",
 		Run: func(cmd *cobra.Command, _ []string) {
@@ -106,23 +111,23 @@ func registerOrgAccountModule(core *core.Core) {
 				username *string
 			)
 			if cmd.Flags().Changed("id") {
-				id = &getOrgAccountID
+				id = &accountID
 			}
 			if cmd.Flags().Changed("uuid") {
-				uuid = &getOrgAccountUUID
+				uuid = &accountUUID
 			}
 			if cmd.Flags().Changed("username") {
-				username = &getOrgAccountUsername
+				username = &accountUsername
 			}
 
-			args := core.NewOrgAccountGetOneArgs(
-				getOrgAccountOrgSlug,
-				id,
-				uuid,
-				username,
+			account, err := core.OrgAccountGetOne(opCtx,
+				core.NewOrgAccountGetOneArgs(
+					orgSlug,
+					id,
+					uuid,
+					username,
+				),
 			)
-
-			account, err := core.OrgAccountGetOne(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -130,17 +135,17 @@ func registerOrgAccountModule(core *core.Core) {
 			printJSON(account)
 		},
 	}
-	getOrgAccountCmd.Flags().StringVar(&getOrgAccountOrgSlug, "orgSlug", "", "Organization slug")
-	getOrgAccountCmd.MarkFlagRequired("orgSlug")
-	getOrgAccountCmd.Flags().Int64Var(&getOrgAccountID, "id", 0, "account.id")
-	getOrgAccountCmd.Flags().StringVar(&getOrgAccountUUID, "uuid", "", "account.uuid")
-	getOrgAccountCmd.Flags().StringVar(&getOrgAccountUsername, "username", "", "account.username")
-	orgAccountCmd.AddCommand(getOrgAccountCmd)
+	getOneCmd.Flags().StringVar(&orgSlug, "orgSlug", "", "Organization slug")
+	getOneCmd.MarkFlagRequired("orgSlug")
+	getOneCmd.Flags().Int64Var(&accountID, "id", 0, "account.id")
+	getOneCmd.Flags().StringVar(&accountUUID, "uuid", "", "account.uuid")
+	getOneCmd.Flags().StringVar(&accountUsername, "username", "", "account.username")
 
-	/* ------------------------------ */
-	/* === UPDATE ORG ACCOUNT CMD === */
-	/* ------------------------------ */
-	updateOrgAccountCmdArgs := struct {
+	parentCmd.AddCommand(getOneCmd)
+}
+
+func orgAccountUpdateCmd(core *core.Core, parentCmd *cobra.Command) {
+	args := struct {
 		orgSlug   string
 		id        int64
 		firstName string
@@ -148,23 +153,23 @@ func registerOrgAccountModule(core *core.Core) {
 		email     string
 		username  string
 	}{}
-	var updateOrgAccountCmd = &cobra.Command{
+	updateCmd := &cobra.Command{
 		Use:   "update",
 		Short: "Update an existing organization account",
 		Run: func(cmd *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			args := core.NewOrgAccountUpdateArgs(
-				updateOrgAccountCmdArgs.orgSlug,
-				updateOrgAccountCmdArgs.id,
-				updateOrgAccountCmdArgs.firstName,
-				updateOrgAccountCmdArgs.lastName,
-				updateOrgAccountCmdArgs.email,
-				updateOrgAccountCmdArgs.username,
+			account, err := core.OrgAccountUpdate(opCtx,
+				core.NewOrgAccountUpdateArgs(
+					args.orgSlug,
+					args.id,
+					args.firstName,
+					args.lastName,
+					args.email,
+					args.username,
+				),
 			)
-
-			account, err := core.OrgAccountUpdate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -173,42 +178,43 @@ func registerOrgAccountModule(core *core.Core) {
 		},
 	}
 
-	updateOrgAccountCmd.Flags().StringVar(&updateOrgAccountCmdArgs.orgSlug, "orgSlug", "", "Organization slug")
-	updateOrgAccountCmd.MarkFlagRequired("orgSlug")
-	updateOrgAccountCmd.Flags().Int64Var(&updateOrgAccountCmdArgs.id, "id", 0, "account.id")
-	updateOrgAccountCmd.MarkFlagRequired("id")
-	updateOrgAccountCmd.Flags().StringVar(&updateOrgAccountCmdArgs.firstName, "firstName", "", "account.firstName")
-	updateOrgAccountCmd.MarkFlagRequired("firstName")
-	updateOrgAccountCmd.Flags().StringVar(&updateOrgAccountCmdArgs.lastName, "lastName", "", "account.lastName")
-	updateOrgAccountCmd.MarkFlagRequired("lastName")
-	updateOrgAccountCmd.Flags().StringVar(&updateOrgAccountCmdArgs.email, "email", "", "account.email")
-	updateOrgAccountCmd.MarkFlagRequired("email")
-	updateOrgAccountCmd.Flags().StringVar(&updateOrgAccountCmdArgs.username, "username", "", "account.username")
-	updateOrgAccountCmd.MarkFlagRequired("username")
-	orgAccountCmd.AddCommand(updateOrgAccountCmd)
+	updateCmd.Flags().StringVar(&args.orgSlug, "orgSlug", "", "Organization slug")
+	updateCmd.MarkFlagRequired("orgSlug")
+	updateCmd.Flags().Int64Var(&args.id, "id", 0, "account.id")
+	updateCmd.MarkFlagRequired("id")
+	updateCmd.Flags().StringVar(&args.firstName, "firstName", "", "account.firstName")
+	updateCmd.MarkFlagRequired("firstName")
+	updateCmd.Flags().StringVar(&args.lastName, "lastName", "", "account.lastName")
+	updateCmd.MarkFlagRequired("lastName")
+	updateCmd.Flags().StringVar(&args.email, "email", "", "account.email")
+	updateCmd.MarkFlagRequired("email")
+	updateCmd.Flags().StringVar(&args.username, "username", "", "account.username")
+	updateCmd.MarkFlagRequired("username")
 
-	/* ------------------------------ */
-	/* === DELETE ORG ACCOUNT CMD === */
-	/* ------------------------------ */
-	var deleteOrgAccountOrgSlug string
-	var deleteOrgAccountAccountID int64
-	var deleteOrgAccountCmd = &cobra.Command{
+	parentCmd.AddCommand(updateCmd)
+}
+
+func orgAccountDeleteCmd(core *core.Core, parentCmd *cobra.Command) {
+	var orgSlug string
+	var accountID int64
+	deleteCmd := &cobra.Command{
 		Use:   "delete",
 		Short: "Delete an organization account",
 		Run: func(cmd *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			if err := core.OrgAccountDelete(opCtx, deleteOrgAccountOrgSlug, deleteOrgAccountAccountID); err != nil {
+			if err := core.OrgAccountDelete(opCtx, orgSlug, accountID); err != nil {
 				log.Fatal(err)
 			}
-			fmt.Printf("Organization account '%v' deleted successfully\n", deleteOrgAccountAccountID)
+
+			fmt.Printf("Organization account '%v' deleted successfully\n", accountID)
 		},
 	}
+	deleteCmd.Flags().StringVar(&orgSlug, "orgSlug", "", "Organization slug")
+	deleteCmd.MarkFlagRequired("orgSlug")
+	deleteCmd.Flags().Int64Var(&accountID, "id", 0, "account.id")
+	deleteCmd.MarkFlagRequired("id")
 
-	deleteOrgAccountCmd.Flags().StringVar(&deleteOrgAccountOrgSlug, "orgSlug", "", "Organization slug")
-	deleteOrgAccountCmd.MarkFlagRequired("orgSlug")
-	deleteOrgAccountCmd.Flags().Int64Var(&deleteOrgAccountAccountID, "id", 0, "account.id")
-	deleteOrgAccountCmd.MarkFlagRequired("id")
-	orgAccountCmd.AddCommand(deleteOrgAccountCmd)
+	parentCmd.AddCommand(deleteCmd)
 }

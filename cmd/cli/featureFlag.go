@@ -15,12 +15,17 @@ func registerFeatureFlagModule(core *core.Core) {
 		Use:   "featureFlag",
 		Short: "SwitchCraft CLI feature flag module",
 	}
-	rootCmd.AddCommand(featureFlagCmd)
+	featureFlagCreateCmd(core, featureFlagCmd)
+	featureFlagGetManyCmd(core, featureFlagCmd)
+	featureFlagGetOneCmd(core, featureFlagCmd)
+	featureFlagUpdateCmd(core, featureFlagCmd)
+	featureFlagDeleteCmd(core, featureFlagCmd)
 
-	/* ----------------------------------- */
-	/* === CREATE FEATURE FLAG COMMAND === */
-	/* ----------------------------------- */
-	createFeatureFlagCmdArgs := struct {
+	rootCmd.AddCommand(featureFlagCmd)
+}
+
+func featureFlagCreateCmd(core *core.Core, parentCmd *cobra.Command) {
+	args := struct {
 		orgSlug     string
 		appSlug     string
 		name        string
@@ -28,23 +33,23 @@ func registerFeatureFlagModule(core *core.Core) {
 		description string
 		isEnabled   bool
 	}{}
-	var createFeatureFlagCmd = &cobra.Command{
+	createCmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create a new feature flag",
 		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			args := core.NewFeatFlagCreateArgs(
-				createFeatureFlagCmdArgs.orgSlug,
-				createFeatureFlagCmdArgs.appSlug,
-				createFeatureFlagCmdArgs.name,
-				createFeatureFlagCmdArgs.label,
-				createFeatureFlagCmdArgs.description,
-				createFeatureFlagCmdArgs.isEnabled,
+			featureFlag, err := core.FeatFlagCreate(opCtx,
+				core.NewFeatFlagCreateArgs(
+					args.orgSlug,
+					args.appSlug,
+					args.name,
+					args.label,
+					args.description,
+					args.isEnabled,
+				),
 			)
-
-			featureFlag, err := core.FeatFlagCreate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -52,31 +57,31 @@ func registerFeatureFlagModule(core *core.Core) {
 			printJSON(featureFlag)
 		},
 	}
-	createFeatureFlagCmd.Flags().StringVar(&createFeatureFlagCmdArgs.orgSlug, "orgSlug", "", "featureFlag.orgSlug")
-	createFeatureFlagCmd.MarkFlagRequired("orgSlug")
-	createFeatureFlagCmd.Flags().StringVar(&createFeatureFlagCmdArgs.appSlug, "applicationSlug", "", "featureFlag.applicationSlug")
-	createFeatureFlagCmd.MarkFlagRequired("applicationSlug")
-	createFeatureFlagCmd.Flags().StringVar(&createFeatureFlagCmdArgs.name, "name", "", "featureFlag.name")
-	createFeatureFlagCmd.MarkFlagRequired("name")
-	createFeatureFlagCmd.Flags().StringVar(&createFeatureFlagCmdArgs.label, "label", "", "featureFlag.label")
-	createFeatureFlagCmd.MarkFlagRequired("label")
-	createFeatureFlagCmd.Flags().StringVar(&createFeatureFlagCmdArgs.description, "description", "", "featureFlag.description")
-	createFeatureFlagCmd.Flags().BoolVar(&createFeatureFlagCmdArgs.isEnabled, "isEnabled", false, "featureFlag.isEnabled")
-	featureFlagCmd.AddCommand(createFeatureFlagCmd)
+	createCmd.Flags().StringVar(&args.orgSlug, "orgSlug", "", "Organization slug")
+	createCmd.MarkFlagRequired("orgSlug")
+	createCmd.Flags().StringVar(&args.appSlug, "applicationSlug", "", "featureFlag.applicationSlug")
+	createCmd.MarkFlagRequired("applicationSlug")
+	createCmd.Flags().StringVar(&args.name, "name", "", "featureFlag.name")
+	createCmd.MarkFlagRequired("name")
+	createCmd.Flags().StringVar(&args.label, "label", "", "featureFlag.label")
+	createCmd.MarkFlagRequired("label")
+	createCmd.Flags().StringVar(&args.description, "description", "", "featureFlag.description")
+	createCmd.Flags().BoolVar(&args.isEnabled, "isEnabled", false, "featureFlag.isEnabled")
 
-	/* --------------------------------- */
-	/* === GET FEATURE FLAGS COMMAND === */
-	/* --------------------------------- */
-	var getFeatureFlagsCmdOrgSlug string
-	var getFeatureFlagsCmdAppSlug string
-	var getFeatureFlagsCmd = &cobra.Command{
+	parentCmd.AddCommand(createCmd)
+}
+
+func featureFlagGetManyCmd(core *core.Core, parentCmd *cobra.Command) {
+	var orgSlug string
+	var appSlug string
+	getManyCmd := &cobra.Command{
 		Use:   "getMany",
 		Short: "Get multiple feature flags",
 		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			featureFlags, err := core.FeatFlagGetMany(opCtx, getFeatureFlagsCmdOrgSlug, getFeatureFlagsCmdAppSlug)
+			featureFlags, err := core.FeatFlagGetMany(opCtx, orgSlug, appSlug)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -84,23 +89,23 @@ func registerFeatureFlagModule(core *core.Core) {
 			printJSON(featureFlags)
 		},
 	}
-	getFeatureFlagsCmd.Flags().StringVar(&getFeatureFlagsCmdOrgSlug, "orgSlug", "", "featureFlag.orgSlug")
-	getFeatureFlagsCmd.MarkFlagRequired("orgSlug")
-	getFeatureFlagsCmd.Flags().StringVar(&getFeatureFlagsCmdAppSlug, "applicationSlug", "", "featureFlag.applicationSlug")
-	getFeatureFlagsCmd.MarkFlagRequired("applicationSlug")
-	featureFlagCmd.AddCommand(getFeatureFlagsCmd)
+	getManyCmd.Flags().StringVar(&orgSlug, "orgSlug", "", "Organization slug")
+	getManyCmd.MarkFlagRequired("orgSlug")
+	getManyCmd.Flags().StringVar(&appSlug, "applicationSlug", "", "featureFlag.applicationSlug")
+	getManyCmd.MarkFlagRequired("applicationSlug")
 
-	/* -------------------------------- */
-	/* === GET FEATURE FLAG COMMAND === */
-	/* -------------------------------- */
-	var getFeatureFlagCmdArgs = struct {
+	parentCmd.AddCommand(getManyCmd)
+}
+
+func featureFlagGetOneCmd(core *core.Core, parentCmd *cobra.Command) {
+	var args = struct {
 		orgSlug string
 		appSlug string
 		id      int64
 		uuid    string
 		name    string
 	}{}
-	var getFeatureFlagCmd = &cobra.Command{
+	getOneCmd := &cobra.Command{
 		Use:   "getOne",
 		Short: "Get a single feature flag",
 		Run: func(cmd *cobra.Command, _ []string) {
@@ -113,24 +118,24 @@ func registerFeatureFlagModule(core *core.Core) {
 				name *string
 			)
 			if cmd.Flags().Changed("id") {
-				id = &getFeatureFlagCmdArgs.id
+				id = &args.id
 			}
 			if cmd.Flags().Changed("uuid") {
-				uuid = &getFeatureFlagCmdArgs.uuid
+				uuid = &args.uuid
 			}
 			if cmd.Flags().Changed("name") {
-				name = &getFeatureFlagCmdArgs.name
+				name = &args.name
 			}
 
-			args := core.NewFeatFlagGetOneArgs(
-				getFeatureFlagCmdArgs.orgSlug,
-				getFeatureFlagCmdArgs.appSlug,
-				id,
-				uuid,
-				name,
+			featureFlag, err := core.FeatFlagGetOne(opCtx,
+				core.NewFeatFlagGetOneArgs(
+					args.orgSlug,
+					args.appSlug,
+					id,
+					uuid,
+					name,
+				),
 			)
-
-			featureFlag, err := core.FeatFlagGetOne(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -138,19 +143,19 @@ func registerFeatureFlagModule(core *core.Core) {
 			printJSON(featureFlag)
 		},
 	}
-	getFeatureFlagCmd.Flags().StringVar(&getFeatureFlagCmdArgs.orgSlug, "orgSlug", "", "featureFlag.orgSlug")
-	getFeatureFlagCmd.MarkFlagRequired("orgSlug")
-	getFeatureFlagCmd.Flags().StringVar(&getFeatureFlagCmdArgs.appSlug, "applicationSlug", "", "featureFlag.applicationSlug")
-	getFeatureFlagCmd.MarkFlagRequired("applicationSlug")
-	getFeatureFlagCmd.Flags().Int64Var(&getFeatureFlagCmdArgs.id, "id", 0, "featureFlag.id")
-	getFeatureFlagCmd.Flags().StringVar(&getFeatureFlagCmdArgs.uuid, "uuid", "", "featureFlag.uuid")
-	getFeatureFlagCmd.Flags().StringVar(&getFeatureFlagCmdArgs.name, "name", "", "featureFlag.name")
-	featureFlagCmd.AddCommand(getFeatureFlagCmd)
+	getOneCmd.Flags().StringVar(&args.orgSlug, "orgSlug", "", "Organization slug")
+	getOneCmd.MarkFlagRequired("orgSlug")
+	getOneCmd.Flags().StringVar(&args.appSlug, "applicationSlug", "", "featureFlag.applicationSlug")
+	getOneCmd.MarkFlagRequired("applicationSlug")
+	getOneCmd.Flags().Int64Var(&args.id, "id", 0, "featureFlag.id")
+	getOneCmd.Flags().StringVar(&args.uuid, "uuid", "", "featureFlag.uuid")
+	getOneCmd.Flags().StringVar(&args.name, "name", "", "featureFlag.name")
 
-	/* ----------------------------------- */
-	/* === UPDATE FEATURE FLAG COMMAND === */
-	/* ----------------------------------- */
-	updateFeatureFlagCmdArgs := struct {
+	parentCmd.AddCommand(getOneCmd)
+}
+
+func featureFlagUpdateCmd(core *core.Core, parentCmd *cobra.Command) {
+	args := struct {
 		orgSlug     string
 		appSlug     string
 		id          int64
@@ -159,24 +164,24 @@ func registerFeatureFlagModule(core *core.Core) {
 		description string
 		isEnabled   bool
 	}{}
-	var updateFeatureFlagCmd = &cobra.Command{
+	updateCmd := &cobra.Command{
 		Use:   "update",
 		Short: "Update an existing feature flag",
 		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			args := core.NewFeatFlagUpdateArgs(
-				updateFeatureFlagCmdArgs.orgSlug,
-				updateFeatureFlagCmdArgs.appSlug,
-				updateFeatureFlagCmdArgs.id,
-				updateFeatureFlagCmdArgs.name,
-				updateFeatureFlagCmdArgs.label,
-				updateFeatureFlagCmdArgs.description,
-				updateFeatureFlagCmdArgs.isEnabled,
+			featureFlag, err := core.FeatFlagUpdate(opCtx,
+				core.NewFeatFlagUpdateArgs(
+					args.orgSlug,
+					args.appSlug,
+					args.id,
+					args.name,
+					args.label,
+					args.description,
+					args.isEnabled,
+				),
 			)
-
-			featureFlag, err := core.FeatFlagUpdate(opCtx, args)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -184,49 +189,47 @@ func registerFeatureFlagModule(core *core.Core) {
 			printJSON(featureFlag)
 		},
 	}
-	updateFeatureFlagCmd.Flags().StringVar(&updateFeatureFlagCmdArgs.orgSlug, "orgSlug", "", "featureFlag.orgSlug")
-	updateFeatureFlagCmd.MarkFlagRequired("orgSlug")
-	updateFeatureFlagCmd.Flags().StringVar(&updateFeatureFlagCmdArgs.appSlug, "applicationSlug", "", "featureFlag.applicationSlug")
-	updateFeatureFlagCmd.Flags().Int64Var(&updateFeatureFlagCmdArgs.id, "id", 0, "featureFlag.id")
-	updateFeatureFlagCmd.MarkFlagRequired("id")
-	updateFeatureFlagCmd.Flags().StringVar(&updateFeatureFlagCmdArgs.name, "name", "", "featureFlag.name")
-	updateFeatureFlagCmd.MarkFlagRequired("name")
-	updateFeatureFlagCmd.Flags().StringVar(&updateFeatureFlagCmdArgs.label, "label", "", "featureFlag.label")
-	updateFeatureFlagCmd.MarkFlagRequired("label")
-	updateFeatureFlagCmd.Flags().StringVar(&updateFeatureFlagCmdArgs.description, "description", "", "featureFlag.description")
-	updateFeatureFlagCmd.Flags().BoolVar(&updateFeatureFlagCmdArgs.isEnabled, "isEnabled", false, "featureFlag.isEnabled")
-	updateFeatureFlagCmd.MarkFlagRequired("isEnabled")
-	featureFlagCmd.AddCommand(updateFeatureFlagCmd)
+	updateCmd.Flags().StringVar(&args.orgSlug, "orgSlug", "", "Organization slug")
+	updateCmd.MarkFlagRequired("orgSlug")
+	updateCmd.Flags().StringVar(&args.appSlug, "applicationSlug", "", "featureFlag.applicationSlug")
+	updateCmd.Flags().Int64Var(&args.id, "id", 0, "featureFlag.id")
+	updateCmd.MarkFlagRequired("id")
+	updateCmd.Flags().StringVar(&args.name, "name", "", "featureFlag.name")
+	updateCmd.MarkFlagRequired("name")
+	updateCmd.Flags().StringVar(&args.label, "label", "", "featureFlag.label")
+	updateCmd.MarkFlagRequired("label")
+	updateCmd.Flags().StringVar(&args.description, "description", "", "featureFlag.description")
+	updateCmd.Flags().BoolVar(&args.isEnabled, "isEnabled", false, "featureFlag.isEnabled")
+	updateCmd.MarkFlagRequired("isEnabled")
 
-	/* ------------------------------- */
-	/* === DELETE FEATURE FLAG CMD === */
-	/* ------------------------------- */
-	var deleteFeatureFlagCmdOrgSlug string
-	var deleteFeatureFlagCmdApplicationSlug string
-	var deleteFeatureFlagCmdID int64
-	var deleteFeatureFlagCmd = &cobra.Command{
+	parentCmd.AddCommand(updateCmd)
+}
+
+func featureFlagDeleteCmd(core *core.Core, parentCmd *cobra.Command) {
+	var orgSlug string
+	var appSlug string
+	var id int64
+	deleteCmd := &cobra.Command{
 		Use:   "delete",
 		Short: "Delete a feature flag",
 		Run: func(_ *cobra.Command, _ []string) {
 			authAccount := mustAuthn(core)
 			opCtx := types.NewOperationCtx(baseCtx, "", time.Now(), *authAccount)
 
-			if err := core.FeatFlagDelete(opCtx,
-				deleteFeatureFlagCmdOrgSlug,
-				deleteFeatureFlagCmdApplicationSlug,
-				deleteFeatureFlagCmdID,
-			); err != nil {
+			err := core.FeatFlagDelete(opCtx, orgSlug, appSlug, id)
+			if err != nil {
 				log.Fatal(err)
 			}
 
-			fmt.Printf("Feature flag '%v' deleted successfully\n", deleteFeatureFlagCmdID)
+			fmt.Printf("Feature flag '%v' deleted successfully\n", id)
 		},
 	}
-	deleteFeatureFlagCmd.Flags().StringVar(&deleteFeatureFlagCmdOrgSlug, "orgSlug", "", "featureFlag.orgSlug")
-	deleteFeatureFlagCmd.MarkFlagRequired("orgSlug")
-	deleteFeatureFlagCmd.Flags().StringVar(&deleteFeatureFlagCmdApplicationSlug, "applicationSlug", "", "featureFlag.applicationSlug")
-	deleteFeatureFlagCmd.MarkFlagRequired("applicationSlug")
-	deleteFeatureFlagCmd.Flags().Int64Var(&deleteFeatureFlagCmdID, "id", 0, "featureFlag.id")
-	deleteFeatureFlagCmd.MarkFlagRequired("id")
-	featureFlagCmd.AddCommand(deleteFeatureFlagCmd)
+	deleteCmd.Flags().StringVar(&orgSlug, "orgSlug", "", "Organization slug")
+	deleteCmd.MarkFlagRequired("orgSlug")
+	deleteCmd.Flags().StringVar(&appSlug, "applicationSlug", "", "featureFlag.applicationSlug")
+	deleteCmd.MarkFlagRequired("applicationSlug")
+	deleteCmd.Flags().Int64Var(&id, "id", 0, "featureFlag.id")
+	deleteCmd.MarkFlagRequired("id")
+
+	parentCmd.AddCommand(deleteCmd)
 }

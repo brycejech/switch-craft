@@ -12,9 +12,14 @@ func registerMigrationsModule(core *core.Core) {
 		Use:   "migrate",
 		Short: "SwitchCraft CLI migrations module",
 	}
-	rootCmd.AddCommand(migrateCmd)
+	migrateUpCmd(core, migrateCmd)
+	migrateDownCmd(core, migrateCmd)
 
-	var upCmd = &cobra.Command{
+	rootCmd.AddCommand(migrateCmd)
+}
+
+func migrateUpCmd(core *core.Core, parentCmd *cobra.Command) {
+	upCmd := &cobra.Command{
 		Use:   "up",
 		Short: "Migrate database all the way up",
 		Run: func(_ *cobra.Command, _ []string) {
@@ -22,12 +27,16 @@ func registerMigrationsModule(core *core.Core) {
 				fmt.Println(err)
 				return
 			}
+
 			fmt.Println("Successfully ran up migration(s)")
 		},
 	}
-	migrateCmd.AddCommand(upCmd)
 
-	var downCmd = &cobra.Command{
+	parentCmd.AddCommand(upCmd)
+}
+
+func migrateDownCmd(core *core.Core, parentCmd *cobra.Command) {
+	downCmd := &cobra.Command{
 		Use:   "down",
 		Short: "Migrate database down by a single migration",
 		Run: func(_ *cobra.Command, _ []string) {
@@ -35,8 +44,10 @@ func registerMigrationsModule(core *core.Core) {
 				fmt.Println(err)
 				return
 			}
+
 			fmt.Println("Successfully ran down migration")
 		},
 	}
-	migrateCmd.AddCommand(downCmd)
+
+	parentCmd.AddCommand(downCmd)
 }
