@@ -3,3 +3,5 @@
 3. Check tenant permissions
    - Always do this at core layer to prevent logic duplication in each adapter.
 4. App config
+5. Connection context
+6. DB Seeder

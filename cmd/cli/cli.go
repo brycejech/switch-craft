@@ -24,6 +24,7 @@ func Start(logger *types.Logger, core *core.Core) {
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 
 	registerMigrationsModule(core)
+	registerSeedModule(core)
 	registerOrgAccountModule(core)
 	registerOrgGroupModule(core)
 	registerOrgModule(core)

@@ -1,0 +1,29 @@
+{
+	"organizations": [
+		{
+			"name": "SwitchCraft",
+			"slug": "switchcraft",
+			"applications": [
+				{
+					"name": "SwitchCraft",
+					"slug": "switchcraft",
+					"featureFlags": [
+						{
+							"name": "",
+							"label": "",
+							"description": "",
+							"isActive": true
+						}
+					]
+				}
+			],
+			"accounts": [],
+			"owner": {
+				"firstName": "Bryce",
+				"lastName": "Jech",
+				"email": "bryce.jech@gmail.com",
+				"isInstanceAdmin": false
+			}
+		}
+	]
+}
