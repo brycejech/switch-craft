@@ -9,20 +9,203 @@
 					"slug": "switchcraft",
 					"featureFlags": [
 						{
-							"name": "",
-							"label": "",
-							"description": "",
-							"isActive": true
+							"name": "ENABLE_SC_FEATURE_1",
+							"label": "Enable SwitchCraft feature 1",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_SC_FEATURE_2",
+							"label": "Enable SwitchCraft feature 2",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_SC_FEATURE_3",
+							"label": "Enable SwitchCraft feature 3",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_SC_FEATURE_4",
+							"label": "Enable SwitchCraft feature 4",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_SC_FEATURE_5",
+							"label": "Enable SwitchCraft feature 5",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						}
+					]
+				},
+				{
+					"name": "RuleCraft",
+					"slug": "rule-craft",
+					"featureFlags": [
+						{
+							"name": "ENABLE_RC_FEATURE_1",
+							"label": "Enable RuleCraft feature 1",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_RC_FEATURE_2",
+							"label": "Enable RuleCraft feature 2",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_RC_FEATURE_3",
+							"label": "Enable RuleCraft feature 3",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_RC_FEATURE_4",
+							"label": "Enable RuleCraft feature 4",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_RC_FEATURE_5",
+							"label": "Enable RuleCraft feature 5",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						}
+					]
+				},
+				{
+					"name": "ApprovalCraft",
+					"slug": "approval-craft",
+					"featureFlags": [
+						{
+							"name": "ENABLE_AC_FEATURE_1",
+							"label": "Enable ApprovalCraft feature 1",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_AC_FEATURE_2",
+							"label": "Enable ApprovalCraft feature 2",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_AC_FEATURE_3",
+							"label": "Enable ApprovalCraft feature 3",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_AC_FEATURE_4",
+							"label": "Enable ApprovalCraft feature 4",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
+						},
+						{
+							"name": "ENABLE_AC_FEATURE_5",
+							"label": "Enable ApprovalCraft feature 5",
+							"description": "More descriptive detail of what this feature does",
+							"isEnabled": true
 						}
 					]
 				}
 			],
-			"accounts": [],
+			"accounts": [
+				{
+					"firstName": "Gandalf",
+					"lastName": "The Gray",
+					"email": "gandalf@lotr.com",
+					"username": "Gandalf"
+				},
+				{
+					"firstName": "Legolas",
+					"lastName": "The Elf",
+					"email": "legolas@lotr.com",
+					"username": "Legolas"
+				},
+				{
+					"firstName": "Gimli",
+					"lastName": "Son of Gloin",
+					"email": "gimli@lotr.com",
+					"username": "Gimli"
+				},
+				{
+					"firstName": "Boromir",
+					"lastName": "Son of Denethor",
+					"email": "boromir@lotr.com",
+					"username": "Boromir"
+				},
+				{
+					"firstName": "Aragorn",
+					"lastName": "Son of Arathorn",
+					"email": "aragorn@lotr.com",
+					"username": "Strider"
+				},
+				{
+					"firstName": "Frodo",
+					"lastName": "Baggins",
+					"email": "frodo@lotr.com",
+					"username": "RingBearer"
+				},
+				{
+					"firstName": "Samwise",
+					"lastName": "Gamgee",
+					"email": "sam@lotr.com",
+					"username": "FlowerPower"
+				},
+				{
+					"firstName": "Meriadoc",
+					"lastName": "Brandybuc",
+					"email": "merry@lotr.com",
+					"username": "MerryB"
+				},
+				{
+					"firstName": "Peregrin",
+					"lastName": "Took",
+					"email": "pippin@lotr.com",
+					"username": "Pip"
+				}
+			],
+			"groups": [
+				{
+					"name": "Alpha users",
+					"description": "Alpha release channel users. Bleeding ege, most unstable features",
+					"members": [
+						"Gandalf",
+						"Legolas",
+						"Strider"
+					]
+				},
+				{
+					"name": "Beta users",
+					"description": "Beta release channel users. Features that have made it through alpha but not quite ready for primetime",
+					"members": [
+						"Boromir",
+						"RingBearer",
+						"FlowerPower"
+					]
+				},
+				{
+					"name": "Power users",
+					"description": "Advanced users that receive complex features we keep hidden from normies. Also serves as an initial production release group.",
+					"members": [
+						"Gandalf",
+						"Legolas",
+						"Boromir",
+						"Strider",
+						"RingBearer",
+						"MerryB"
+					]
+				}
+			],
 			"owner": {
 				"firstName": "Bryce",
 				"lastName": "Jech",
 				"email": "bryce.jech@gmail.com",
-				"isInstanceAdmin": false
+				"username": "BryceJech"
 			}
 		}
 	]

@@ -24,6 +24,38 @@ type orgAccountRepo struct {
 	db     *pgxpool.Pool
 }
 
+func (r *orgAccountRepo) Signup(ctx context.Context,
+	firstName string,
+	lastName string,
+	email string,
+	username string,
+	password string,
+) (*types.Account, error) {
+	var (
+		account types.Account
+		rows    pgx.Rows
+		err     error
+	)
+
+	if rows, err = r.db.Query(
+		ctx,
+		queries.SignupAccountCreate,
+		firstName,
+		lastName,
+		email,
+		username,
+		password,
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	if account, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Account]); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	return &account, nil
+}
+
 func (r *orgAccountRepo) Create(ctx context.Context,
 	orgID int64,
 	firstName string,
@@ -33,7 +65,6 @@ func (r *orgAccountRepo) Create(ctx context.Context,
 	password *string,
 	createdBy int64,
 ) (*types.Account, error) {
-
 	var (
 		account types.Account
 		rows    pgx.Rows
@@ -111,7 +142,6 @@ func (r *orgAccountRepo) GetOne(ctx context.Context,
 	uuid *string,
 	username *string,
 ) (*types.Account, error) {
-
 	var (
 		account types.Account
 		rows    pgx.Rows
@@ -144,7 +174,6 @@ func (r *orgAccountRepo) Update(ctx context.Context,
 	username string,
 	modifiedBy int64,
 ) (*types.Account, error) {
-
 	var (
 		account types.Account
 		rows    pgx.Rows
@@ -160,6 +189,31 @@ func (r *orgAccountRepo) Update(ctx context.Context,
 		email,
 		username,
 		modifiedBy,
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	if account, err = pgx.CollectOneRow(rows, pgx.RowToStructByName[types.Account]); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	return &account, nil
+}
+
+func (r *orgAccountRepo) SetOrgID(ctx context.Context,
+	orgID int64,
+	accountID int64,
+) (*types.Account, error) {
+	var (
+		account types.Account
+		rows    pgx.Rows
+		err     error
+	)
+
+	if rows, err = r.db.Query(ctx,
+		queries.SignupAccountSetOrg,
+		orgID,
+		accountID,
 	); err != nil {
 		return nil, handleError(ctx, r.logger, err)
 	}

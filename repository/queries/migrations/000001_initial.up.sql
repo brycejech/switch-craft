@@ -79,7 +79,7 @@ CREATE TABLE account.org_group (
 	, id              int          NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY
 	, uuid            uuid         NOT NULL UNIQUE DEFAULT gen_random_uuid()
 	, name            varchar(64)  NOT NULL
-	, description     varchar(64)
+	, description     text
 
 	, created      timestamp with time zone  NOT NULL DEFAULT (now() at time zone 'utc')
 	, created_by   bigint                    REFERENCES account.account(id)
