@@ -104,6 +104,13 @@ type GlobalAccountRepo interface {
 }
 
 type OrgAccountRepo interface {
+	Signup(ctx context.Context,
+		firstName string,
+		lastName string,
+		email string,
+		username string,
+		password string,
+	) (*types.Account, error)
 	Create(ctx context.Context,
 		orgID int64,
 		firstName string,
@@ -132,6 +139,10 @@ type OrgAccountRepo interface {
 		email string,
 		username string,
 		modifiedBy int64,
+	) (*types.Account, error)
+	SetOrgID(ctx context.Context,
+		orgID int64,
+		accountID int64,
 	) (*types.Account, error)
 	Delete(ctx context.Context, orgID int64, id int64) error
 }

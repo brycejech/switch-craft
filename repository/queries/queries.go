@@ -26,6 +26,16 @@ var GlobalAccountDelete string
 //go:embed globalAccount/accountGetByUsername.sql
 var AccountGetByUsername string
 
+/* ------------------------------- */
+/* === ACCOUNT SIGN-UP QUERIES === */
+/* ------------------------------- */
+
+//go:embed signup/accountCreate.sql
+var SignupAccountCreate string
+
+//go:embed signup/accountSetOrg.sql
+var SignupAccountSetOrg string
+
 /* --------------------------- */
 /* === ORG ACCOUNT QUERIES === */
 /* --------------------------- */
