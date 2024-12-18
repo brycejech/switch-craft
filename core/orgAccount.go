@@ -6,6 +6,68 @@ import (
 	"switchcraft/types"
 )
 
+type orgAccountSignupArgs struct {
+	firstName string
+	lastName  string
+	email     string
+	username  string
+	password  string
+}
+
+func (a *orgAccountSignupArgs) Validate() error {
+	if a.firstName == "" {
+		return errors.New("orgAccountSignupArgs.firstName cannot be empty")
+	}
+	if a.lastName == "" {
+		return errors.New("orgAccountSignupArgs.lastName cannot be empty")
+	}
+	if a.email == "" {
+		return errors.New("orgAccountSignupArgs.email cannot be empty")
+	}
+	if a.username == "" {
+		return errors.New("orgAccountSignupArgs.username cannot be empty")
+	}
+	if a.password == "" {
+		return errors.New("orgAccountSignupArgs.password cannot be empty")
+	}
+	return nil
+}
+
+func (c *Core) NewOrgAccountSignupArgs(
+	firstName string,
+	lastName string,
+	email string,
+	username string,
+	password string,
+) orgAccountSignupArgs {
+	return orgAccountSignupArgs{
+		firstName: firstName,
+		lastName:  lastName,
+		email:     email,
+		username:  username,
+		password:  password,
+	}
+}
+
+func (c *Core) Signup(ctx context.Context, args orgAccountSignupArgs) (*types.Account, error) {
+	if err := args.Validate(); err != nil {
+		return nil, err
+	}
+
+	password, err := c.AuthPasswordHash(args.password)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.orgAccountRepo.Signup(ctx,
+		args.firstName,
+		args.lastName,
+		args.email,
+		args.username,
+		password,
+	)
+}
+
 type orgAccountCreateArgs struct {
 	orgSlug   string
 	firstName string
@@ -17,19 +79,19 @@ type orgAccountCreateArgs struct {
 
 func (a *orgAccountCreateArgs) Validate() error {
 	if a.orgSlug == "" {
-		return errors.New("accountCreateArgs.orgSlug cannot be empty")
+		return errors.New("orgAccountCreateArgs.orgSlug cannot be empty")
 	}
 	if a.firstName == "" {
-		return errors.New("accountCreateArgs.firstName cannot be empty")
+		return errors.New("orgAccountCreateArgs.firstName cannot be empty")
 	}
 	if a.lastName == "" {
-		return errors.New("accountCreateArgs.lastName cannot be empty")
+		return errors.New("orgAccountCreateArgs.lastName cannot be empty")
 	}
 	if a.email == "" {
-		return errors.New("accountCreateArgs.email cannot be empty")
+		return errors.New("orgAccountCreateArgs.email cannot be empty")
 	}
 	if a.username == "" {
-		return errors.New("accountCreateArgs.username cannot be empty")
+		return errors.New("orgAccountCreateArgs.username cannot be empty")
 	}
 	return nil
 }
@@ -227,6 +289,16 @@ func (c *Core) OrgAccountUpdate(ctx context.Context, args orgAccountUpdateArgs) 
 		args.username,
 		tracer.AuthAccount.ID,
 	)
+}
+
+func (c *Core) OrgAccountSetOrgID(ctx context.Context, orgID int64, accountID int64) (*types.Account, error) {
+	if orgID < 1 {
+		return nil, errors.New("core.OrgAccountSetOrgID orgID must be positive integer")
+	}
+	if accountID < 1 {
+		return nil, errors.New("core.OrgAccountSetOrgID accountID must be positive integer")
+	}
+	return c.orgAccountRepo.SetOrgID(ctx, orgID, accountID)
 }
 
 func (c *Core) OrgAccountDelete(ctx context.Context, orgSlug string, id int64) error {
