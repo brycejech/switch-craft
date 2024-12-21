@@ -286,4 +286,37 @@ type FeatureFlagRepo interface {
 		applicationID int64,
 		id int64,
 	) error
+	GroupFlagCreate(ctx context.Context,
+		orgID int64,
+		groupID int64,
+		appID int64,
+		flagID int64,
+		isEnabled bool,
+		createdBy int64,
+	) (*types.OrgGroupFeatureFlag, error)
+	GroupFlagsGetByFlagID(ctx context.Context,
+		orgID int64,
+		applicationID int64,
+		flagID int64,
+	) ([]types.OrgGroupFeatureFlag, error)
+	GroupFlagGetOne(ctx context.Context,
+		orgID int64,
+		groupID int64,
+		applicationID int64,
+		flagID int64,
+	) (*types.OrgGroupFeatureFlag, error)
+	GroupFlagUpdate(ctx context.Context,
+		orgID int64,
+		groupID int64,
+		appID int64,
+		flagID int64,
+		isEnabled bool,
+		modifiedBy int64,
+	) (*types.OrgGroupFeatureFlag, error)
+	GroupFlagDelete(ctx context.Context,
+		orgID int64,
+		groupID int64,
+		appID int64,
+		flagID int64,
+	) error
 }

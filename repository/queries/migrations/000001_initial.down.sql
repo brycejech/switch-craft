@@ -1,5 +1,7 @@
 BEGIN TRANSACTION;
 
+DROP TABLE application.org_group_feature_flag;
+
 DROP TABLE account.org_group_account;
 DROP TABLE account.org_group;
 

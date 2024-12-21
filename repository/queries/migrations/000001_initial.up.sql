@@ -102,4 +102,19 @@ CREATE TABLE account.org_group_account (
 	, UNIQUE (group_id, account_id)
 );
 
+CREATE TABLE application.org_group_feature_flag (
+	  org_id          bigint   NOT NULL REFERENCES account.org(id) ON DELETE CASCADE ON UPDATE CASCADE
+	, group_id        bigint   NOT NULL REFERENCES account.org_group(id) ON DELETE CASCADE ON UPDATE CASCADE
+	, application_id  bigint   NOT NULL REFERENCES application.application(id) ON DELETE CASCADE ON UPDATE CASCADE
+	, flag_id         bigint   NOT NULL REFERENCES application.feature_flag(id) ON DELETE CASCADE ON UPDATE CASCADE
+	, is_enabled      boolean  NOT NULL DEFAULT false
+
+	, created      timestamp with time zone  NOT NULL DEFAULT (now() at time zone 'utc')
+	, created_by   bigint                    REFERENCES account.account(id)
+	, modified     timestamp with time zone
+	, modified_by  bigint                    REFERENCES account.account(id)
+
+	, UNIQUE (org_id, group_id, flag_id)
+);
+
 END TRANSACTION;

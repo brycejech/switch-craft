@@ -189,3 +189,167 @@ func (r *featureFlagRepo) Delete(ctx context.Context,
 
 	return nil
 }
+
+func (r *featureFlagRepo) GroupFlagCreate(ctx context.Context,
+	orgID int64,
+	groupID int64,
+	appID int64,
+	flagID int64,
+	isEnabled bool,
+	createdBy int64,
+) (*types.OrgGroupFeatureFlag, error) {
+	var (
+		groupFlag types.OrgGroupFeatureFlag
+		rows      pgx.Rows
+		err       error
+	)
+
+	if rows, err = r.db.Query(ctx,
+		queries.OrgGroupFeatureFlagCreate,
+		orgID,
+		groupID,
+		appID,
+		flagID,
+		isEnabled,
+		createdBy,
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	if groupFlag, err = pgx.CollectOneRow(
+		rows,
+		pgx.RowToStructByName[types.OrgGroupFeatureFlag],
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	return &groupFlag, nil
+}
+
+func (r *featureFlagRepo) GroupFlagsGetByFlagID(ctx context.Context,
+	orgID int64,
+	applicationID int64,
+	flagID int64,
+) ([]types.OrgGroupFeatureFlag, error) {
+	var (
+		groupFlags []types.OrgGroupFeatureFlag
+		rows       pgx.Rows
+		err        error
+	)
+
+	if rows, err = r.db.Query(ctx,
+		queries.OrgGroupFeatureFlagGetByFlagID,
+		orgID,
+		applicationID,
+		flagID,
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	if groupFlags, err = pgx.CollectRows(
+		rows,
+		pgx.RowToStructByName[types.OrgGroupFeatureFlag],
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	return groupFlags, nil
+}
+
+func (r *featureFlagRepo) GroupFlagGetOne(ctx context.Context,
+	orgID int64,
+	groupID int64,
+	applicationID int64,
+	flagID int64,
+) (*types.OrgGroupFeatureFlag, error) {
+	var (
+		groupFlag types.OrgGroupFeatureFlag
+		rows      pgx.Rows
+		err       error
+	)
+
+	if rows, err = r.db.Query(ctx,
+		queries.OrgGroupFeatureFlagGetOne,
+		orgID,
+		groupID,
+		applicationID,
+		flagID,
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	if groupFlag, err = pgx.CollectOneRow(
+		rows,
+		pgx.RowToStructByName[types.OrgGroupFeatureFlag],
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	return &groupFlag, nil
+}
+
+func (r *featureFlagRepo) GroupFlagUpdate(ctx context.Context,
+	orgID int64,
+	groupID int64,
+	appID int64,
+	flagID int64,
+	isEnabled bool,
+	modifiedBy int64,
+) (*types.OrgGroupFeatureFlag, error) {
+	var (
+		groupFlag types.OrgGroupFeatureFlag
+		rows      pgx.Rows
+		err       error
+	)
+
+	if rows, err = r.db.Query(ctx,
+		queries.OrgGroupFeatureFlagUpdate,
+		orgID,
+		groupID,
+		appID,
+		flagID,
+		isEnabled,
+		modifiedBy,
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	if groupFlag, err = pgx.CollectOneRow(
+		rows,
+		pgx.RowToStructByName[types.OrgGroupFeatureFlag],
+	); err != nil {
+		return nil, handleError(ctx, r.logger, err)
+	}
+
+	return &groupFlag, nil
+}
+
+func (r *featureFlagRepo) GroupFlagDelete(ctx context.Context,
+	orgID int64,
+	groupID int64,
+	appID int64,
+	flagID int64,
+) error {
+	row := r.db.QueryRow(ctx,
+		queries.OrgGroupFeatureFlagDelete,
+		orgID,
+		groupID,
+		appID,
+		flagID,
+	)
+
+	var numDeleted int64
+	if err := row.Scan(&numDeleted); err != nil {
+		return handleError(ctx, r.logger, err)
+	}
+
+	if numDeleted < 1 {
+		return types.ErrNotFound
+	}
+
+	if numDeleted > 1 {
+		return fmt.Errorf("expected to delete 1 row, deleted %v", numDeleted)
+	}
+
+	return nil
+}

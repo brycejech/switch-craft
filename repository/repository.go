@@ -94,6 +94,9 @@ func handleError(ctx context.Context, logger *types.Logger, err error) error {
 		if pgErr.Code == "23505" {
 			logger.Error(tracer, types.ErrItemExists.Error(), nil)
 			return types.ErrItemExists
+		} else if pgErr.Code == "23503" {
+			logger.Error(tracer, types.ErrLinkedItemNotFound.Error(), nil)
+			return types.ErrLinkedItemNotFound
 		}
 		bytes, _ := json.MarshalIndent(pgErr, "", "  ")
 		fmt.Println(string(bytes))

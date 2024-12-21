@@ -64,7 +64,10 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	router.HandleFunc("DELETE /org/{orgSlug}/group/{groupID}", authMiddleware(orgGroupController.Delete))
 
 	/* === ORG GROUP ACCOUNT ROUTES === */
-	router.HandleFunc("GET /org/{orgSlug}/group/{groupID}/account", authMiddleware(orgGroupController.AccountsGet))
+	router.HandleFunc(
+		"GET /org/{orgSlug}/group/{groupID}/account",
+		authMiddleware(orgGroupController.AccountsGet),
+	)
 	router.HandleFunc(
 		"PUT /org/{orgSlug}/group/{groupID}/account",
 		authMiddleware(orgGroupController.AccountsSet),
@@ -86,9 +89,38 @@ func addRoutes(logger *types.Logger, core *core.Core, router *http.ServeMux) {
 	router.HandleFunc("DELETE /org/{orgSlug}/app/{appSlug}", authMiddleware(appController.Delete))
 
 	/* === FEATURE FLAG ROUTES === */
-	router.HandleFunc("POST /org/{orgSlug}/app/{appSlug}/flag", authMiddleware(featFlagController.Create))
-	router.HandleFunc("GET /org/{orgSlug}/app/{appSlug}/flag", authMiddleware(featFlagController.GetMany))
-	router.HandleFunc("GET /org/{orgSlug}/app/{appSlug}/flag/{flagID}", authMiddleware(featFlagController.GetOne))
-	router.HandleFunc("PUT /org/{orgSlug}/app/{appSlug}/flag/{flagID}", authMiddleware(featFlagController.Update))
-	router.HandleFunc("DELETE /org/{orgSlug}/app/{appSlug}/flag/{flagID}", authMiddleware(featFlagController.Delete))
+	router.HandleFunc(
+		"POST /org/{orgSlug}/app/{appSlug}/flag",
+		authMiddleware(featFlagController.Create),
+	)
+	router.HandleFunc(
+		"GET /org/{orgSlug}/app/{appSlug}/flag",
+		authMiddleware(featFlagController.GetMany),
+	)
+	router.HandleFunc(
+		"GET /org/{orgSlug}/app/{appSlug}/flag/{flagID}",
+		authMiddleware(featFlagController.GetOne),
+	)
+	router.HandleFunc(
+		"PUT /org/{orgSlug}/app/{appSlug}/flag/{flagID}",
+		authMiddleware(featFlagController.Update),
+	)
+	router.HandleFunc(
+		"DELETE /org/{orgSlug}/app/{appSlug}/flag/{flagID}",
+		authMiddleware(featFlagController.Delete),
+	)
+
+	/* === ORG GROUP FLAG ROUTES === */
+	router.HandleFunc(
+		"PUT /org/{orgSlug}/app/{appSlug}/flag/{flagID}/group-flag/{groupID}",
+		authMiddleware(featFlagController.GroupFlagUpsert),
+	)
+	router.HandleFunc(
+		"GET /org/{orgSlug}/app/{appSlug}/flag/{flagID}/group-flag",
+		authMiddleware(featFlagController.GroupFlagGetMany),
+	)
+	router.HandleFunc(
+		"DELETE /org/{orgSlug}/app/{appSlug}/flag/{flagID}/group-flag/{groupID}",
+		authMiddleware(featFlagController.GroupFlagDelete),
+	)
 }
