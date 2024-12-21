@@ -18,6 +18,8 @@ func HandleCoreErr(w http.ResponseWriter, r *http.Request, err error) {
 		NotFound(w, r)
 	} else if errors.Is(err, types.ErrItemExists) {
 		BadRequest(w, r)
+	} else if errors.Is(err, types.ErrLinkedItemNotFound) {
+		BadRequest(w, r)
 	} else {
 		InternalServerError(w, r)
 	}

@@ -31,7 +31,9 @@ func (c *orgGroupController) AccountAdd(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	groupAccount, err := c.core.OrgGroupAccountAdd(r.Context(), c.core.NewOrgGroupAccountAddArgs(orgSlug, groupID, accountID))
+	groupAccount, err := c.core.OrgGroupAccountAdd(r.Context(),
+		c.core.NewOrgGroupAccountAddArgs(orgSlug, groupID, accountID),
+	)
 	if err != nil {
 		restutils.HandleCoreErr(w, r, err)
 		return

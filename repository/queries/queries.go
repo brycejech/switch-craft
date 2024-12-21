@@ -150,6 +150,25 @@ var FeatureFlagUpdate string
 //go:embed featureFlag/featureFlagDelete.sql
 var FeatureFlagDelete string
 
+/* -------------------------------------- */
+/* === ORG GROUP FEATURE FLAG QUERIES === */
+/* -------------------------------------- */
+
+//go:embed orgGroupFeatureFlag/orgGroupFeatureFlagCreate.sql
+var OrgGroupFeatureFlagCreate string
+
+//go:embed orgGroupFeatureFlag/orgGroupFeatureFlagGetByFlagID.sql
+var OrgGroupFeatureFlagGetByFlagID string
+
+//go:embed orgGroupFeatureFlag/orgGroupFeatureFlagGetOne.sql
+var OrgGroupFeatureFlagGetOne string
+
+//go:embed orgGroupFeatureFlag/orgGroupFeatureFlagUpdate.sql
+var OrgGroupFeatureFlagUpdate string
+
+//go:embed orgGroupFeatureFlag/orgGroupFeatureFlagDelete.sql
+var OrgGroupFeatureFlagDelete string
+
 /* ------------------------- */
 /* === MIGRATION QUERIES === */
 /* ------------------------- */
